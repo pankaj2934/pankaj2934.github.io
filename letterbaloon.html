@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Balloon Letter Pop</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Comic Sans MS', sans-serif;
+      background: skyblue;
+      text-align: center;
+    }
+
+    #target-letter {
+      font-size: 60px;
+      margin: 20px;
+      color: darkblue;
+      position: relative;
+      z-index: 100;
+    }
+
+    .balloon {
+      position: absolute;
+      width: 80px;
+      height: 100px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+      animation: floatUp 20s linear forwards; /* Slow down to 20 seconds */
+      transition: transform 0.2s;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-50vh); }
+      100% { transform: translateY(-100vh); }
+    }
+
+    #message {
+      font-size: 48px;
+      color: green;
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      display: none;
+      z-index: 200;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="target-letter">Pop: A</div>
+  <div id="message">🎉 Great Job! 🎉</div>
+
+  <script>
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const colors = ['#ff6b6b', '#6bc5ff', '#ffd93b', '#9cff57', '#e18fff', '#ffa07a'];
+    let targetLetter = '';
+    let balloonInterval;
+
+    function getRandomLetter() {
+      return letters[Math.floor(Math.random() * letters.length)];
+    }
+
+    function getRandomColor() {
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function createBalloon(letter) {
+      const balloon = document.createElement('div');
+      balloon.className = 'balloon';
+      balloon.style.left = Math.floor(Math.random() * (window.innerWidth - 80)) + 'px';
+      balloon.style.bottom = '-120px';
+      balloon.style.backgroundColor = getRandomColor();
+      balloon.textContent = letter;
+      balloon.setAttribute('data-letter', letter);
+      document.body.appendChild(balloon);
+
+      balloon.addEventListener('click', () => {
+        if (letter === targetLetter) {
+          showSuccess();
+        } else {
+          balloon.style.backgroundColor = '#888'; // Incorrect
+        }
+      });
+
+      setTimeout(() => {
+        if (balloon && balloon.parentNode) balloon.remove();
+      }, 20000); // Matches 20s animation
+    }
+
+    function showSuccess() {
+      document.getElementById('message').style.display = 'block';
+      clearInterval(balloonInterval);
+      removeAllBalloons();
+
+      setTimeout(() => {
+        document.getElementById('message').style.display = 'none';
+        startGame(); // Start new round
+      }, 2000);
+    }
+
+    function removeAllBalloons() {
+      document.querySelectorAll('.balloon').forEach(b => b.remove());
+    }
+
+    function startGame() {
+      removeAllBalloons();
+
+      // New target
+      targetLetter = getRandomLetter();
+      document.getElementById('target-letter').textContent = 'Pop: ' + targetLetter;
+
+      // Generate balloons continuously
+      balloonInterval = setInterval(() => {
+        const total = Math.floor(Math.random() * 3) + 3;
+        const correctIndex = Math.floor(Math.random() * total);
+        for (let i = 0; i < total; i++) {
+          const letter = i === correctIndex ? targetLetter : getRandomLetter();
+          createBalloon(letter);
+        }
+      }, 2000); // Every 2 seconds
+    }
+
+    // Start first round
+    startGame();
+  </script>
+
+</body>
+</html>

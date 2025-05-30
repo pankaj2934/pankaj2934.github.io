@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>More Means Greater - Count & Compare</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', sans-serif;
+      text-align: center;
+      background-color: #f0f8ff;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 80px;
+      margin-top: 40px;
+    }
+
+    .group {
+      font-size: 40px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 200px;
+      min-height: 100px;
+      border: 3px solid #ccc;
+      border-radius: 15px;
+      background-color: #fffbe7;
+      padding: 20px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      position: relative;
+    }
+
+    .group:hover {
+      transform: scale(1.05);
+    }
+
+    .count-label {
+      position: absolute;
+      bottom: 5px;
+      right: 10px;
+      font-size: 18px;
+      color: #555;
+    }
+
+    .feedback {
+      font-size: 28px;
+      margin-top: 30px;
+      height: 40px;
+    }
+
+    .highlight-correct {
+      color: green;
+      font-weight: bold;
+    }
+
+    .highlight-wrong {
+      color: red;
+      font-weight: bold;
+    }
+
+    .footer-note {
+      font-size: 16px;
+      margin-top: 40px;
+      color: #666;
+    }
+
+    .question-section {
+      margin-top: 30px;
+      display: none;
+    }
+
+    .symbol-buttons button {
+      font-size: 32px;
+      margin: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    .number-large {
+      font-size: 48px;
+      margin: 10px;
+    }
+
+    .symbol-compare-box {
+      font-size: 48px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍎 Count & Compare Game</h1>
+  <p><strong>Click the group with more apples</strong></p>
+
+  <div class="container">
+    <div class="group" id="leftGroup" onclick="checkAnswer('left')">
+      <div class="count-label" id="leftCountLabel"></div>
+    </div>
+    <div class="group" id="rightGroup" onclick="checkAnswer('right')">
+      <div class="count-label" id="rightCountLabel"></div>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedback"></div>
+
+  <div class="question-section" id="numberCompare">
+    <p>Which number is greater?</p>
+    <div>
+      <span class="number-large" id="greaterLeft" onclick="chooseGreater('left')" style="cursor: pointer; border: 2px solid #ccc; padding: 10px; border-radius: 10px; margin: 10px;"></span>
+      <span class="number-large" id="greaterRight" onclick="chooseGreater('right')" style="cursor: pointer; border: 2px solid #ccc; padding: 10px; border-radius: 10px; margin: 10px;"></span>
+    </div>
+  </div>
+
+  <div class="question-section" id="symbolCompare">
+    <p>Select the correct symbol to go between:</p>
+    <div class="symbol-compare-box">
+      <span id="leftNumBox"></span>
+      <span style="padding: 0 20px; border: 2px dashed #aaa; min-width: 50px; display: inline-block;">?</span>
+      <span id="rightNumBox"></span>
+    </div>
+    <div class="symbol-buttons">
+      <button onclick="checkSymbol('<')">&lt;</button>
+      <button onclick="checkSymbol('=')">=</button>
+      <button onclick="checkSymbol('>')">&gt;</button>
+    </div>
+  </div>
+
+  <div class="footer-note">More apples = Greater number 🍎</div>
+
+  <script>
+    let leftCount = 0;
+    let rightCount = 0;
+    let selectedGreater = '';
+
+    function generateGroups() {
+      leftCount = Math.floor(Math.random() * 5) + 1;
+      rightCount = Math.floor(Math.random() * 5) + 1;
+      if (leftCount === rightCount) rightCount += 1;
+
+      const leftGroup = document.getElementById("leftGroup");
+      const rightGroup = document.getElementById("rightGroup");
+      const leftLabel = document.getElementById("leftCountLabel");
+      const rightLabel = document.getElementById("rightCountLabel");
+
+      leftGroup.innerHTML = "";
+      rightGroup.innerHTML = "";
+      leftLabel.innerHTML = `${leftCount}`;
+      rightLabel.innerHTML = `${rightCount}`;
+      leftGroup.appendChild(leftLabel);
+      rightGroup.appendChild(rightLabel);
+
+      for (let i = 0; i < leftCount; i++) leftGroup.innerHTML += "🍎";
+      for (let i = 0; i < rightCount; i++) rightGroup.innerHTML += "🍎";
+
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("numberCompare").style.display = 'none';
+      document.getElementById("symbolCompare").style.display = 'none';
+    }
+
+    function checkAnswer(selected) {
+      const isCorrect = (selected === 'left' && leftCount > rightCount) ||
+                        (selected === 'right' && rightCount > leftCount);
+      const feedback = document.getElementById("feedback");
+
+      if (isCorrect) {
+        feedback.textContent = "✅ Correct! More means greater!";
+        feedback.className = "feedback highlight-correct";
+        document.getElementById("greaterLeft").textContent = leftCount;
+        document.getElementById("greaterRight").textContent = rightCount;
+        document.getElementById("numberCompare").style.display = 'block';
+      } else {
+        feedback.textContent = "❌ Try again. Count the apples.";
+        feedback.className = "feedback highlight-wrong";
+      }
+    }
+
+    function chooseGreater(selected) {
+      const isCorrect = (selected === 'left' && leftCount > rightCount) ||
+                        (selected === 'right' && rightCount > leftCount);
+      if (isCorrect) {
+        selectedGreater = selected;
+        document.getElementById("feedback").textContent = "✅ Great! Now choose the correct symbol.";
+        document.getElementById("feedback").className = "feedback highlight-correct";
+        document.getElementById("leftNumBox").textContent = leftCount;
+        document.getElementById("rightNumBox").textContent = rightCount;
+        document.getElementById("symbolCompare").style.display = 'block';
+      } else {
+        document.getElementById("feedback").textContent = "❌ Oops! Try again.";
+        document.getElementById("feedback").className = "feedback highlight-wrong";
+      }
+    }
+
+    function checkSymbol(symbol) {
+      let correct;
+      if (leftCount > rightCount) correct = '>';
+      else if (leftCount < rightCount) correct = '<';
+      else correct = '=';
+
+      const selectedVal = `${leftCount} ${symbol} ${rightCount}`;
+
+      if (symbol === correct) {
+        document.getElementById("feedback").textContent = `🎉 ${selectedVal} is correct!`;
+        document.getElementById("feedback").className = "feedback highlight-correct";
+        setTimeout(generateGroups, 3000);
+      } else {
+        document.getElementById("feedback").textContent = `❌ ${selectedVal} is incorrect. Try again!`;
+        document.getElementById("feedback").className = "feedback highlight-wrong";
+      }
+    }
+
+    generateGroups();
+  </script>
+</body>
+</html>

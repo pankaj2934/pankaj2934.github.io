@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Multiplication Practice</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      text-align: center;
+      background-color: #f2f2f2;
+    }
+
+    h2 {
+      margin-bottom: 30px;
+    }
+
+    .series {
+      margin-bottom: 20px;
+    }
+
+    .box, input {
+      width: 60px;
+      height: 40px;
+      margin: 5px;
+      font-size: 20px;
+      text-align: center;
+    }
+
+    .box {
+      display: inline-block;
+      background-color: #e0f7fa;
+      border: 1px solid #bbb;
+      line-height: 40px;
+    }
+
+    input.correct {
+      border: 2px solid green;
+      background-color: #eaffea;
+    }
+
+    input.incorrect {
+      border: 2px solid red;
+      background-color: #ffeaea;
+    }
+
+    .message {
+      font-size: 24px;
+      color: green;
+      margin-top: 15px;
+      display: none;
+    }
+
+    #nextBtn {
+      display: none;
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Fill in the last 3 numbers of the multiplication series</h2>
+<div class="series" id="series-container"></div>
+<div class="message" id="message">Great job!</div>
+<button id="nextBtn" onclick="generateSeries()">Next</button>
+
+<script>
+  const container = document.getElementById('series-container');
+  const message = document.getElementById('message');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function generateSeries() {
+    container.innerHTML = '';
+    message.style.display = 'none';
+    nextBtn.style.display = 'none';
+
+    const table = Math.floor(Math.random() * 10) + 2; // Table 2–11
+    const start = Math.floor(Math.random() * 6) + 1;  // Start multiplier: 1–6
+    const seriesLength = 6;
+    const end = start + seriesLength - 1;
+
+    for (let i = start; i <= end; i++) {
+      const product = i * table;
+
+      if (i < start + 3) {
+        const box = document.createElement('div');
+        box.className = 'box';
+        box.textContent = product;
+        container.appendChild(box);
+      } else {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'text');
+        input.setAttribute('maxlength', '3');
+        input.setAttribute('data-answer', product);
+        input.addEventListener('input', handleInput);
+        container.appendChild(input);
+      }
+    }
+  }
+
+  function handleInput(e) {
+    const input = e.target;
+    const expected = parseInt(input.getAttribute('data-answer'));
+    const value = parseInt(input.value);
+
+    if (!isNaN(value)) {
+      if (value === expected) {
+        input.classList.remove('incorrect');
+        input.classList.add('correct');
+        input.disabled = true;
+
+        // Move focus to next box
+        const next = Array.from(document.querySelectorAll('input:not([disabled])'))[0];
+        if (next) {
+          next.focus();
+        } else {
+          message.style.display = 'block';
+          nextBtn.style.display = 'inline-block';
+        }
+      } else {
+        input.classList.remove('correct');
+        input.classList.add('incorrect');
+      }
+    } else {
+      input.classList.remove('correct', 'incorrect');
+    }
+  }
+
+  // Load initial series on page load
+  generateSeries();
+</script>
+
+</body>
+</html>

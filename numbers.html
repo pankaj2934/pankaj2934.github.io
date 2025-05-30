@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Multiplication Balloon Pop Game</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #cceeff;
+    font-family: Arial, sans-serif;
+    touch-action: manipulation;
+  }
+  .balloon {
+    position: absolute;
+    border-radius: 50%;
+    width: 80px; /* Increased size for better touch targets */
+    height: 100px;
+    text-align: center;
+    line-height: 100px;
+    font-size: 36px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .balloon:hover {
+    transform: scale(1.1);
+  }
+  #problem {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    font-size: 24px;
+    z-index: 1000;
+    width: 80%;
+    max-width: 300px;
+    text-align: center;
+  }
+  #score {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    font-size: 20px;
+  }
+  #feedback {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    color: #333;
+    opacity: 0;
+    transition: opacity 0.3s;
+    text-align: center;
+    width: 80%;
+    max-width: 300px;
+  }
+  #tableSelector {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    text-align: center;
+    z-index: 2000;
+    width: 90%;
+    max-width: 400px;
+  }
+  #tableSelector h2 {
+    margin-top: 0;
+    color: #333;
+    font-size: 24px;
+  }
+  .table-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Changed to 3 columns for mobile */
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .table-btn {
+    padding: 15px 20px;
+    font-size: 24px;
+    border: none;
+    border-radius: 10px;
+    background-color: #66ccff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .table-btn:hover {
+    background-color: #3399ff;
+  }
+  .game-container {
+    display: none;
+  }
+
+  /* Media queries for different screen sizes */
+  @media (min-width: 768px) {
+    .table-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+    .balloon {
+      width: 60px;
+      height: 80px;
+      line-height: 80px;
+      font-size: 30px;
+    }
+    #problem {
+      width: auto;
+      max-width: none;
+    }
+    #feedback {
+      width: auto;
+      max-width: none;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="tableSelector">
+  <h2>Select Multiplication Table</h2>
+  <div class="table-grid">
+    <button class="table-btn" onclick="startGame(2)">2×</button>
+    <button class="table-btn" onclick="startGame(3)">3×</button>
+    <button class="table-btn" onclick="startGame(4)">4×</button>
+    <button class="table-btn" onclick="startGame(5)">5×</button>
+    <button class="table-btn" onclick="startGame(6)">6×</button>
+    <button class="table-btn" onclick="startGame(7)">7×</button>
+    <button class="table-btn" onclick="startGame(8)">8×</button>
+    <button class="table-btn" onclick="startGame(9)">9×</button>
+    <button class="table-btn" onclick="startGame(10)">10×</button>
+  </div>
+</div>
+
+<div class="game-container">
+  <div id="problem"></div>
+  <div id="score">Score: 0</div>
+  <div id="feedback"></div>
+</div>
+
+<script>
+let score = 0;
+let currentProblem = {};
+let selectedTable = 0;
+let gameInterval;
+
+// Generate random color
+function getRandomColor() {
+    const colors = ["#ff6666", "#ffcc66", "#66ff66", "#66ccff", "#cc66ff", "#ff66cc"];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+// Start game with selected table
+function startGame(table) {
+    selectedTable = table;
+    document.getElementById('tableSelector').style.display = 'none';
+    document.querySelector('.game-container').style.display = 'block';
+    score = 0;
+    document.getElementById('score').textContent = `Score: ${score}`;
+    generateProblem();
+    gameInterval = setInterval(createBalloon, 1500);
+}
+
+// Generate multiplication problem
+function generateProblem() {
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    const answer = selectedTable * num2;
+    currentProblem = { num1: selectedTable, num2, answer };
+    document.getElementById('problem').textContent = `${selectedTable} × ${num2} = ?`;
+}
+
+// Show feedback message
+function showFeedback(message, isCorrect) {
+    const feedback = document.getElementById('feedback');
+    feedback.textContent = message;
+    feedback.style.color = isCorrect ? '#2ecc71' : '#e74c3c';
+    feedback.style.opacity = 1;
+    setTimeout(() => {
+        feedback.style.opacity = 0;
+    }, 1000);
+}
+
+// Create a balloon
+function createBalloon() {
+    const balloon = document.createElement("div");
+    balloon.className = "balloon";
+    balloon.style.backgroundColor = getRandomColor();
+    
+    // Generate a number that's either the correct answer or a close number
+    let number;
+    if (Math.random() < 0.3) { // 30% chance of correct answer
+        number = currentProblem.answer;
+    } else {
+        // Generate a number within ±5 of the correct answer
+        const offset = Math.floor(Math.random() * 11) - 5;
+        number = Math.max(1, currentProblem.answer + offset);
+    }
+    
+    balloon.innerText = number;
+
+    // Set random start position
+    balloon.style.left = Math.random() * (window.innerWidth - 80) + "px";
+    balloon.style.top = window.innerHeight + "px";
+
+    document.body.appendChild(balloon);
+
+    let speed = Math.random() * 1 + 0.5;
+
+    function moveUp() {
+        let top = parseFloat(balloon.style.top);
+        if (top < -100) {
+            balloon.remove();
+        } else {
+            balloon.style.top = (top - speed) + "px";
+            requestAnimationFrame(moveUp);
+        }
+    }
+
+    // Handle both click and touch events
+    balloon.addEventListener("click", handleBalloonClick);
+    balloon.addEventListener("touchstart", handleBalloonClick, { passive: true });
+
+    function handleBalloonClick(event) {
+        event.preventDefault(); // Prevent default touch behavior
+        const selectedNumber = parseInt(balloon.innerText);
+        if (selectedNumber === currentProblem.answer) {
+            score += 10;
+            showFeedback("Correct! +10 points", true);
+            generateProblem(); // Generate new problem after correct answer
+        } else {
+            score = Math.max(0, score - 5);
+            showFeedback("Try again! -5 points", false);
+        }
+        document.getElementById('score').textContent = `Score: ${score}`;
+        balloon.remove();
+    }
+
+    moveUp();
+}
+</script>
+</body>
+</html>
