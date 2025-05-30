@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vault-injected-pktest
+  labels:
+    app: vault-injected-pktest
+  annotations:
+    vault.hashicorp.com/agent-inject: "true"
+    vault.hashicorp.com/role: "170600-secure-notes-tekton-pipeline-role"
+    vault.hashicorp.com/agent-inject-token: "true"
+
+    # All keys from Vault path written to one file
+    vault.hashicorp.com/agent-inject-secret-pktest.env: "kv2secret/data/170600/secure-notes/pktest"
+    vault.hashicorp.com/agent-inject-template-pktest.env: |
+      {{- with secret "kv2secret/data/170600/secure-notes/pktest" -}}
+      {{- range $key, $value := .Data.data }}
+      {{ $key }}={{ $value }}
+      {{- end }}
+      {{- end }}
+
+    vault.hashicorp.com/vault-addr: "https://dev-hcvault.nam.nsroot.net:8200"
+    vault.hashicorp.com/tls-skip-verify: "true"
+spec:
+  serviceAccountName: default
+  containers:
+  - name: oc-cli
+    image: artifactgeo.citigroup.net/docker-gcs-infra-local/redhat/openshift4:4.16.17-x86_64-cli
+    command: ["sleep", "infinity"]
+    volumeMounts:
+    - name: vault-secrets
+      mountPath: /vault/secrets
+      readOnly: true
+  volumes:
+  - name: vault-secrets
+    emptyDir: {}
