@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Greater or Smaller Quiz</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', sans-serif;
+      background-color: #f2faff;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      color: #333;
+    }
+    .number-box {
+      font-size: 60px;
+      margin: 30px;
+    }
+    .button-container button {
+      font-size: 40px;
+      margin: 10px;
+      padding: 10px 30px;
+      cursor: pointer;
+      border-radius: 12px;
+      border: 2px solid #aaa;
+    }
+    .feedback {
+      font-size: 28px;
+      margin-top: 20px;
+      height: 40px;
+    }
+    .config {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔢 Greater or Smaller?</h1>
+
+  <div class="config">
+    Max Number: <input type="number" id="maxRange" value="200" min="1" style="font-size: 20px; width: 80px;">
+    <button onclick="startQuiz()">Start</button>
+  </div>
+
+  <div id="quiz" style="display: none;">
+    <div class="number-box">
+      <span id="num1" style="border: 2px solid #ccc; padding: 20px 40px; border-radius: 10px; background: #fff;">0</span>
+      <span> ? </span>
+      <span id="num2" style="border: 2px solid #ccc; padding: 20px 40px; border-radius: 10px; background: #fff;">0</span>
+    </div>
+    <div class="button-container">
+      <button onclick="checkAnswer('<')">&lt;</button>
+      <button onclick="checkAnswer('=')">=</button>
+      <button onclick="checkAnswer('>')">&gt;</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <script>
+    let num1 = 0, num2 = 0, max = 200;
+
+    function startQuiz() {
+      max = parseInt(document.getElementById("maxRange").value) || 200;
+      document.getElementById("quiz").style.display = 'block';
+      generateNumbers();
+    }
+
+    function generateNumbers() {
+      num1 = Math.floor(Math.random() * (max + 1));
+      num2 = Math.floor(Math.random() * (max + 1));
+      document.getElementById("num1").textContent = num1;
+      document.getElementById("num2").textContent = num2;
+      document.getElementById("feedback").textContent = "";
+    }
+
+    function checkAnswer(symbol) {
+      let correct;
+      if (num1 < num2) correct = '<';
+      else if (num1 > num2) correct = '>';
+      else correct = '=';
+
+      const feedback = document.getElementById("feedback");
+      if (symbol === correct) {
+        feedback.textContent = "✅ Correct!";
+        feedback.style.color = "green";
+        setTimeout(generateNumbers, 1500);
+      } else {
+        feedback.textContent = "❌ Try again.";
+        feedback.style.color = "red";
+      }
+    }
+  </script>
+</body>
+</html>
