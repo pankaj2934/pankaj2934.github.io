@@ -137,7 +137,6 @@
     }
     .blank.filled{border-bottom-color:transparent}
 
-    /* Result */
     #resultCard{
       margin-top:10px;
       display:none;
@@ -257,7 +256,6 @@
       text-align:center;
     }
 
-    /* Flying letter */
     .flyLetter{
       position:absolute;
       width:56px;height:56px;border-radius:16px;
@@ -282,7 +280,6 @@
       100%{transform:translate(0,0)}
     }
 
-    /* Error overlay (for blank page debugging) */
     #errorOverlay{
       position:absolute;inset:0;z-index:999;
       display:none;place-items:center;
@@ -406,17 +403,13 @@
           clearTimeout(showToast._t);
           showToast._t = setTimeout(() => (toastEl.style.display = "none"), ms);
         }
+        function capWord(w){ return w ? (w[0].toUpperCase() + w.slice(1)) : w; }
+        function spellOut(word) { return word.toUpperCase().split("").join(" - "); }
 
-        function capWord(w){
-          return w ? (w[0].toUpperCase() + w.slice(1)) : w;
-        }
         function articleFor(word) {
           const w = word.toLowerCase();
           const vowels = ["a","e","i","o","u"];
-          return vowels.includes(w[0]) ? "An" : "A";
-        }
-        function spellOut(word) {
-          return word.toUpperCase().split("").join(" - ");
+          return vowels.includes(w[0]) ? "an" : "a";
         }
 
         // ----------------------------
@@ -493,7 +486,6 @@
           "Z": ["zebra","zucchini","zipper","zoo","zookeeper","zeppelin","zigzag","zodiac","zero","zenith","zircon","zinnia","zest","zombie","zone","zoom","zither","zebu","zirconium","zwitterion"]
         };
 
-        // Matching meanings (same order)
         const MEANINGS_BY_LETTER = {
           "A": ["a sweet round fruit","a small insect that lives in groups","a large reptile with sharp teeth","a flying vehicle with wings","a person who travels in space","a heavy object that holds a boat still","a nut from an oak tree","a tank where fish and sea animals live","a cloth you wear to protect clothes while cooking","a vehicle that takes sick people to the hospital","a person who makes art","a pointed weapon or sign that shows direction","a book of maps","natural lights that shine in the night sky","a rocky object that orbits the sun","the season after summer","the set of letters used to write","a fast slide of snow down a mountain","a space just under the roof of a house","a small water animal that can grow back parts"],
           "B": ["a long yellow fruit","a large furry animal","an insect that can make honey","an animal that builds dams","an insect with colorful wings","a rubbery bag filled with air","a two-wheeled vehicle you pedal","a set of pages you read","a structure that crosses over water or roads","a container used to carry things","a round ball of air or soap","a small fastener you push to close clothes","a bag you carry on your back","a place where bread and cakes are made","a sport played with a bat and ball","a sandy place by the ocean or lake","a home made of wax for bees","tools to see faraway things","a soft cover used to keep warm","a green vegetable shaped like small trees"],
@@ -536,27 +528,176 @@
           }
         }
 
-        const NO_ARTICLE_WORDS = new Set([
-          "sun","earth","oxygen","energy","electricity","gravity","justice","knowledge","homework",
-          "oatmeal","icecream","nature","recycling","sunshine","moonlight","universe","yoga",
-          "nightfall","northstar","industry","odyssey","orbit","uppercase"
-        ]);
+        // ----------------------------
+        // SMART, MEANINGFUL SENTENCES (NOT definitions)
+        // ----------------------------
+        const SENTENCE_TEMPLATES = {
+          animal: [
+            w => `We saw ${articleFor(w)} ${w} at the zoo.`,
+            w => `The ${w} moved quietly and looked around.`,
+            w => `I learned about the ${w} in a nature book.`,
+            w => `The ${w} used its body to stay safe.`
+          ],
+          bird: [
+            w => `A ${w} flew across the sky near our house.`,
+            w => `We listened as the ${w} made sounds outside.`,
+            w => `The ${w} looked for food in the yard.`
+          ],
+          insect: [
+            w => `A ${w} crawled on a leaf and then flew away.`,
+            w => `We watched the ${w} carefully without touching it.`,
+            w => `The ${w} helped nature in its own way.`
+          ],
+          fish_sea: [
+            w => `We spotted a ${w} swimming in the water.`,
+            w => `The ${w} moved smoothly through the waves.`,
+            w => `At the aquarium, the ${w} was my favorite.`
+          ],
+          fruit: [
+            w => `I ate ${articleFor(w)} ${w} with my snack.`,
+            w => `We cut the ${w} and shared it at home.`,
+            w => `The ${w} tasted fresh and sweet.`
+          ],
+          vegetable: [
+            w => `We added the ${w} to dinner to make it healthy.`,
+            w => `I tried the ${w} even though it was new to me.`,
+            w => `The ${w} was crunchy when I took a bite.`
+          ],
+          food: [
+            w => `I had ${articleFor(w)} ${w} after school.`,
+            w => `We made ${w} together in the kitchen.`,
+            w => `The ${w} smelled delicious.`
+          ],
+          place: [
+            w => `We visited the ${w} and learned something new.`,
+            w => `I want to go to the ${w} again someday.`,
+            w => `The ${w} was busy and exciting.`
+          ],
+          tool: [
+            (w, purpose) => purpose ? `I used the ${w} to ${purpose}.` : `I used the ${w} carefully to help me.`,
+            (w, purpose) => purpose ? `The ${w} helped me ${purpose}.` : `The ${w} helped me do my task.`,
+          ],
+          vehicle: [
+            w => `The ${w} took us to our destination safely.`,
+            w => `I watched the ${w} move fast and smooth.`,
+            w => `We climbed into the ${w} and got ready to go.`
+          ],
+          person: [
+            w => `The ${w} helped us when we needed it.`,
+            w => `I asked the ${w} a question, and they answered kindly.`,
+            w => `The ${w} did their job very well.`
+          ],
+          clothing: [
+            w => `I wore my ${w} because it was comfortable.`,
+            w => `My ${w} kept me ready for the day.`,
+            w => `I put on the ${w} before we went outside.`
+          ],
+          object: [
+            w => `I picked up the ${w} and used it right away.`,
+            w => `The ${w} was on the table in front of me.`,
+            w => `I put the ${w} back where it belongs.`
+          ],
+          concept: [
+            w => `We talked about ${w} in class today.`,
+            w => `${capWord(w)} is important when we learn and grow.`,
+            w => `I practiced ${w} by making a good choice.`
+          ],
+          weather: [
+            w => `We stayed inside because the ${w} was strong.`,
+            w => `The ${w} changed what we did that day.`,
+            w => `After the ${w}, everything felt calmer.`
+          ],
+          science: [
+            w => `In science class, we learned what ${w} means.`,
+            w => `We saw the word ${w} in a science book.`,
+            w => `The teacher explained ${w} with an example.`
+          ],
+          time: [
+            w => `I checked the time and waited one ${w}.`,
+            w => `In one ${w}, a lot can happen.`,
+            w => `We used a ${w} to plan our day.`
+          ],
+          default: [
+            w => `I used the word ${w} in a sentence today.`,
+            w => `I can spell ${w} and say it clearly.`,
+            w => `I learned something new about ${w}.`
+          ]
+        };
 
-        function buildSentence(word, meaning){
+        function pick(arr){ return arr[randInt(0, arr.length - 1)]; }
+
+        function extractPurpose(meaning){
+          // If meaning contains "to ____", use that as a natural action phrase.
+          // Example: "a tool you climb to reach high places" -> "reach high places"
+          const m = String(meaning || "").toLowerCase();
+          const idx = m.lastIndexOf(" to ");
+          if (idx === -1) return "";
+          let after = m.slice(idx + 4).trim();
+          after = after.replace(/\.$/,"");
+          // Keep it short for kids
+          if (after.length > 50) after = after.slice(0, 50).trim();
+          return after;
+        }
+
+        function categoryFor(word, meaning){
           const w = word.toLowerCase();
-          const m = meaning.trim();
-          const ml = m.toLowerCase();
+          const m = String(meaning || "").toLowerCase();
 
-          // plural-style words
-          const isPlural = (w.endsWith("s") && !w.endsWith("ss")) || w === "binoculars";
-          if (isPlural) return `${capWord(word)} are ${m}.`;
+          // animals / birds / insects / sea
+          if (m.includes("bird")) return "bird";
+          if (m.includes("insect") || w === "bee" || w === "ant" || w === "butterfly") return "insect";
+          if (m.includes("sea animal") || m.includes("ocean animal") || w === "octopus" || w === "jellyfish") return "fish_sea";
+          if (m.includes("animal") || m.includes("reptile") || m.includes("pet") || m.includes("wild cat")) return "animal";
 
-          // no-article rules
-          if (NO_ARTICLE_WORDS.has(w) || ml.startsWith("the ") || ml.startsWith("everything ") || ml.startsWith("under ") || ml.startsWith("paper ") || ml.startsWith("moving ")) {
-            return `${capWord(word)} is ${m}.`;
+          // food
+          if (m.includes("fruit")) return "fruit";
+          if (m.includes("vegetable") || w === "broccoli" || w === "zucchini") return "vegetable";
+          if (m.includes("snack") || m.includes("dessert") || m.includes("treat") || m.includes("breakfast") || m.includes("food")) return "food";
+
+          // people
+          if (m.startsWith("a person") || m.includes("a person who")) return "person";
+
+          // vehicles
+          if (m.includes("vehicle") || m.includes("boat") || m.includes("airplane") || m.includes("flying vehicle")) return "vehicle";
+
+          // tools
+          if (m.includes("a tool") || m.includes("tool") || m.includes("device") || m.includes("machine")) return "tool";
+
+          // places
+          if (m.includes("a place") || m.includes("building") || m.includes("store") || m.includes("library") || m.includes("museum") || m.includes("zoo")) return "place";
+
+          // clothing
+          if (m.includes("clothing") || m.includes("clothes") || m.includes("sweater") || m.includes("suit you wear") || m.includes("you wear")) return "clothing";
+
+          // weather/nature events
+          if (m.includes("storm") || m.includes("rain") || m.includes("snow") || m.includes("wind") || m.includes("earthquake") || m.includes("tornado") || m.includes("hurricane")) return "weather";
+
+          // time
+          if (m.includes("seconds") || m.includes("time") || w === "yesterday") return "time";
+
+          // science words
+          if (m.includes("gas") || m.includes("metal") || m.includes("chemical") || m.includes("molecule") || m.includes("element")) return "science";
+
+          // concepts
+          if (m.includes("winning") || m.includes("success") || m.includes("important") || m.includes("information") || m.includes("fair") || w === "justice" || w === "knowledge") return "concept";
+
+          // default object
+          return "object";
+        }
+
+        function buildMeaningfulSentence(word, meaning){
+          const cat = categoryFor(word, meaning);
+          const purpose = extractPurpose(meaning);
+
+          if (cat === "tool") {
+            const tpl = pick(SENTENCE_TEMPLATES.tool);
+            return tpl(word, purpose);
           }
 
-          return `${articleFor(word)} ${word} is ${m}.`;
+          const list = SENTENCE_TEMPLATES[cat] || SENTENCE_TEMPLATES.default;
+          const tpl = pick(list);
+          // Some templates accept (w, purpose) but most accept (w)
+          return tpl.length >= 2 ? tpl(word, purpose) : tpl(word);
         }
 
         // ----------------------------
@@ -665,7 +806,6 @@
 
           fly.style.left = (startX - 28) + "px";
           fly.style.top  = (startY - 28) + "px";
-          fly.style.transform = "translate(0px,0px) scale(1)";
 
           document.body.appendChild(fly);
 
@@ -687,8 +827,8 @@
 
         function showResult(ok){
           const w = current.word;
-          const meaning = meaningMap.get(w) || "a word with a meaning";
-          const sentence = buildSentence(w, meaning);
+          const meaning = meaningMap.get(w) || "something you can learn about";
+          const sentence = buildMeaningfulSentence(w, meaning);
 
           resultCard.style.display = "block";
           nextBtn.style.display = "inline-block";
