@@ -4,23 +4,24 @@
   <meta charset="UTF-8" />
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
   />
   <title>Missing Letter Cannon Game</title>
+
   <style>
     :root {
       --bg: #cfefff;
       --panel: rgba(255,255,255,0.92);
       --ink: #16324a;
       --accent: #2b7cff;
-      --good: #21b66f;
-      --bad: #ff4d4d;
       --shadow: 0 10px 25px rgba(0,0,0,0.12);
+      --vh: 1vh; /* updated by JS for iPhone Safari */
     }
 
     * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
     body {
-      margin: 0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background: var(--bg);
       color: var(--ink);
@@ -29,33 +30,43 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Layout */
+    /* Real viewport height fix (especially iPhone Safari) */
     #game {
       position: relative;
       width: 100vw;
-      height: 100vh;
+      height: calc(var(--vh) * 100);
+      display: flex;
+      flex-direction: column;
       overflow: hidden;
     }
 
-    #topBar {
+    /* Fireworks canvas behind everything */
+    #fxCanvas {
       position: absolute;
-      left: 50%;
-      top: 12px;
-      transform: translateX(-50%);
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Top bar (safe area aware) */
+    #topBar {
+      z-index: 5;
+      margin: calc(10px + env(safe-area-inset-top)) auto 8px;
+      width: min(94vw, 760px);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      border-radius: 16px;
+      padding: 10px 12px;
       display: flex;
       gap: 10px;
       align-items: center;
-      padding: 10px 12px;
-      border-radius: 16px;
-      background: var(--panel);
-      box-shadow: var(--shadow);
-      z-index: 10;
-      max-width: min(92vw, 700px);
-      width: fit-content;
+      flex-wrap: wrap;
+      justify-content: center;
+      border: 1px solid rgba(0,0,0,0.06);
     }
 
     #badge {
-      font-weight: 800;
+      font-weight: 900;
       padding: 6px 10px;
       border-radius: 999px;
       background: #eaf3ff;
@@ -66,7 +77,7 @@
     }
 
     #score {
-      font-weight: 800;
+      font-weight: 900;
       padding: 6px 10px;
       border-radius: 999px;
       background: #eafff4;
@@ -76,140 +87,114 @@
       white-space: nowrap;
     }
 
-    #hint {
-      font-size: 14px;
-      opacity: 0.9;
-    }
+    #hint { font-size: 14px; opacity: 0.9; }
 
+    /* Main word area grows/shrinks */
     #wordArea {
-      position: absolute;
-      top: 90px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: min(92vw, 800px);
-      height: 44vh;
+      z-index: 4;
+      flex: 1;
       display: grid;
       place-items: center;
-      z-index: 5;
+      padding: 8px 10px;
+      min-height: 0; /* important for iOS flex */
     }
 
-    /* Floating word card */
     #wordCard {
-      position: relative;
-      padding: 22px 18px;
-      border-radius: 22px;
       background: var(--panel);
       box-shadow: var(--shadow);
+      border-radius: 22px;
       border: 1px solid rgba(0,0,0,0.06);
-      max-width: 92vw;
+      padding: 18px 14px;
       text-align: center;
+      max-width: min(94vw, 820px);
 
-      /* subtle float */
+      /* subtle float (small so it does not clip) */
       animation: floaty 2.2s ease-in-out infinite;
     }
 
     @keyframes floaty {
-      0%   { transform: translate(0px, 0px) rotate(-0.6deg); }
-      50%  { transform: translate(8px, -6px) rotate(0.6deg); }
-      100% { transform: translate(0px, 0px) rotate(-0.6deg); }
+      0%   { transform: translate(0px, 0px); }
+      50%  { transform: translate(6px, -5px); }
+      100% { transform: translate(0px, 0px); }
     }
 
     #word {
-      font-size: clamp(38px, 7vw, 72px);
-      font-weight: 900;
+      font-size: clamp(34px, 8.2vw, 72px);
+      font-weight: 950;
       letter-spacing: 0.06em;
       line-height: 1.05;
       user-select: none;
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
       gap: 0.06em;
-      padding: 4px 10px;
+      padding: 2px 8px;
+      text-transform: uppercase;
     }
 
     .letter {
       display: inline-block;
-      position: relative;
       min-width: 0.9em;
-      text-transform: uppercase;
     }
 
     .blank {
-      display: inline-block;
       min-width: 0.9em;
       border-bottom: 6px solid rgba(22,50,74,0.35);
       padding-bottom: 2px;
       transform: translateY(-2px);
     }
+    .blank.filled { border-bottom-color: transparent; }
 
-    .blank.filled {
-      border-bottom-color: transparent;
-    }
-
-    /* Feedback overlays */
+    /* Feedback */
     #feedback {
       position: absolute;
       left: 50%;
-      top: 55%;
+      top: 50%;
       transform: translate(-50%, -50%);
-      z-index: 30;
+      z-index: 7;
       pointer-events: none;
       display: none;
       text-align: center;
     }
+    #feedback .emoji { font-size: clamp(60px, 15vw, 90px); }
+    #feedback .text { margin-top: 4px; font-weight: 950; font-size: 22px; }
 
-    #feedback .emoji {
-      font-size: 84px;
-      filter: drop-shadow(0 12px 10px rgba(0,0,0,0.15));
-    }
-
-    #feedback .text {
-      margin-top: 6px;
-      font-weight: 900;
-      font-size: 22px;
-    }
-
-    .shake {
-      animation: shake 0.45s ease-in-out 1;
-    }
+    .shake { animation: shake 0.45s ease-in-out 1; }
     @keyframes shake {
-      0% { transform: translate(0,0) rotate(0deg); }
-      20% { transform: translate(-6px, 0) rotate(-1deg); }
-      40% { transform: translate(6px, 0) rotate(1deg); }
-      60% { transform: translate(-5px, 0) rotate(-1deg); }
-      80% { transform: translate(5px, 0) rotate(1deg); }
-      100% { transform: translate(0,0) rotate(0deg); }
+      0% { transform: translate(0,0); }
+      20% { transform: translate(-6px, 0); }
+      40% { transform: translate(6px, 0); }
+      60% { transform: translate(-5px, 0); }
+      80% { transform: translate(5px, 0); }
+      100% { transform: translate(0,0); }
     }
 
-    /* Bottom panel */
+    /* Bottom panel ALWAYS visible, safe-area aware */
     #bottomPanel {
-      position: absolute;
-      left: 50%;
-      bottom: 14px;
-      transform: translateX(-50%);
-      width: min(96vw, 900px);
+      z-index: 6;
+      width: min(96vw, 920px);
+      margin: 0 auto;
       background: var(--panel);
       border-radius: 22px;
       box-shadow: var(--shadow);
       border: 1px solid rgba(0,0,0,0.06);
-      padding: 12px;
-      z-index: 10;
+      padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+      margin-bottom: env(safe-area-inset-bottom);
     }
 
+    /* Choices wrap cleanly */
     #choicesRow {
       display: flex;
       gap: 10px;
       justify-content: center;
       flex-wrap: wrap;
-      padding: 6px 4px 10px;
+      padding: 6px 4px 8px;
     }
 
     .choiceBtn {
-      font-size: 22px;
-      font-weight: 900;
-      width: 62px;
-      height: 62px;
-      border-radius: 18px;
+      font-size: clamp(18px, 5.2vw, 22px);
+      font-weight: 950;
+      width: clamp(50px, 14vw, 62px);
+      height: clamp(50px, 14vw, 62px);
+      border-radius: 16px;
       border: 2px solid rgba(22,50,74,0.18);
       background: #ffffff;
       box-shadow: 0 6px 14px rgba(0,0,0,0.08);
@@ -224,49 +209,79 @@
       transform: translateY(-2px);
     }
 
+    /* Controls row: responsive, no overflow */
     #controlsRow {
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 12px;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
       align-items: end;
       padding: 4px;
     }
 
-    /* Cannon area */
+    #skipBtn {
+      font-weight: 900;
+      border: 2px solid rgba(22,50,74,0.18);
+      background: white;
+      color: var(--ink);
+      border-radius: 16px;
+      padding: 12px 12px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    #skipBtn:active { transform: scale(0.98); }
+
+    #fireBtn {
+      font-size: 18px;
+      font-weight: 950;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(180deg, #2b7cff, #1f5fe0);
+      color: white;
+      box-shadow: 0 14px 22px rgba(43,124,255,0.24);
+      user-select: none;
+      white-space: nowrap;
+    }
+    #fireBtn:active { transform: scale(0.98); }
+    #fireBtn:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+
+    /* Cannon scales with screen */
     #cannonWrap {
       position: relative;
-      height: 130px;
+      height: clamp(92px, 16vh, 130px);
       display: flex;
       justify-content: center;
       align-items: flex-end;
+      min-width: 0;
     }
 
     #cannon {
       position: relative;
-      width: 220px;
-      height: 110px;
+      width: clamp(160px, 52vw, 220px);
+      height: clamp(90px, 14vh, 110px);
     }
 
-    /* base */
     #cannonBase {
       position: absolute;
       bottom: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 170px;
-      height: 54px;
+      width: 78%;
+      height: 50%;
       border-radius: 18px;
       background: #2b3f54;
       box-shadow: inset 0 8px 0 rgba(255,255,255,0.12), 0 12px 18px rgba(0,0,0,0.12);
     }
 
-    /* barrel */
     #cannonBarrel {
       position: absolute;
-      bottom: 38px;
-      left: 46%;
-      width: 160px;
-      height: 38px;
+      bottom: 40%;
+      left: 48%;
+      width: 75%;
+      height: 34%;
       transform: translateX(-50%) rotate(-10deg);
       transform-origin: left center;
       border-radius: 18px;
@@ -277,10 +292,10 @@
     #cannonMouth {
       position: absolute;
       right: -6px;
-      top: 6px;
-      width: 28px;
-      height: 26px;
-      border-radius: 14px;
+      top: 18%;
+      width: 20%;
+      height: 64%;
+      border-radius: 999px;
       background: #243647;
       box-shadow: inset 0 6px 0 rgba(255,255,255,0.10);
     }
@@ -288,106 +303,72 @@
     #loadedLetter {
       position: absolute;
       left: 50%;
-      bottom: 8px;
+      bottom: 6%;
       transform: translateX(-50%);
-      width: 82px;
-      height: 48px;
+      width: clamp(70px, 20vw, 86px);
+      height: clamp(40px, 10vw, 48px);
       border-radius: 16px;
       display: grid;
       place-items: center;
-      font-weight: 900;
-      font-size: 24px;
+      font-weight: 950;
+      font-size: clamp(18px, 5vw, 24px);
       color: #0b2a4a;
       background: #ffffff;
       border: 2px dashed rgba(22,50,74,0.25);
       user-select: none;
     }
 
-    /* Fire button */
-    #fireBtn {
-      font-size: 22px;
-      font-weight: 900;
-      padding: 16px 22px;
-      border-radius: 18px;
-      border: none;
-      cursor: pointer;
-      background: linear-gradient(180deg, #2b7cff, #1f5fe0);
-      color: white;
-      box-shadow: 0 14px 22px rgba(43,124,255,0.24);
-      user-select: none;
-    }
-    #fireBtn:active { transform: scale(0.98); }
-    #fireBtn:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    /* New word / skip */
-    #skipBtn {
-      justify-self: start;
-      font-weight: 800;
-      border: 2px solid rgba(22,50,74,0.18);
-      background: white;
-      color: var(--ink);
-      border-radius: 16px;
-      padding: 14px 16px;
-      cursor: pointer;
-      user-select: none;
-    }
-    #skipBtn:active { transform: scale(0.98); }
-
-    /* Small prompt */
+    /* Toast stays above bottom panel */
     #toast {
       position: absolute;
       left: 50%;
-      bottom: 170px;
       transform: translateX(-50%);
+      bottom: calc(190px + env(safe-area-inset-bottom));
       background: rgba(22,50,74,0.92);
       color: white;
       padding: 10px 14px;
       border-radius: 14px;
-      font-weight: 800;
-      z-index: 50;
+      font-weight: 900;
+      z-index: 9;
       display: none;
       box-shadow: var(--shadow);
+      max-width: 92vw;
+      text-align: center;
     }
 
-    /* Projectile letter */
+    /* Projectile */
     .projectile {
       position: absolute;
-      width: 60px;
-      height: 60px;
-      border-radius: 18px;
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
       display: grid;
       place-items: center;
-      font-size: 28px;
-      font-weight: 900;
+      font-size: 26px;
+      font-weight: 950;
       background: #ffffff;
       border: 3px solid rgba(43,124,255,0.40);
       box-shadow: 0 12px 24px rgba(0,0,0,0.16);
-      z-index: 40;
+      z-index: 10;
       pointer-events: none;
       user-select: none;
       will-change: transform;
     }
 
-    /* Fireworks canvas */
-    #fxCanvas {
-      position: absolute;
-      inset: 0;
-      z-index: 25;
-      pointer-events: none;
-    }
-
-    /* Responsive tweaks */
-    @media (max-height: 650px) {
-      #wordArea { top: 78px; height: 40vh; }
-      #cannonWrap { height: 115px; }
-      #bottomPanel { bottom: 10px; }
+    /* On very small phones, stack buttons to avoid squeezing */
+    @media (max-width: 380px) {
+      #controlsRow {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        align-items: center;
+      }
+      #skipBtn, #fireBtn { width: 100%; }
+      #cannonWrap { height: 100px; }
+      #toast { bottom: calc(220px + env(safe-area-inset-bottom)); }
     }
   </style>
 </head>
+
 <body>
   <div id="game">
     <canvas id="fxCanvas"></canvas>
@@ -400,7 +381,7 @@
 
     <div id="wordArea">
       <div id="wordCard">
-        <div id="word" aria-label="Word with missing letter"></div>
+        <div id="word"></div>
       </div>
     </div>
 
@@ -412,7 +393,7 @@
     <div id="toast"></div>
 
     <div id="bottomPanel">
-      <div id="choicesRow" aria-label="Letter choices"></div>
+      <div id="choicesRow"></div>
 
       <div id="controlsRow">
         <button id="skipBtn" type="button">New Word</button>
@@ -433,41 +414,35 @@
   </div>
 
   <script>
-    // --- Word list (animals / fruits / birds) ---
+    // iPhone Safari viewport height fix
+    function setVH() {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    }
+    window.addEventListener("resize", setVH);
+    window.addEventListener("orientationchange", setVH);
+    setVH();
+
+    // --- Word list ---
     const WORDS = [
-      // Animals
-      { word: "tiger", type: "animal" },
-      { word: "zebra", type: "animal" },
-      { word: "monkey", type: "animal" },
-      { word: "elephant", type: "animal" },
-      { word: "giraffe", type: "animal" },
-      { word: "rabbit", type: "animal" },
-      { word: "lion", type: "animal" },
-      { word: "panda", type: "animal" },
+      { word: "tiger", type: "animal" }, { word: "zebra", type: "animal" },
+      { word: "monkey", type: "animal" }, { word: "elephant", type: "animal" },
+      { word: "giraffe", type: "animal" }, { word: "rabbit", type: "animal" },
+      { word: "lion", type: "animal" }, { word: "panda", type: "animal" },
       { word: "donkey", type: "animal" },
 
-      // Fruits
-      { word: "banana", type: "fruit" },
-      { word: "apple", type: "fruit" },
-      { word: "mango", type: "fruit" },
-      { word: "orange", type: "fruit" },
-      { word: "grapes", type: "fruit" },
-      { word: "papaya", type: "fruit" },
-      { word: "cherry", type: "fruit" },
-      { word: "melon", type: "fruit" },
+      { word: "banana", type: "fruit" }, { word: "apple", type: "fruit" },
+      { word: "mango", type: "fruit" }, { word: "orange", type: "fruit" },
+      { word: "grapes", type: "fruit" }, { word: "papaya", type: "fruit" },
+      { word: "cherry", type: "fruit" }, { word: "melon", type: "fruit" },
 
-      // Birds
-      { word: "parrot", type: "bird" },
-      { word: "sparrow", type: "bird" },
-      { word: "peacock", type: "bird" },
-      { word: "pigeon", type: "bird" },
-      { word: "eagle", type: "bird" },
-      { word: "owl", type: "bird" },
+      { word: "parrot", type: "bird" }, { word: "sparrow", type: "bird" },
+      { word: "peacock", type: "bird" }, { word: "pigeon", type: "bird" },
+      { word: "eagle", type: "bird" }, { word: "owl", type: "bird" },
       { word: "crow", type: "bird" }
     ];
 
     // --- Elements ---
-    const gameEl = document.getElementById("game");
     const wordEl = document.getElementById("word");
     const choicesRow = document.getElementById("choicesRow");
     const loadedLetterEl = document.getElementById("loadedLetter");
@@ -475,17 +450,17 @@
     const skipBtn = document.getElementById("skipBtn");
     const toastEl = document.getElementById("toast");
     const scoreNumEl = document.getElementById("scoreNum");
-
     const feedbackEl = document.getElementById("feedback");
     const feedbackEmojiEl = document.getElementById("feedbackEmoji");
     const feedbackTextEl = document.getElementById("feedbackText");
+    const wordCardEl = document.getElementById("wordCard");
 
     const canvas = document.getElementById("fxCanvas");
     const ctx = canvas.getContext("2d");
 
-    // --- Game state ---
-    let current = null;          // {word, type, missingIndex, missingChar}
-    let selectedLetter = null;   // "a"
+    // --- State ---
+    let current = null;
+    let selectedLetter = null;
     let animating = false;
     let score = 0;
 
@@ -493,7 +468,6 @@
     function randInt(min, maxInclusive) {
       return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
     }
-
     function shuffle(arr) {
       for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -501,16 +475,14 @@
       }
       return arr;
     }
-
     function showToast(msg, ms = 1200) {
       toastEl.textContent = msg;
       toastEl.style.display = "block";
       clearTimeout(showToast._t);
-      showToast._t = setTimeout(() => {
-        toastEl.style.display = "none";
-      }, ms);
+      showToast._t = setTimeout(() => (toastEl.style.display = "none"), ms);
     }
 
+    // Canvas sizing
     function setCanvasSize() {
       const dpr = window.devicePixelRatio || 1;
       canvas.width = Math.floor(window.innerWidth * dpr);
@@ -519,19 +491,15 @@
       canvas.style.height = window.innerHeight + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
-
     window.addEventListener("resize", setCanvasSize);
     setCanvasSize();
 
-    // --- Render word with missing letter ---
     function renderWord() {
       wordEl.innerHTML = "";
       const w = current.word.toUpperCase();
-
       for (let i = 0; i < w.length; i++) {
         const span = document.createElement("span");
         span.className = "letter";
-
         if (i === current.missingIndex) {
           span.classList.add("blank");
           span.dataset.blank = "1";
@@ -550,8 +518,6 @@
     function generateChoices(correctChar) {
       const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
       const options = new Set([correctChar]);
-
-      // Make 3-5 options total depending on word length
       const total = (current.word.length <= 5) ? 3 : 4;
       while (options.size < total) {
         options.add(alphabet[randInt(0, alphabet.length - 1)]);
@@ -565,18 +531,15 @@
       document.querySelectorAll(".choiceBtn").forEach(b => b.classList.remove("selected"));
     }
 
-    // --- New round ---
     function newRound() {
       animating = false;
       fireBtn.disabled = false;
       hideFeedback();
-
       clearSelectionUI();
 
       const pick = WORDS[randInt(0, WORDS.length - 1)];
       const word = pick.word.trim().toLowerCase();
 
-      // choose missing index (avoid 0 sometimes for easier reading)
       const minIndex = word.length >= 4 ? 1 : 0;
       const maxIndex = word.length - 2 >= minIndex ? word.length - 2 : word.length - 1;
       const missingIndex = randInt(minIndex, maxIndex);
@@ -590,10 +553,8 @@
 
       renderWord();
 
-      // Build choices
       const choices = generateChoices(current.missingChar);
       choicesRow.innerHTML = "";
-
       choices.forEach(ch => {
         const btn = document.createElement("button");
         btn.type = "button";
@@ -610,7 +571,6 @@
       });
     }
 
-    // --- Projectile animation ---
     function getCannonMouthCenter() {
       const mouth = document.getElementById("cannonMouth");
       const r = mouth.getBoundingClientRect();
@@ -630,21 +590,15 @@
       const proj = document.createElement("div");
       proj.className = "projectile";
       proj.textContent = letter;
-
-      // place at start (centered)
-      proj.style.left = (start.x - 30) + "px";
-      proj.style.top  = (start.y - 30) + "px";
-
-      // initial transform
+      proj.style.left = (start.x - 28) + "px";
+      proj.style.top  = (start.y - 28) + "px";
       proj.style.transform = "translate(0px, 0px) scale(1)";
 
       document.body.appendChild(proj);
 
-      // Use transform to animate
       const dx = (end.x - start.x);
       const dy = (end.y - start.y);
 
-      // ensure transition triggers
       requestAnimationFrame(() => {
         proj.style.transition = "transform 520ms cubic-bezier(0.2, 0.9, 0.2, 1.0)";
         proj.style.transform = `translate(${dx}px, ${dy}px) scale(0.92)`;
@@ -656,7 +610,6 @@
       }, { once: true });
     }
 
-    // --- Feedback ---
     function showFeedback(ok) {
       feedbackEl.style.display = "block";
       if (ok) {
@@ -667,17 +620,13 @@
         feedbackTextEl.textContent = "Try again!";
       }
     }
+    function hideFeedback() { feedbackEl.style.display = "none"; }
 
-    function hideFeedback() {
-      feedbackEl.style.display = "none";
-    }
-
-    // --- Fireworks effect (simple particles) ---
+    // Fireworks
     let particles = [];
     let fxRunning = false;
 
     function launchFireworks(x, y) {
-      // x,y are in CSS pixels
       const count = 90;
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
@@ -688,7 +637,6 @@
           vy: Math.sin(angle) * speed,
           life: 50 + Math.random() * 30,
           size: 2 + Math.random() * 2.5,
-          // random bright color
           r: randInt(80, 255),
           g: randInt(80, 255),
           b: randInt(80, 255),
@@ -701,15 +649,12 @@
     }
 
     function fxLoop() {
-      // clear with slight fade
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // draw particles
       ctx.save();
       for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.06; // gravity
+        p.vy += 0.06;
         p.vx *= 0.99;
         p.vy *= 0.99;
         p.life -= 1;
@@ -724,16 +669,13 @@
       ctx.restore();
 
       particles = particles.filter(p => p.life > 0);
-
-      if (particles.length > 0) {
-        requestAnimationFrame(fxLoop);
-      } else {
+      if (particles.length > 0) requestAnimationFrame(fxLoop);
+      else {
         fxRunning = false;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     }
 
-    // --- Main action ---
     function fire() {
       if (animating) return;
 
@@ -750,33 +692,25 @@
         const ok = (selectedLetter === current.missingChar);
 
         if (ok) {
-          // Fill the blank
           const blank = getBlankElement();
           blank.classList.add("filled");
           blank.textContent = current.missingChar;
-          blank.style.color = "#0b2a4a";
 
           showFeedback(true);
 
-          // fireworks at blank
           const c = getBlankCenter();
           launchFireworks(c.x, c.y);
 
           score += 1;
           scoreNumEl.textContent = String(score);
 
-          // Next round after a short delay
-          setTimeout(() => {
-            newRound();
-          }, 1100);
+          setTimeout(() => newRound(), 1100);
         } else {
-          // Wrong: show sad face and allow try again
           showFeedback(false);
-          document.getElementById("wordCard").classList.remove("shake");
-          void document.getElementById("wordCard").offsetWidth; // restart animation trick
-          document.getElementById("wordCard").classList.add("shake");
+          wordCardEl.classList.remove("shake");
+          void wordCardEl.offsetWidth;
+          wordCardEl.classList.add("shake");
 
-          // keep state; allow another try
           setTimeout(() => {
             fireBtn.disabled = false;
             animating = false;
@@ -785,14 +719,9 @@
       });
     }
 
-    // --- Buttons ---
     fireBtn.addEventListener("click", fire);
-    skipBtn.addEventListener("click", () => {
-      if (animating) return;
-      newRound();
-    });
+    skipBtn.addEventListener("click", () => { if (!animating) newRound(); });
 
-    // Start
     newRound();
   </script>
 </body>
