@@ -1,283 +1,657 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Multiplication Balloon Pop Game</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Balloon Math 0–20 (Stable)</title>
 <style>
-  body {
-    margin: 0;
-    overflow: hidden;
-    background-color: #cceeff;
-    font-family: Arial, sans-serif;
+  :root{
+    --safeTop: env(safe-area-inset-top, 0px);
+    --safeRight: env(safe-area-inset-right, 0px);
+    --safeBottom: env(safe-area-inset-bottom, 0px);
+    --safeLeft: env(safe-area-inset-left, 0px);
+
+    --bg1:#8fd3ff; --bg2:#e9f8ff;
+    --card: rgba(255,255,255,0.92);
+    --text: #0e1a2b;
+    --ok: #2ecc71;
+    --bad: #e74c3c;
+
+    --big: clamp(20px, 5.2vw, 32px);
+    --med: clamp(14px, 3.4vw, 18px);
+    --small: clamp(12px, 2.8vw, 14px);
+  }
+
+  * { box-sizing: border-box; }
+
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at 20% 15%, rgba(255,255,255,0.75), rgba(255,255,255,0) 40%),
+      radial-gradient(circle at 75% 25%, rgba(255,255,255,0.7), rgba(255,255,255,0) 42%),
+      linear-gradient(180deg, var(--bg1) 0%, #bfe9ff 45%, var(--bg2) 100%);
+    overflow:hidden;
     touch-action: manipulation;
   }
-  .balloon {
-    position: absolute;
-    border-radius: 50%;
-    width: 80px;
-    height: 100px;
-    text-align: center;
-    line-height: 100px;
-    font-size: 36px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .balloon:hover {
-    transform: scale(1.1);
-  }
-  #problem {
+
+  /* Top bar */
+  #topBar{
     position: fixed;
-    top: 20px;
+    top: calc(var(--safeTop) + 10px);
+    left: calc(var(--safeLeft) + 10px);
+    right: calc(var(--safeRight) + 10px);
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 10px;
+    z-index: 10;
+  }
+
+  .card{
+    background: var(--card);
+    border-radius: 16px;
+    padding: 10px 12px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.14);
+    backdrop-filter: blur(6px);
+  }
+
+  #hud{
+    display:flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .row{
+    display:flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: var(--small);
+    font-weight: 700;
+  }
+  .val{ font-weight: 900; }
+
+  #lives{
+    display:flex;
+    gap: 4px;
+    justify-content: flex-end;
+    font-size: clamp(16px, 4.2vw, 22px);
+    line-height: 1;
+  }
+
+  #problemCard{
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  #problemText{
+    font-size: var(--big);
+    font-weight: 950;
+    text-align:center;
+    letter-spacing: 0.2px;
+  }
+
+  #timerWrap{
+    height: 12px;
+    background: rgba(0,0,0,0.08);
+    border-radius: 999px;
+    overflow:hidden;
+  }
+  #timerFill{
+    height: 100%;
+    width: 100%;
+    transform-origin: left center;
+    transform: scaleX(1);
+    background: linear-gradient(90deg, rgba(46,204,113,0.95), rgba(46,204,113,0.65));
+    transition: transform 0.1s linear;
+  }
+
+  #feedback{
+    position: fixed;
+    top: calc(var(--safeTop) + 110px);
     left: 50%;
     transform: translateX(-50%);
-    background-color: white;
-    padding: 15px 30px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    font-size: 24px;
-    z-index: 1000;
-    width: 80%;
-    max-width: 300px;
-    text-align: center;
-  }
-  #score {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: white;
-    padding: 10px 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    font-size: 20px;
-  }
-  #feedback {
-    position: fixed;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 24px;
-    color: #333;
+    width: min(92vw, 520px);
+    text-align:center;
+    font-size: var(--med);
+    font-weight: 900;
     opacity: 0;
-    transition: opacity 0.3s;
-    text-align: center;
-    width: 80%;
-    max-width: 300px;
+    transition: opacity 0.2s;
+    z-index: 11;
+    pointer-events:none;
+    text-shadow: 0 6px 16px rgba(255,255,255,0.55);
   }
-  #tableDisplay {
+
+  /* Main area */
+  #main{
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-    text-align: center;
-    z-index: 2000;
-    display: none;
-    width: 90%;
-    max-width: 400px;
+    inset: 0;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    padding: calc(var(--safeTop) + 130px) calc(var(--safeRight) + 12px) calc(var(--safeBottom) + 16px) calc(var(--safeLeft) + 12px);
   }
-  .next-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
+
+  /* Answer grid */
+  #grid{
+    width: min(92vw, 680px);
+    display:grid;
+    gap: 12px;
+  }
+
+  @media (max-width: 520px){
+    #grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 521px) and (max-width: 860px){
+    #grid{ grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (min-width: 861px){
+    #grid{ grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .balloonBtn{
+    -webkit-tap-highlight-color: transparent;
+    appearance: none;
     border: none;
-    border-radius: 5px;
-    font-size: 18px;
+    width: 100%;
+    aspect-ratio: 1 / 1.15;
+    border-radius: 999px;
+    color: white;
+    font-weight: 950;
+    font-size: clamp(18px, 4.6vw, 34px);
+    box-shadow: 0 16px 26px rgba(0,0,0,0.15);
+    border: 2px solid rgba(255,255,255,0.25);
     cursor: pointer;
-    margin-top: 15px;
-    transition: background-color 0.3s;
+    user-select: none;
+    touch-action: manipulation;
+    transition: transform 0.08s ease, opacity 0.12s ease;
+    position: relative;
+    overflow:hidden;
   }
-  .next-btn:hover {
-    background-color: #45a049;
+  .balloonBtn::after{
+    content:"";
+    position:absolute;
+    width: 22%;
+    height: 24%;
+    left: 18%;
+    top: 16%;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.26);
+    transform: rotate(-18deg);
   }
-  .blink {
-    animation: blink-animation 0.5s steps(5, start) infinite;
+  .balloonBtn:active{ transform: scale(0.98); }
+  .balloonBtn.disabled{ pointer-events:none; opacity: 0.65; }
+
+  /* Modal overlay */
+  #overlay{
+    position: fixed;
+    inset: 0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding: calc(var(--safeTop) + 16px) calc(var(--safeRight) + 14px) calc(var(--safeBottom) + 16px) calc(var(--safeLeft) + 14px);
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(2px);
+    z-index: 50;
   }
-  @keyframes blink-animation {
-    to {
-      visibility: hidden;
-    }
+  #modal{
+    width: min(92vw, 520px);
+    background: rgba(255,255,255,0.96);
+    border-radius: 18px;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 14px 34px rgba(0,0,0,0.18);
+    padding: 12px;
   }
-  .game-container {
-    display: block;
+  #modalTitle{
+    text-align:center;
+    font-weight: 950;
+    font-size: clamp(18px, 4.6vw, 22px);
+    margin: 4px 0 10px;
   }
-  @media (max-width: 768px) {
-    .balloon {
-      width: 60px;
-      height: 80px;
-      line-height: 80px;
-      font-size: 24px;
-    }
-    #problem {
-      font-size: 20px;
-      padding: 10px 20px;
-      width: 90%;
-    }
-    #score {
-      font-size: 16px;
-      padding: 8px 15px;
-    }
-    #feedback {
-      font-size: 20px;
-      width: 90%;
-    }
-    #tableDisplay {
-      width: 95%;
-      padding: 15px;
-    }
-    #tableDisplay h3 {
-      font-size: 20px;
-    }
-    #tableDisplay p {
-      font-size: 16px;
-      margin: 5px 0;
-    }
-    .next-btn {
-      font-size: 16px;
-      padding: 8px 16px;
-    }
+  #modalBody{
+    max-height: 52vh;
+    overflow:auto;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(255,255,255,0.7);
+    border-radius: 14px;
+    padding: 10px;
+  }
+  .line{
+    display:flex;
+    justify-content: space-between;
+    padding: 6px 8px;
+    border-radius: 10px;
+    font-size: var(--med);
+    font-weight: 800;
+  }
+  .line:nth-child(odd){ background: rgba(0,0,0,0.03); }
+
+  .btn{
+    width:100%;
+    margin-top: 12px;
+    border:none;
+    border-radius: 14px;
+    padding: 12px;
+    font-weight: 950;
+    font-size: var(--med);
+    color:white;
+    cursor:pointer;
+    background: linear-gradient(180deg, #3bd27a, #24b463);
+  }
+  .btn.secondary{
+    background: linear-gradient(180deg, #5aa8ff, #2f78ff);
   }
 </style>
 </head>
+
 <body>
-<div class="game-container">
-  <div id="problem"></div>
-  <div id="score">Score: 0</div>
+  <div id="topBar">
+    <div id="hud" class="card">
+      <div class="row"><span>Score</span><span class="val" id="scoreVal">0</span></div>
+      <div class="row"><span>Level</span><span class="val" id="levelVal">1</span></div>
+      <div class="row"><span>Streak</span><span class="val" id="streakVal">0</span></div>
+      <div class="row"><span>Lives</span><span id="lives"></span></div>
+    </div>
+
+    <div id="problemCard" class="card">
+      <div id="problemText">—</div>
+      <div id="timerWrap"><div id="timerFill"></div></div>
+    </div>
+  </div>
+
   <div id="feedback"></div>
-  <div id="tableDisplay"></div>
-</div>
+
+  <div id="main">
+    <div id="grid" aria-label="Answer options"></div>
+  </div>
+
+  <div id="overlay" role="dialog" aria-modal="true">
+    <div id="modal">
+      <div id="modalTitle"></div>
+      <div id="modalBody"></div>
+      <button class="btn" id="modalBtnPrimary" type="button">Next Question</button>
+      <button class="btn secondary" id="modalBtnSecondary" type="button" style="display:none;">Restart</button>
+    </div>
+  </div>
 
 <script>
+/* SIMPLE + STABLE + MORE TIME */
+
+const ui = {
+  scoreVal: document.getElementById("scoreVal"),
+  levelVal: document.getElementById("levelVal"),
+  streakVal: document.getElementById("streakVal"),
+  lives: document.getElementById("lives"),
+  problemText: document.getElementById("problemText"),
+  timerFill: document.getElementById("timerFill"),
+  feedback: document.getElementById("feedback"),
+  grid: document.getElementById("grid"),
+  overlay: document.getElementById("overlay"),
+  modalTitle: document.getElementById("modalTitle"),
+  modalBody: document.getElementById("modalBody"),
+  modalBtnPrimary: document.getElementById("modalBtnPrimary"),
+  modalBtnSecondary: document.getElementById("modalBtnSecondary"),
+};
+
 let score = 0;
-let currentProblem = {};
-let balloons = [];
+let lives = 3;
+let streak = 0;
+let level = 1;
 
-// Generate random color
-function getRandomColor() {
-    const colors = ["#ff6666", "#ffcc66", "#66ff66", "#66ccff", "#cc66ff", "#ff66cc"];
-    return colors[Math.floor(Math.random() * colors.length)];
+let current = null;
+let state = "playing";
+
+let timerId = null;
+let timeTotal = 10;
+let timeLeft = 10;
+
+function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+function randInt(min,max){ return Math.floor(min + Math.random()*(max-min+1)); }
+function choose(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function randomBalloonBg(){
+  const colors = [
+    ["#ff4d6d","#ff006e"],
+    ["#ffb703","#fb8500"],
+    ["#2ec4b6","#00bbf9"],
+    ["#3a86ff","#2f78ff"],
+    ["#8338ec","#5f2eea"],
+    ["#38b000","#2ecc71"]
+  ];
+  const pair = colors[Math.floor(Math.random()*colors.length)];
+  return `radial-gradient(circle at 30% 25%, rgba(255,255,255,0.35), rgba(255,255,255,0) 40%),
+          linear-gradient(180deg, ${pair[0]}, ${pair[1]})`;
 }
 
-// Generate multiplication problem
-function generateProblem() {
-    const num1 = Math.floor(Math.random() * 5) + 1; // 1 to 5
-    const num2 = Math.floor(Math.random() * 10) + 1; // 1 to 10
-    const answer = num1 * num2;
-    currentProblem = { num1, num2, answer };
-    document.getElementById('problem').textContent = `${num1} × ${num2} = ?`;
-    createBalloons();
+function showFeedback(text, ok){
+  ui.feedback.textContent = text;
+  ui.feedback.style.color = ok ? "var(--ok)" : "var(--bad)";
+  ui.feedback.style.opacity = 1;
+  setTimeout(() => ui.feedback.style.opacity = 0, ok ? 900 : 1200);
 }
 
-// Show feedback message
-function showFeedback(message, isCorrect) {
-    const feedback = document.getElementById('feedback');
-    feedback.textContent = message;
-    feedback.style.color = isCorrect ? '#2ecc71' : '#e74c3c';
-    feedback.style.opacity = 1;
-    if (!isCorrect) {
-        feedback.classList.add('blink');
-        showMultiplicationTable();
-    } else {
-        feedback.classList.remove('blink');
-        setTimeout(generateProblem, 1000);
+function updateHUD(){
+  ui.scoreVal.textContent = score;
+  ui.levelVal.textContent = level;
+  ui.streakVal.textContent = streak;
+
+  ui.lives.innerHTML = "";
+  for (let i=0; i<3; i++){
+    const s = document.createElement("span");
+    s.textContent = (i < lives) ? "❤️" : "🖤";
+    ui.lives.appendChild(s);
+  }
+}
+
+function stopTimer(){
+  if (timerId){
+    clearInterval(timerId);
+    timerId = null;
+  }
+}
+
+function startTimer(seconds){
+  stopTimer();
+  timeTotal = seconds;
+  timeLeft = seconds;
+  ui.timerFill.style.transform = "scaleX(1)";
+
+  const stepMs = 100;
+  timerId = setInterval(() => {
+    if (state !== "playing") return;
+    timeLeft = Math.max(0, timeLeft - stepMs/1000);
+    const t = (timeTotal > 0) ? (timeLeft / timeTotal) : 0;
+    ui.timerFill.style.transform = `scaleX(${t})`;
+
+    if (t > 0.55) ui.timerFill.style.background = "linear-gradient(90deg, rgba(46,204,113,0.95), rgba(46,204,113,0.65))";
+    else if (t > 0.25) ui.timerFill.style.background = "linear-gradient(90deg, rgba(255,183,3,0.95), rgba(255,183,3,0.65))";
+    else ui.timerFill.style.background = "linear-gradient(90deg, rgba(231,76,60,0.95), rgba(231,76,60,0.65))";
+
+    if (timeLeft <= 0){
+      stopTimer();
+      handleWrong("⏰ Time up!");
     }
-    setTimeout(() => {
-        feedback.style.opacity = 0;
-        feedback.classList.remove('blink');
-    }, 3000);
+  }, stepMs);
 }
 
-// Show multiplication table
-function showMultiplicationTable() {
-    const tableDisplay = document.getElementById('tableDisplay');
-    let tableHTML = `<h3>${currentProblem.num1} Times Table</h3>`;
-    for (let i = 1; i <= 9; i++) {
-        tableHTML += `<p>${currentProblem.num1} × ${i} = ${currentProblem.num1 * i}</p>`;
-    }
-    tableHTML += `<button class="next-btn" onclick="nextQuestion()">Next Question</button>`;
-    tableDisplay.innerHTML = tableHTML;
-    tableDisplay.style.display = 'block';
+/* Difficulty: SAME but with MORE generous time */
+function cfgForLevel(lvl){
+  const options = (lvl <= 2) ? 4 : (lvl <= 4) ? 6 : (lvl <= 6) ? 8 : 9;
+
+  // ✅ Increased time per level (was 12/10/8/6)
+  const seconds = (lvl <= 2) ? 18 : (lvl <= 4) ? 16 : (lvl <= 6) ? 14 : 12;
+
+  // keep scoring/penalties so 1000 is still hard
+  const basePoints = 10 + lvl * 2;
+  const wrongPenalty = 12 + lvl * 4;
+
+  const types = (lvl <= 3) ? [0,0,0,0,0,1] : (lvl <= 6) ? [0,0,0,1,1,2] : [0,1,1,2,2];
+
+  const maxFactor = (lvl <= 2) ? 10 : (lvl <= 4) ? 14 : (lvl <= 6) ? 18 : 20;
+
+  return { options, seconds, basePoints, wrongPenalty, types, maxFactor };
 }
 
-// Function to handle next question
-function nextQuestion() {
-    document.getElementById('tableDisplay').style.display = 'none';
-    generateProblem();
+function updateLevelFromStreak(){
+  if (streak >= 24) level = 8;
+  else if (streak >= 18) level = 7;
+  else if (streak >= 14) level = 6;
+  else if (streak >= 10) level = 5;
+  else if (streak >= 7) level = 4;
+  else if (streak >= 4) level = 3;
+  else if (streak >= 2) level = 2;
+  else level = 1;
 }
 
-// Create balloons with one correct answer
-function createBalloons() {
-    // Remove existing balloons
-    balloons.forEach(balloon => balloon.remove());
-    balloons = [];
+function generateQuestion(){
+  const cfg = cfgForLevel(level);
+  const type = choose(cfg.types);
 
-    // Generate 3 wrong answers
-    let wrongAnswers = new Set();
-    while (wrongAnswers.size < 3) {
-        const offset = Math.floor(Math.random() * 11) - 5;
-        const wrongAnswer = Math.max(1, currentProblem.answer + offset);
-        if (wrongAnswer !== currentProblem.answer) {
-            wrongAnswers.add(wrongAnswer);
-        }
-    }
+  if (type === 0){
+    const a = randInt(0, cfg.maxFactor);
+    const b = randInt(0, cfg.maxFactor);
+    return {
+      type: 0,
+      a, b,
+      answer: a*b,
+      display: `${a} × ${b} = ?`,
+      helperFactor: (a !== 0 ? a : b)
+    };
+  }
 
-    // Create array of all answers and shuffle
-    let answers = [...wrongAnswers, currentProblem.answer];
-    answers = answers.sort(() => Math.random() - 0.5);
+  let known = randInt(0, cfg.maxFactor);
+  let missing = randInt(0, cfg.maxFactor);
 
-    // Create balloons
-    answers.forEach((number, index) => {
-        const balloon = document.createElement("div");
-        balloon.className = "balloon";
-        balloon.style.backgroundColor = getRandomColor();
-        balloon.innerText = number;
+  if (level >= 4){
+    if (known === 0 && Math.random() < 0.8) known = randInt(1, cfg.maxFactor);
+    if (missing === 0 && Math.random() < 0.8) missing = randInt(1, cfg.maxFactor);
+  }
 
-        // Position balloons in a grid
-        const row = Math.floor(index / 2);
-        const col = index % 2;
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
-        const balloonWidth = 80;
-        const balloonHeight = 100;
-        const spacing = 20;
+  const p = known * missing;
 
-        // Calculate positions based on screen size
-        const startX = (screenWidth - (2 * balloonWidth + spacing)) / 2;
-        const startY = (screenHeight - (2 * balloonHeight + spacing)) / 2;
+  if (type === 1){
+    return {
+      type: 1,
+      a: known,
+      b: missing,
+      answer: missing,
+      display: `${known} × ? = ${p}`,
+      helperFactor: known
+    };
+  } else {
+    return {
+      type: 2,
+      a: missing,
+      b: known,
+      answer: missing,
+      display: `? × ${known} = ${p}`,
+      helperFactor: known
+    };
+  }
+}
 
-        balloon.style.left = (startX + col * (balloonWidth + spacing)) + "px";
-        balloon.style.top = (startY + row * (balloonHeight + spacing)) + "px";
+/* ALWAYS include correct answer */
+function buildChoices(){
+  const cfg = cfgForLevel(level);
+  const ans = current.answer;
+  const isFactorAnswer = (current.type !== 0);
+  const maxV = isFactorAnswer ? 20 : 400;
 
-        document.body.appendChild(balloon);
-        balloons.push(balloon);
+  const wrong = new Set();
 
-        // Handle both click and touch events
-        balloon.addEventListener("click", handleBalloonClick);
-        balloon.addEventListener("touchstart", handleBalloonClick, { passive: true });
+  [ans-3, ans-2, ans-1, ans+1, ans+2, ans+3].forEach(v => {
+    v = clamp(v, 0, maxV);
+    if (v !== ans) wrong.add(v);
+  });
+
+  if (!isFactorAnswer){
+    const a = current.a ?? 0, b = current.b ?? 0;
+    const candidates = [ans + a, ans - a, ans + b, ans - b, (a+1)*b, (a-1)*b, a*(b+1), a*(b-1)];
+    candidates.forEach(v => {
+      v = clamp(v, 0, 400);
+      if (v !== ans) wrong.add(v);
     });
-}
+  }
 
-function handleBalloonClick(event) {
-    event.preventDefault();
-    const selectedNumber = parseInt(event.target.innerText);
-    if (selectedNumber === currentProblem.answer) {
-        score += 10;
-        showFeedback("Correct! +10 points", true);
+  while (wrong.size < cfg.options - 1){
+    let pick;
+    if (isFactorAnswer){
+      pick = randInt(0, 20);
     } else {
-        score = Math.max(0, score - 5);
-        showFeedback(`Wrong! The answer is ${currentProblem.answer}`, false);
+      const spread = clamp(40 - level*4, 12, 40);
+      pick = clamp(ans + randInt(-spread, spread), 0, 400);
     }
-    document.getElementById('score').textContent = `Score: ${score}`;
+    if (pick !== ans) wrong.add(pick);
+  }
+
+  const arr = Array.from(wrong);
+  arr.sort(() => Math.random() - 0.5);
+  const final = arr.slice(0, cfg.options - 1);
+  final.push(ans);
+  final.sort(() => Math.random() - 0.5);
+  return final;
 }
 
-// Start the game
-generateProblem();
+function renderChoices(choices){
+  ui.grid.innerHTML = "";
+  for (const val of choices){
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "balloonBtn";
+    btn.style.background = randomBalloonBg();
+    btn.textContent = String(val);
+
+    btn.addEventListener("click", () => {
+      if (state !== "playing") return;
+      handlePick(val);
+    });
+
+    ui.grid.appendChild(btn);
+  }
+}
+
+function disableChoices(){
+  [...ui.grid.querySelectorAll(".balloonBtn")].forEach(b => b.classList.add("disabled"));
+}
+
+function pointsForCorrect(){
+  const cfg = cfgForLevel(level);
+  const speedRatio = (timeTotal > 0) ? (timeLeft / timeTotal) : 0;
+
+  // With longer timers, reduce speed bonus slightly so scoring stays balanced
+  const speedBonus = Math.round(cfg.basePoints * speedRatio * 0.25);
+  const streakBonus = Math.round(Math.min(10, streak) * 1);
+  return cfg.basePoints + speedBonus + streakBonus;
+}
+
+function showTableModal(title, factor){
+  state = "modal";
+  stopTimer();
+  disableChoices();
+
+  ui.modalTitle.textContent = title;
+  ui.modalBody.innerHTML = "";
+  const frag = document.createDocumentFragment();
+  for (let i=0; i<=20; i++){
+    const line = document.createElement("div");
+    line.className = "line";
+    line.innerHTML = `<span>${factor} × ${i}</span><span><b>${factor*i}</b></span>`;
+    frag.appendChild(line);
+  }
+  ui.modalBody.appendChild(frag);
+
+  ui.modalBtnPrimary.textContent = "Next Question";
+  ui.modalBtnPrimary.onclick = () => {
+    ui.overlay.style.display = "none";
+    startNextRound();
+  };
+
+  ui.modalBtnSecondary.style.display = "none";
+  ui.overlay.style.display = "flex";
+}
+
+function showGameOver(){
+  state = "gameover";
+  stopTimer();
+  disableChoices();
+
+  ui.modalTitle.textContent = `Game Over! Final Score: ${score}`;
+  ui.modalBody.innerHTML = `
+    <div class="line"><span>Tip</span><span><b>Keep streaks to level up</b></span></div>
+    <div class="line"><span>Challenge</span><span><b>1000+ still takes skill</b></span></div>
+  `;
+
+  ui.modalBtnPrimary.textContent = "Restart";
+  ui.modalBtnPrimary.onclick = restart;
+
+  ui.modalBtnSecondary.style.display = "none";
+  ui.overlay.style.display = "flex";
+}
+
+function handlePick(value){
+  state = "playing";
+  disableChoices();
+  stopTimer();
+
+  if (value === current.answer){
+    streak++;
+    updateLevelFromStreak();
+    const pts = pointsForCorrect();
+    score += pts;
+    showFeedback(`✅ Correct! +${pts}`, true);
+    updateHUD();
+    setTimeout(startNextRound, 550);
+  } else {
+    handleWrong("😕 Wrong!");
+  }
+}
+
+function handleWrong(prefix){
+  state = "modal";
+  stopTimer();
+  disableChoices();
+
+  lives = Math.max(0, lives - 1);
+
+  streak = 0;
+  updateLevelFromStreak();
+
+  const cfg = cfgForLevel(level);
+  score = Math.max(0, score - cfg.wrongPenalty);
+
+  updateHUD();
+
+  if (lives <= 0){
+    showGameOver();
+    return;
+  }
+
+  showTableModal(`${prefix} Answer: ${current.answer}  (-${cfg.wrongPenalty})`, current.helperFactor);
+}
+
+function startNextRound(){
+  state = "playing";
+  ui.overlay.style.display = "none";
+
+  current = generateQuestion();
+  ui.problemText.textContent = current.display;
+
+  const cfg = cfgForLevel(level);
+  const choices = buildChoices();
+
+  renderChoices(choices);
+  updateHUD();
+  startTimer(cfg.seconds);
+}
+
+function restart(){
+  stopTimer();
+  score = 0;
+  lives = 3;
+  streak = 0;
+  level = 1;
+  state = "playing";
+  ui.overlay.style.display = "none";
+  updateHUD();
+  startNextRound();
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden){
+    stopTimer();
+  } else {
+    if (state === "playing"){
+      startNextRound();
+    }
+  }
+});
+
+/* Start */
+updateHUD();
+startNextRound();
 </script>
 </body>
-</html> 
+</html>
