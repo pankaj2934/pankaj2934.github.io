@@ -11,3 +11,6 @@ These pages are hosted via GitHub Pages.
 - [multiplication](https://pankaj2934.github.io/multiplication.html)
 - [numbers](https://pankaj2934.github.io/numbers.html)
 - [series](https://pankaj2934.github.io/series.html)
+
+## 📄 Word Games
+- [Words](https://pankaj2934.github.io/cannon.html)
