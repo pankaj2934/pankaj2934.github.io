@@ -1,0 +1,1146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fraction Shading Quest</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#111b2e;
+      --panel2:#0f172a;
+      --text:#e8eefc;
+      --muted:#a9b4d0;
+      --good:#2ee59d;
+      --bad:#ff5c7a;
+      --accent:#7aa7ff;
+      --line:#2a3a62;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
+      --btn:#1b2a4f;
+      --btn2:#23345f;
+      --chalk:#d9e6ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1200px 600px at 30% 15%, #14224a, var(--bg));
+      color:var(--text);
+    }
+    header{
+      padding:18px 16px 10px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+    .topbar{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .badge{
+      font-size:12px;
+      padding:4px 10px;
+      background:rgba(122,167,255,.12);
+      border:1px solid rgba(122,167,255,.25);
+      border-radius:999px;
+      color:var(--chalk);
+      white-space:nowrap;
+    }
+    .nav{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    button{
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, var(--btn), var(--btn2));
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      box-shadow: 0 6px 18px rgba(0,0,0,.25);
+      font-weight:700;
+      letter-spacing:.1px;
+      touch-action: manipulation;
+    }
+    button:hover{ filter:brightness(1.05); }
+    button:active{ transform: translateY(1px); }
+    button.secondary{
+      background:transparent;
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:none;
+    }
+    button.primary{
+      border:1px solid rgba(122,167,255,.45);
+      background:linear-gradient(180deg, rgba(122,167,255,.35), rgba(122,167,255,.15));
+    }
+    button.good{
+      border:1px solid rgba(46,229,157,.55);
+      background:linear-gradient(180deg, rgba(46,229,157,.28), rgba(46,229,157,.12));
+    }
+    button.bad{
+      border:1px solid rgba(255,92,122,.55);
+      background:linear-gradient(180deg, rgba(255,92,122,.25), rgba(255,92,122,.10));
+    }
+    button.toggleOn{
+      border-color: rgba(46,229,157,.6);
+      background:linear-gradient(180deg, rgba(46,229,157,.22), rgba(46,229,157,.08));
+    }
+
+    main{
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 16px 28px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+    }
+    @media (max-width: 900px){
+      main{ grid-template-columns:1fr; }
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(17,27,46,.9), rgba(15,23,42,.92));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      background: rgba(255,255,255,.03);
+    }
+    .card .hd h2{
+      margin:0;
+      font-size:15px;
+    }
+    .card .bd{ padding:14px; }
+    .hint{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
+    .statrow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .pill{
+      padding:8px 10px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:999px;
+      font-size:13px;
+      color:var(--chalk);
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+    }
+    .mini{ font-size:12px; color:var(--muted); }
+    .big{ font-size:18px; font-weight:900; letter-spacing:.2px; }
+
+    .board{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    .canvasWrap{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      align-items:center;
+      justify-items:center;
+      padding:10px;
+      background: rgba(0,0,0,.12);
+      border:1px dashed rgba(255,255,255,.12);
+      border-radius:16px;
+      min-height:300px;
+    }
+    svg{
+      max-width: 100%;
+      height:auto;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .question{
+      font-weight:900;
+      font-size:16px;
+      margin:0 0 8px 0;
+    }
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:center;
+    }
+    .fracBox{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:center;
+      width:100%;
+    }
+    select, input{
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      outline:none;
+      font-weight:800;
+      touch-action: manipulation;
+    }
+    input{
+      width:90px;
+      text-align:center;
+      font-size:16px;
+    }
+    .slash{
+      font-size:18px;
+      font-weight:900;
+      color:var(--muted);
+      margin:0 4px;
+    }
+    .feedback{
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      font-size:14px;
+      line-height:1.35;
+      min-height:54px;
+    }
+    .feedback.good{ border-color: rgba(46,229,157,.5); background: rgba(46,229,157,.08); }
+    .feedback.bad{ border-color: rgba(255,92,122,.5); background: rgba(255,92,122,.08); }
+
+    .options{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:10px;
+      margin-top:10px;
+      width:100%;
+    }
+    @media (max-width: 520px){
+      .options{ grid-template-columns:1fr; }
+    }
+    .opt{
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      padding:10px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      cursor:pointer;
+      transition: transform .05s ease, filter .2s ease;
+      touch-action: manipulation;
+    }
+    .opt:hover{ filter:brightness(1.05); }
+    .opt:active{ transform: translateY(1px); }
+    .opt .f{
+      font-size:22px;
+      font-weight:950;
+      width:78px;
+      text-align:center;
+      background: rgba(122,167,255,.10);
+      border:1px solid rgba(122,167,255,.18);
+      border-radius:14px;
+      padding:8px 6px;
+      flex:0 0 auto;
+    }
+    .opt small{ color:var(--muted); display:block; margin-top:2px; }
+
+    .legend{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:6px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
+    .dot{
+      width:12px;height:12px;border-radius:4px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      display:inline-block;
+      margin-right:6px;
+      vertical-align:middle;
+    }
+    .dot.on{
+      background: linear-gradient(180deg, rgba(143,211,255,.9), rgba(75,182,255,.9));
+      border-color: rgba(143,211,255,.55);
+    }
+    .footerNote{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .rightGrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+    }
+    .smallCard{
+      background:rgba(0,0,0,.12);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      padding:12px;
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      padding:2px 6px;
+      border-radius:8px;
+      font-size:12px;
+      color:var(--chalk);
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="topbar">
+    <h1>Fraction Shading Quest <span class="badge">Shaded parts → fraction (like the worksheet)</span></h1>
+    <div class="nav">
+      <button class="secondary" id="modeLearnBtn">Learn</button>
+      <button class="primary" id="modeMatchBtn">Picture → Fraction</button>
+      <button class="primary" id="modePaintBtn">Fraction → Picture</button>
+      <button class="secondary toggleOn" id="soundBtn" title="Turn voice on/off">🔊 Voice</button>
+      <button class="secondary" id="resetBtn">Reset</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT: Game -->
+  <section class="card">
+    <div class="hd">
+      <div>
+        <h2 id="panelTitle">Picture → Fraction</h2>
+        <div class="hint" id="panelHint">
+          Denominator = total equal parts. Numerator = shaded parts.
+        </div>
+      </div>
+      <div class="statrow">
+        <span class="pill"><span class="mini">Score</span> <span class="big" id="score">0</span></span>
+        <span class="pill"><span class="mini">Streak</span> <span class="big" id="streak">0</span></span>
+        <span class="pill"><span class="mini">Level</span> <span class="big" id="level">1</span></span>
+      </div>
+    </div>
+
+    <div class="bd">
+      <div class="board">
+        <div>
+          <p class="question" id="questionText">What fraction is shaded?</p>
+          <div class="canvasWrap">
+            <div id="svgHost"></div>
+            <div class="legend">
+              <span><span class="dot on"></span>Shaded</span>
+              <span><span class="dot"></span>Not shaded</span>
+              <span>Count total parts first, then shaded parts.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls" id="controlsArea"></div>
+
+        <div class="feedback" id="feedback">
+          Ready! Count total parts (denominator), then shaded parts (numerator).
+        </div>
+
+        <div class="footerNote" id="footerNote">
+          Tip: After a correct answer, the game automatically moves to the next picture and slowly gets harder.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: Coach -->
+  <aside class="card">
+    <div class="hd">
+      <h2>Fraction Coach</h2>
+      <div class="mini">Phone • iPad • Laptop friendly</div>
+    </div>
+    <div class="bd rightGrid">
+      <div class="smallCard">
+        <div style="font-weight:900; font-size:16px;">Denominator = Down</div>
+        <div class="hint">The number down tells <b>how many equal parts</b> the whole has.</div>
+      </div>
+      <div class="smallCard">
+        <div style="font-weight:900; font-size:16px;">Numerator = Shaded</div>
+        <div class="hint">The number on top tells <b>how many parts are shaded</b>.</div>
+      </div>
+      <div class="smallCard">
+        <div class="hint">
+          <b>Keyboard:</b> press <span class="kbd">N</span> for next (laptop).<br/>
+          <b>Touch:</b> tap slices/boxes to shade (phone/iPad).
+        </div>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<script>
+(() => {
+  // ---------- State ----------
+  const Mode = { LEARN: "learn", MATCH: "match", PAINT: "paint" };
+  let mode = Mode.MATCH;
+
+  // Adaptive difficulty: slowly ramps up as the child succeeds
+  // difficultyStep grows with correct answers and streak.
+  let score = 0, streak = 0, level = 1;
+  let correctTotal = 0;
+
+  // Each session gets a fresh random seed so series differs every play
+  const sessionSeed = crypto && crypto.getRandomValues ? crypto.getRandomValues(new Uint32Array(1))[0] : (Date.now() >>> 0);
+  let rngState = sessionSeed;
+
+  // Current problem
+  let problem = null;     // {type, denom, numer, rows, cols, shaded:Set}
+  let paintedSet = new Set();
+  let autoNextTimer = null;
+
+  // Speech
+  let voiceOn = true;
+  const speakRate = 0.85; // slower
+  const speakPitch = 1.0;
+
+  // ---------- DOM ----------
+  const $ = (id) => document.getElementById(id);
+  const svgHost = $("svgHost");
+  const panelTitle = $("panelTitle");
+  const panelHint = $("panelHint");
+  const questionText = $("questionText");
+  const controlsArea = $("controlsArea");
+  const feedback = $("feedback");
+  const scoreEl = $("score");
+  const streakEl = $("streak");
+  const levelEl = $("level");
+  const footerNote = $("footerNote");
+  const soundBtn = $("soundBtn");
+
+  $("modeLearnBtn").onclick = () => setMode(Mode.LEARN);
+  $("modeMatchBtn").onclick = () => setMode(Mode.MATCH);
+  $("modePaintBtn").onclick = () => setMode(Mode.PAINT);
+  $("resetBtn").onclick = resetAll;
+
+  soundBtn.onclick = () => {
+    voiceOn = !voiceOn;
+    soundBtn.classList.toggle("toggleOn", voiceOn);
+    soundBtn.textContent = voiceOn ? "🔊 Voice" : "🔇 Voice";
+    if (!voiceOn) stopSpeaking();
+  };
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key.toLowerCase() === "n") newRound(false);
+  });
+
+  // ---------- RNG helpers (deterministic per session, different each play) ----------
+  function randU32(){
+    // xorshift32
+    rngState ^= (rngState << 13) >>> 0;
+    rngState ^= (rngState >>> 17) >>> 0;
+    rngState ^= (rngState << 5) >>> 0;
+    return rngState >>> 0;
+  }
+  function randFloat(){
+    return randU32() / 4294967296;
+  }
+  function randInt(min, maxInclusive){
+    return Math.floor(randFloat() * (maxInclusive - min + 1)) + min;
+  }
+  function pick(arr){ return arr[Math.floor(randFloat()*arr.length)]; }
+
+  // ---------- Speech ----------
+  function stopSpeaking(){
+    try { window.speechSynthesis.cancel(); } catch(_) {}
+  }
+  function speak(text){
+    if (!voiceOn) return;
+    if (!("speechSynthesis" in window)) return;
+
+    // Cancel any previous message so it does not overlap
+    stopSpeaking();
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = speakRate;
+    u.pitch = speakPitch;
+    u.volume = 1;
+    window.speechSynthesis.speak(u);
+  }
+
+  // ---------- Math helpers ----------
+  function gcd(a,b){ while(b){ [a,b]=[b,a%b]; } return a; }
+  function simplify(n, d){
+    const g = gcd(n,d);
+    return {n:n/g, d:d/g};
+  }
+
+  // ---------- UI helpers ----------
+  function setStats(){
+    scoreEl.textContent = score;
+    streakEl.textContent = streak;
+    levelEl.textContent = level;
+  }
+  function toast(msg, kind=""){
+    feedback.className = "feedback" + (kind ? " " + kind : "");
+    feedback.textContent = msg;
+  }
+  function bumpLevel(){
+    level = 1 + Math.floor(score / 5);
+    setStats();
+  }
+
+  function resetAll(){
+    stopSpeaking();
+    clearTimeout(autoNextTimer);
+    autoNextTimer = null;
+
+    score = 0; streak = 0; level = 1; correctTotal = 0;
+    setStats();
+    toast("Reset done. Let’s start again: count total parts, then shaded parts.");
+    speak("Reset done. Let's start again. Count total parts, then shaded parts.");
+    newRound(true);
+  }
+
+  // ---------- Adaptive difficulty plan ----------
+  // As correctTotal grows, we slowly increase:
+  // - denominators (more parts)
+  // - include grids later
+  function getDifficultyBand(){
+    // bands: 0..4
+    if (correctTotal < 4) return 0;   // very easy
+    if (correctTotal < 9) return 1;   // easy
+    if (correctTotal < 15) return 2;  // medium
+    if (correctTotal < 24) return 3;  // hard
+    return 4;                         // harder
+  }
+
+  // ---------- Problem generation ----------
+  function generateProblem(){
+    const band = getDifficultyBand();
+
+    // Types: start with bars + circles; add grids later
+    const types =
+      band <= 1 ? ["circle", "bar"] :
+      band === 2 ? ["circle", "bar"] :
+      ["circle", "bar", "grid"];
+
+    const type = pick(types);
+
+    if (type === "circle"){
+      const denomChoices =
+        band === 0 ? [2,3,4] :
+        band === 1 ? [2,3,4,5] :
+        band === 2 ? [3,4,5,6] :
+        band === 3 ? [4,5,6,8] :
+        [4,5,6,8,10,12];
+
+      const denom = pick(denomChoices);
+      const numer = randInt(1, denom-1);
+      const shaded = new Set();
+      while(shaded.size < numer) shaded.add(randInt(0, denom-1));
+      return {type, denom, numer, shaded};
+    }
+
+    if (type === "bar"){
+      const denomChoices =
+        band === 0 ? [2,3,4] :
+        band === 1 ? [3,4,5] :
+        band === 2 ? [4,5,6] :
+        band === 3 ? [5,6,8,10] :
+        [6,8,10,12];
+
+      const denom = pick(denomChoices);
+      const numer = randInt(1, denom-1);
+      const shaded = new Set();
+      while(shaded.size < numer) shaded.add(randInt(0, denom-1));
+      return {type, denom, numer, shaded};
+    }
+
+    // grid
+    const gridChoices =
+      band <= 2 ? [{r:2,c:3},{r:2,c:4},{r:3,c:3}] :
+      band === 3 ? [{r:2,c:5},{r:3,c:4},{r:4,c:4}] :
+      [{r:3,c:5},{r:4,c:4},{r:4,c:5}];
+
+    const g = pick(gridChoices);
+    const denom = g.r * g.c;
+    const maxShade = Math.max(1, Math.floor(denom * 0.75));
+    const numer = randInt(1, Math.min(maxShade, denom-1));
+    const shaded = new Set();
+    while(shaded.size < numer) shaded.add(randInt(0, denom-1));
+    return {type, rows:g.r, cols:g.c, denom, numer, shaded};
+  }
+
+  function makeOptions(correctN, correctD){
+    // Always include correct, plus 3 plausible wrong options
+    const opts = new Set();
+    const correct = `${correctN}/${correctD}`;
+    opts.add(correct);
+
+    const correctS = simplify(correctN, correctD);
+
+    while(opts.size < 4){
+      let n = correctN, d = correctD;
+
+      if (randFloat() < 0.55){
+        n = Math.max(1, Math.min(d-1, n + pick([-2,-1,1,2])));
+      } else {
+        d = Math.max(2, d + pick([-2,-1,1,2,3]));
+        n = Math.max(1, Math.min(d-1, n));
+      }
+
+      // avoid same simplified fraction too often
+      const s = simplify(n, d);
+      if (`${s.n}/${s.d}` === `${correctS.n}/${correctS.d}` && (n !== correctN || d !== correctD)) continue;
+
+      opts.add(`${n}/${d}`);
+    }
+
+    // shuffle
+    return Array.from(opts).sort(() => randFloat() - 0.5);
+  }
+
+  // ---------- SVG drawing ----------
+  function clearHost(){ svgHost.innerHTML = ""; }
+
+  function svgEl(name, attrs={}){
+    const el = document.createElementNS("http://www.w3.org/2000/svg", name);
+    for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+    return el;
+  }
+
+  function drawCircleSectors(denom, shadedSet, clickable=false){
+    const size = 280;
+    const cx = size/2, cy = size/2, r = 110;
+    const svg = svgEl("svg", { viewBox:`0 0 ${size} ${size}`, width:"340", "aria-label":"Fraction circle" });
+
+    svg.appendChild(svgEl("circle", { cx, cy, r:r+18, fill:"rgba(255,255,255,.03)", stroke:"rgba(255,255,255,.06)" }));
+    svg.appendChild(svgEl("circle", { cx, cy, r, fill:"rgba(255,255,255,.02)", stroke:"rgba(255,255,255,.25)", "stroke-width":"3" }));
+
+    const defs = svgEl("defs");
+    const lg = svgEl("linearGradient", { id:"shadeGrad", x1:"0", y1:"0", x2:"0", y2:"1" });
+    lg.appendChild(svgEl("stop", { offset:"0%", "stop-color":"rgba(143,211,255,.95)" }));
+    lg.appendChild(svgEl("stop", { offset:"100%", "stop-color":"rgba(75,182,255,.95)" }));
+    defs.appendChild(lg);
+    svg.appendChild(defs);
+
+    for(let i=0;i<denom;i++){
+      const a0 = (Math.PI*2) * (i/denom) - Math.PI/2;
+      const a1 = (Math.PI*2) * ((i+1)/denom) - Math.PI/2;
+
+      const x0 = cx + r*Math.cos(a0), y0 = cy + r*Math.sin(a0);
+      const x1 = cx + r*Math.cos(a1), y1 = cy + r*Math.sin(a1);
+      const largeArc = (a1-a0) > Math.PI ? 1 : 0;
+
+      const path = svgEl("path", {
+        d: `M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${largeArc} 1 ${x1} ${y1} Z`,
+        fill: shadedSet.has(i) ? "url(#shadeGrad)" : "rgba(255,255,255,.05)",
+        stroke: "rgba(255,255,255,.20)",
+        "stroke-width":"2",
+        "data-index": i,
+        tabindex: clickable ? "0" : "-1",
+        role: clickable ? "button" : "img",
+      });
+
+      if (clickable){
+        path.style.cursor = "pointer";
+        path.addEventListener("click", () => togglePaint(i));
+        path.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); togglePaint(i); }
+        });
+      }
+      svg.appendChild(path);
+    }
+
+    const txt = svgEl("text", { x:cx, y:cy+6, "text-anchor":"middle", fill:"rgba(217,230,255,.9)", "font-size":"16", "font-weight":"900" });
+    txt.textContent = `${denom} parts`;
+    svg.appendChild(txt);
+
+    return svg;
+  }
+
+  function drawBarParts(denom, shadedSet, clickable=false){
+    const w = 440, h = 130;
+    const svg = svgEl("svg", { viewBox:`0 0 ${w} ${h}`, width:"540", "aria-label":"Fraction bar" });
+
+    const defs = svgEl("defs");
+    const lg = svgEl("linearGradient", { id:"shadeGrad2", x1:"0", y1:"0", x2:"0", y2:"1" });
+    lg.appendChild(svgEl("stop", { offset:"0%", "stop-color":"rgba(143,211,255,.95)" }));
+    lg.appendChild(svgEl("stop", { offset:"100%", "stop-color":"rgba(75,182,255,.95)" }));
+    defs.appendChild(lg);
+    svg.appendChild(defs);
+
+    const pad = 18;
+    const x0 = pad, y0 = 42, bw = w - pad*2, bh = 62;
+    svg.appendChild(svgEl("rect", { x: x0-10, y:y0-22, width:bw+20, height:bh+44, rx:"18",
+      fill:"rgba(255,255,255,.03)", stroke:"rgba(255,255,255,.06)"}));
+
+    const partW = bw / denom;
+
+    for(let i=0;i<denom;i++){
+      const rect = svgEl("rect", {
+        x: x0 + i*partW, y:y0, width:partW, height:bh,
+        fill: shadedSet.has(i) ? "url(#shadeGrad2)" : "rgba(255,255,255,.05)",
+        stroke: "rgba(255,255,255,.22)",
+        "stroke-width":"2",
+        "data-index": i,
+        tabindex: clickable ? "0" : "-1",
+        role: clickable ? "button" : "img",
+      });
+      if (clickable){
+        rect.style.cursor = "pointer";
+        rect.addEventListener("click", () => togglePaint(i));
+        rect.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); togglePaint(i); }
+        });
+      }
+      svg.appendChild(rect);
+    }
+
+    const txt = svgEl("text", { x:w/2, y:26, "text-anchor":"middle", fill:"rgba(217,230,255,.9)", "font-size":"16", "font-weight":"900" });
+    txt.textContent = `${denom} equal boxes`;
+    svg.appendChild(txt);
+
+    return svg;
+  }
+
+  function drawGrid(rows, cols, shadedSet, clickable=false){
+    const cell = 44;
+    const pad = 18;
+    const w = cols*cell + pad*2;
+    const h = rows*cell + pad*2 + 26;
+    const svg = svgEl("svg", { viewBox:`0 0 ${w} ${h}`, width:"540", "aria-label":"Fraction grid" });
+
+    const defs = svgEl("defs");
+    const lg = svgEl("linearGradient", { id:"shadeGrad3", x1:"0", y1:"0", x2:"0", y2:"1" });
+    lg.appendChild(svgEl("stop", { offset:"0%", "stop-color":"rgba(143,211,255,.95)" }));
+    lg.appendChild(svgEl("stop", { offset:"100%", "stop-color":"rgba(75,182,255,.95)" }));
+    defs.appendChild(lg);
+    svg.appendChild(defs);
+
+    svg.appendChild(svgEl("rect", { x:6, y:6, width:w-12, height:h-12, rx:"18",
+      fill:"rgba(255,255,255,.03)", stroke:"rgba(255,255,255,.06)"}));
+
+    const startX = pad, startY = pad + 20;
+    for(let r=0;r<rows;r++){
+      for(let c=0;c<cols;c++){
+        const idx = r*cols + c;
+        const rect = svgEl("rect", {
+          x: startX + c*cell,
+          y: startY + r*cell,
+          width: cell, height: cell,
+          fill: shadedSet.has(idx) ? "url(#shadeGrad3)" : "rgba(255,255,255,.05)",
+          stroke: "rgba(255,255,255,.22)",
+          "stroke-width":"2",
+          "data-index": idx,
+          tabindex: clickable ? "0" : "-1",
+          role: clickable ? "button" : "img",
+        });
+        if (clickable){
+          rect.style.cursor = "pointer";
+          rect.addEventListener("click", () => togglePaint(idx));
+          rect.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); togglePaint(idx); }
+          });
+        }
+        svg.appendChild(rect);
+      }
+    }
+
+    const txt = svgEl("text", { x:w/2, y:24, "text-anchor":"middle", fill:"rgba(217,230,255,.9)", "font-size":"16", "font-weight":"900" });
+    txt.textContent = `${rows} × ${cols} grid`;
+    svg.appendChild(txt);
+
+    return svg;
+  }
+
+  function renderPicture(clickable=false, usePainted=false){
+    clearHost();
+    const shadedSet = usePainted ? paintedSet : problem.shaded;
+    let svg;
+    if (problem.type === "circle") svg = drawCircleSectors(problem.denom, shadedSet, clickable);
+    if (problem.type === "bar")    svg = drawBarParts(problem.denom, shadedSet, clickable);
+    if (problem.type === "grid")   svg = drawGrid(problem.rows, problem.cols, shadedSet, clickable);
+    svgHost.appendChild(svg);
+  }
+
+  // ---------- Mode UI ----------
+  function setMode(nextMode){
+    stopSpeaking();
+    clearTimeout(autoNextTimer);
+    autoNextTimer = null;
+
+    mode = nextMode;
+
+    if (mode === Mode.LEARN){
+      panelTitle.textContent = "Learn (Tap to shade)";
+      panelHint.innerHTML = "Tap parts to shade. Watch the fraction change. Denominator stays the same.";
+      questionText.textContent = "Tap to shade. Can you make the goal fraction?";
+      footerNote.textContent = "Learning mode: practice numerator (shaded) and denominator (total).";
+    } else if (mode === Mode.MATCH){
+      panelTitle.textContent = "Picture → Fraction";
+      panelHint.innerHTML = "Choose the fraction for the shaded parts. Denominator = total. Numerator = shaded.";
+      questionText.textContent = "What fraction is shaded?";
+      footerNote.textContent = "After a correct answer, it will automatically go to the next picture and slowly get harder.";
+    } else {
+      panelTitle.textContent = "Fraction → Picture";
+      panelHint.innerHTML = "Shade the picture to match the given fraction.";
+      questionText.textContent = "Shade to match the fraction.";
+      footerNote.textContent = "After you match it, the game moves to the next picture and slowly gets harder.";
+    }
+
+    newRound(true);
+  }
+
+  function buildControls(){
+    controlsArea.innerHTML = "";
+
+    if (mode === Mode.MATCH){
+      const opts = makeOptions(problem.numer, problem.denom);
+      const wrap = document.createElement("div");
+      wrap.style.width = "100%";
+
+      const options = document.createElement("div");
+      options.className = "options";
+
+      opts.forEach((fr) => {
+        const [n,d] = fr.split("/").map(Number);
+        const card = document.createElement("div");
+        card.className = "opt";
+        card.onclick = () => checkMatch(n,d);
+
+        const f = document.createElement("div");
+        f.className = "f";
+        f.textContent = fr;
+
+        const desc = document.createElement("div");
+        desc.innerHTML = `<div style="font-weight:900">Choose ${fr}</div>
+                          <small>${n} shaded out of ${d} total</small>`;
+        card.appendChild(f);
+        card.appendChild(desc);
+        options.appendChild(card);
+      });
+
+      wrap.appendChild(options);
+      controlsArea.appendChild(wrap);
+      return;
+    }
+
+    if (mode === Mode.PAINT){
+      const paintBox = document.createElement("div");
+      paintBox.className = "fracBox";
+
+      const target = document.createElement("div");
+      target.className = "pill";
+      target.innerHTML = `<span class="mini">Target</span> <span class="big">${problem.numer}/${problem.denom}</span>`;
+      paintBox.appendChild(target);
+
+      const current = document.createElement("div");
+      current.className = "pill";
+      current.id = "currentFrac";
+      current.innerHTML = `<span class="mini">You shaded</span> <span class="big">${paintedSet.size}/${problem.denom}</span>`;
+      paintBox.appendChild(current);
+
+      const checkBtn = document.createElement("button");
+      checkBtn.className = "good";
+      checkBtn.textContent = "Check";
+      checkBtn.onclick = checkPaint;
+      paintBox.appendChild(checkBtn);
+
+      const clearBtn = document.createElement("button");
+      clearBtn.className = "secondary";
+      clearBtn.textContent = "Clear";
+      clearBtn.onclick = () => {
+        paintedSet.clear();
+        renderPicture(true, true);
+        updatePaintReadout();
+        toast("Cleared. Try again.");
+        speak("Cleared. Try again.");
+      };
+      paintBox.appendChild(clearBtn);
+
+      controlsArea.appendChild(paintBox);
+
+      const tip = document.createElement("div");
+      tip.className = "hint";
+      tip.style.textAlign = "center";
+      tip.style.width = "100%";
+      tip.innerHTML = `Tap parts to shade. Stop when you shaded <b>${problem.numer}</b> parts.`;
+      controlsArea.appendChild(tip);
+
+      return;
+    }
+
+    // LEARN mode
+    const wrap = document.createElement("div");
+    wrap.style.width = "100%";
+    wrap.className = "fracBox";
+
+    const shapeSel = document.createElement("select");
+    ["Circle","Bar","Grid"].forEach((t)=>{
+      const o = document.createElement("option");
+      o.value = t.toLowerCase();
+      o.textContent = t;
+      shapeSel.appendChild(o);
+    });
+
+    const denomSel = document.createElement("select");
+    [2,3,4,5,6,8,10,12].forEach(v=>{
+      const o = document.createElement("option");
+      o.value = v;
+      o.textContent = `${v} parts`;
+      denomSel.appendChild(o);
+    });
+    denomSel.value = "4";
+
+    const goalN = document.createElement("input");
+    goalN.type="number"; goalN.min="0"; goalN.value="1"; goalN.id="goalN";
+    const slash = document.createElement("span"); slash.className="slash"; slash.textContent="/";
+    const goalD = document.createElement("input");
+    goalD.type="number"; goalD.min="2"; goalD.value="4"; goalD.id="goalD";
+
+    const setBtn = document.createElement("button");
+    setBtn.className = "primary";
+    setBtn.textContent = "Set Picture";
+    setBtn.onclick = () => {
+      const s = shapeSel.value;
+      const d = parseInt(denomSel.value,10);
+
+      let rows=2, cols=3;
+      if (s === "grid"){
+        const grids = [{r:2,c:2},{r:2,c:3},{r:2,c:4},{r:3,c:3},{r:3,c:4},{r:4,c:4}];
+        const match = grids.find(g => g.r*g.c === d) || pick(grids);
+        rows = match.r; cols = match.c;
+      }
+      problem = {
+        type: s,
+        denom: (s === "grid") ? rows*cols : d,
+        rows, cols,
+        numer: 0,
+        shaded: new Set()
+      };
+      paintedSet.clear();
+      goalD.value = problem.denom;
+      goalN.max = problem.denom;
+
+      renderPicture(true, true);
+      updateLearnReadout();
+      toast("Tap to shade. Denominator is total parts. Numerator is shaded parts.");
+      speak("Tap to shade. Denominator is total parts. Numerator is shaded parts.");
+    };
+
+    const live = document.createElement("div");
+    live.className = "pill";
+    live.id = "learnLive";
+    live.innerHTML = `<span class="mini">Live</span> <span class="big">0/4</span>`;
+
+    const checkGoal = document.createElement("button");
+    checkGoal.className = "good";
+    checkGoal.textContent = "Check Goal";
+    checkGoal.onclick = () => {
+      const n = parseInt(goalN.value||"0",10);
+      const d = parseInt(goalD.value||"2",10);
+      if (d !== problem.denom){
+        toast(`Set denominator to ${problem.denom} (total parts).`, "bad");
+        speak(`Set the denominator to ${problem.denom}. That is the total parts.`);
+        return;
+      }
+      if (paintedSet.size === n){
+        toast(`Nice! ${n} shaded out of ${d}. That is ${n}/${d}.`, "good");
+        speak(`Great job. There are ${d} total parts, and ${n} are shaded. That is ${n} over ${d}.`);
+      } else {
+        toast(`You have ${paintedSet.size} shaded out of ${d}. Try again to make ${n}/${d}.`, "bad");
+        speak(`You have ${paintedSet.size} shaded parts out of ${d} total. Try again.`);
+      }
+    };
+
+    wrap.appendChild(shapeSel);
+    wrap.appendChild(denomSel);
+    wrap.appendChild(setBtn);
+    wrap.appendChild(live);
+
+    const row2 = document.createElement("div");
+    row2.className = "fracBox";
+    row2.style.marginTop = "8px";
+    row2.style.width = "100%";
+    const goalPill = document.createElement("div");
+    goalPill.className = "pill";
+    goalPill.innerHTML = `<span class="mini">Goal</span> <span class="big" id="goalText">1/4</span>`;
+    row2.appendChild(goalPill);
+    row2.appendChild(goalN);
+    row2.appendChild(slash);
+    row2.appendChild(goalD);
+    row2.appendChild(checkGoal);
+
+    const clearBtn = document.createElement("button");
+    clearBtn.className = "secondary";
+    clearBtn.textContent = "Clear";
+    clearBtn.onclick = () => {
+      paintedSet.clear();
+      renderPicture(true, true);
+      updateLearnReadout();
+      toast("Cleared. Try a new goal fraction.");
+      speak("Cleared. Try a new goal fraction.");
+    };
+    row2.appendChild(clearBtn);
+
+    controlsArea.appendChild(wrap);
+    controlsArea.appendChild(row2);
+
+    // init default
+    setBtn.click();
+  }
+
+  // ---------- Paint interactions ----------
+  function togglePaint(index){
+    if (paintedSet.has(index)) paintedSet.delete(index);
+    else paintedSet.add(index);
+
+    renderPicture(true, true);
+
+    if (mode === Mode.PAINT) updatePaintReadout();
+    if (mode === Mode.LEARN) updateLearnReadout();
+  }
+
+  function updatePaintReadout(){
+    const el = $("currentFrac");
+    if (!el) return;
+    el.querySelector(".big").textContent = `${paintedSet.size}/${problem.denom}`;
+  }
+  function updateLearnReadout(){
+    const live = $("learnLive");
+    if (live) live.querySelector(".big").textContent = `${paintedSet.size}/${problem.denom}`;
+    const goalText = $("goalText");
+    const n = parseInt($("goalN")?.value || "0", 10);
+    const d = parseInt($("goalD")?.value || `${problem.denom}`, 10);
+    if (goalText) goalText.textContent = `${n}/${d}`;
+  }
+
+  // ---------- Correct / wrong handlers ----------
+  function onCorrectExplainAndNext(total, shaded){
+    // Great job + explanation, then auto next
+    toast(`✅ Great job! Total parts = ${total}. Shaded parts = ${shaded}. So it is ${shaded}/${total}.`, "good");
+    speak(`Great job. There are ${total} total parts, and ${shaded} are shaded. So the fraction is ${shaded} over ${total}.`);
+
+    // Update stats
+    score += 1;
+    streak += 1;
+    correctTotal += 1;
+    bumpLevel();
+    setStats();
+
+    clearTimeout(autoNextTimer);
+    autoNextTimer = setTimeout(() => newRound(true), 1300); // short pause, then next
+  }
+
+  function onWrongExplainRetry(total, shaded){
+    // Explain counts, allow retry (do NOT show the correct fraction)
+    toast(`❌ Not yet. Count again: total parts = ${total}. shaded parts = ${shaded}. Try again.`, "bad");
+    speak(`Not yet. Total parts are ${total}. Shaded parts are ${shaded}. Try again.`);
+    streak = 0;
+    setStats();
+    // No auto next; kid retries same problem
+  }
+
+  // ---------- Checking ----------
+  function checkMatch(n,d){
+    clearTimeout(autoNextTimer);
+    autoNextTimer = null;
+
+    const total = problem.denom;
+    const shaded = problem.numer;
+
+    if (n === shaded && d === total){
+      onCorrectExplainAndNext(total, shaded);
+    } else {
+      onWrongExplainRetry(total, shaded);
+    }
+  }
+
+  function checkPaint(){
+    clearTimeout(autoNextTimer);
+    autoNextTimer = null;
+
+    const total = problem.denom;
+    const targetShaded = problem.numer;
+    const shadedNow = paintedSet.size;
+
+    if (shadedNow === targetShaded){
+      onCorrectExplainAndNext(total, targetShaded);
+    } else {
+      // For paint mode, tell how many shaded now and total, then retry
+      toast(`❌ Not yet. You shaded ${shadedNow} out of ${total}. Try again to make ${targetShaded}/${total}.`, "bad");
+      speak(`Not yet. You shaded ${shadedNow} parts out of ${total} total. Try again.`);
+      streak = 0;
+      setStats();
+    }
+  }
+
+  // ---------- Round flow ----------
+  function newRound(announce){
+    stopSpeaking();
+    clearTimeout(autoNextTimer);
+    autoNextTimer = null;
+
+    if (mode === Mode.LEARN){
+      buildControls();
+      return;
+    }
+
+    problem = generateProblem();
+    paintedSet.clear();
+
+    if (mode === Mode.MATCH){
+      renderPicture(false, false);
+      buildControls();
+      toast("Choose the fraction for the shaded parts.");
+      if (announce) speak("New picture. Count total parts, then count shaded parts.");
+      return;
+    }
+
+    if (mode === Mode.PAINT){
+      renderPicture(true, true);
+      buildControls();
+      toast(`Shade to match ${problem.numer}/${problem.denom}.`);
+      if (announce) speak(`New fraction. Shade ${problem.numer} parts out of ${problem.denom}.`);
+      return;
+    }
+  }
+
+  // ---------- Start ----------
+  setStats();
+  setMode(Mode.MATCH);
+})();
+</script>
+</body>
+</html>
