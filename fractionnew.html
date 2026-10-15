@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Fraction Detective: a kids' game for learning divisibility tricks and simplifying fractions.">
+<meta name="theme-color" content="#FFF7E8">
+<title>Fraction Detective</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%95%B5%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF7E8; --ink:#1E2640; --muted:#5A6382; --card:#FFFFFF;
+  --good:#16865A; --good-bg:#E2F6EA; --bad:#D63C43; --bad-bg:#FDE7E7; --hint-bg:#FFF1C7; --gold:#F5B301;
+  --c2:#2F80ED; --c3:#8E5CE0; --c4:#0E9F9E; --c5:#F08A2C; --c6:#E2557B; --c7:#C044D6; --c9:#1F9D63; --c10:#B7791F; --c11:#5B6B86;
+  --r:20px; --fd:'Fredoka','Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;color:var(--ink);line-height:1.45;
+  background-color:var(--bg);
+  background-image:linear-gradient(rgba(47,128,237,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(47,128,237,.09) 1px,transparent 1px);
+  background-size:26px 26px;min-height:100vh}
+h1,h2,h3{font-family:var(--fd);font-weight:600;margin:0 0 .4em;line-height:1.15}
+h2{font-size:1.45rem} h3{font-size:1.15rem}
+p{margin:.4em 0} b{font-weight:800}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.wrap{max-width:900px;margin:0 auto;padding:14px 16px 40px}
+.muted{color:var(--muted)} .small{font-size:.92rem}
+.row{display:flex;align-items:center} .between{justify-content:space-between} .center{justify-content:center} .gap{gap:10px} .wrapf{flex-wrap:wrap}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:56px;height:56px;flex:none;border-radius:16px;background:var(--gold);border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);display:grid;place-items:center;font-size:30px;transform:rotate(-6deg)}
+h1{font-size:clamp(1.5rem,5.5vw,2.1rem);margin:0;font-weight:700}
+.whoami{background:none;border:0;padding:0;cursor:pointer;color:var(--muted);font-size:.95rem;text-align:left}
+.whoami b{color:var(--ink)}
+.hud{display:flex;gap:8px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:3px solid var(--ink);border-radius:999px;padding:6px 14px;font-family:var(--fd);font-weight:600;font-size:1.15rem;box-shadow:0 3px 0 var(--ink)}
+button.pill{cursor:pointer;padding:6px 10px}
+
+/* tabs */
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 18px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 8px;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:0 4px 0 var(--ink);font-family:var(--fd);font-weight:600;font-size:1rem;cursor:pointer;transition:transform .06s,box-shadow .06s;-webkit-tap-highlight-color:transparent}
+.tab span{font-size:1.5rem;line-height:1}
+.tab[aria-selected="true"]{background:var(--ink);color:#fff}
+
+/* cards & buttons */
+.card{background:var(--card);border:3px solid var(--ink);border-radius:var(--r);box-shadow:0 6px 0 var(--ink);padding:18px;margin-bottom:20px}
+.btn{font-family:var(--fd);font-weight:600;font-size:1.1rem;border:3px solid var(--ink);border-radius:14px;background:#fff;padding:10px 16px;box-shadow:0 4px 0 var(--ink);cursor:pointer;transition:transform .06s,box-shadow .06s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.tab:active,.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:0 4px 0 var(--ink)}
+.btn.primary{background:var(--gold)}
+.btn.dark{background:var(--ink);color:#fff}
+.btn.yes{background:var(--good-bg)} .btn.no{background:var(--bad-bg)}
+.btn:focus-visible,.tab:focus-visible,.chip:focus-visible,input:focus-visible{outline:3px solid var(--c2);outline-offset:3px}
+.levels{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-family:var(--fd);font-weight:600;font-size:.95rem;border:2.5px solid var(--ink);background:#fff;border-radius:999px;padding:5px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff}
+
+/* fractions */
+.frac{display:inline-flex;flex-direction:column;align-items:center;font-family:var(--fd);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.frac>span:not(.bar){padding:0 .12em}
+.frac .bar{align-self:stretch;height:max(5px,.08em);background:var(--ink);border-radius:99px;margin:.1em 0}
+.frac.md{font-size:2.6rem} .frac.big{font-size:clamp(4rem,19vw,6.5rem)}
+.mini{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-family:var(--fd);font-weight:600;line-height:1.05;margin:0 .15em;font-variant-numeric:tabular-nums}
+.mini>span{padding:0 .2em} .mini>span:first-child{border-bottom:2px solid currentColor}
+
+/* learn */
+.hero-eg{display:flex;align-items:center;justify-content:center;gap:18px;margin:12px 0}
+.arrow{font-family:var(--fd);font-weight:600;font-size:1.4rem;color:var(--c5)}
+.numbig{width:100%;max-width:260px;font-family:var(--fd);font-weight:700;font-size:2rem;text-align:center;border:3px solid var(--ink);border-radius:14px;padding:8px 12px;background:#FFFDF7;color:var(--ink)}
+.nd-sum{margin:12px 0 10px;padding:10px 12px;background:var(--hint-bg);border:2px dashed var(--ink);border-radius:12px}
+.clues{display:grid;gap:6px}
+.clue{display:grid;grid-template-columns:auto 22px 1fr;gap:10px;align-items:center;padding:7px 10px;border-radius:12px;background:var(--good-bg)}
+.clue.no{background:#F2F3F7;color:var(--muted)}
+.clue .mark{font-weight:900;font-size:1.1rem;text-align:center}
+.clue.yes .mark{color:var(--good)} .clue.no .mark{color:var(--bad)}
+.badge{display:inline-block;font-family:var(--fd);font-weight:700;color:#fff;background:var(--c,var(--c11));border:2px solid var(--ink);border-radius:10px;padding:1px 8px;min-width:46px;text-align:center}
+.section-title{margin:6px 4px 12px;font-size:1.6rem}
+.rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-bottom:22px}
+.rule{background:#fff;border:3px solid var(--ink);border-top:10px solid var(--c);border-radius:var(--r);box-shadow:0 5px 0 var(--ink);padding:16px;position:relative}
+.rule.smart{background:var(--hint-bg)}
+.rule-h{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.rule .num{width:54px;height:54px;flex:none;border-radius:50%;background:var(--c);color:#fff;border:3px solid var(--ink);display:grid;place-items:center;font-family:var(--fd);font-weight:700;font-size:1.25rem}
+.rule h3{margin:0}
+.ex{font-family:var(--fd);font-weight:500;padding:4px 10px;border-radius:10px;margin:6px 0;font-size:1.02rem}
+.ex.ok{background:var(--good-bg)} .ex.ok::before{content:'\2713  ';color:var(--good);font-weight:700}
+.ex.no{background:var(--bad-bg)} .ex.no::before{content:'\2717  ';color:var(--bad);font-weight:700}
+.tip-s{font-size:.9rem;color:var(--muted);margin-top:8px}
+.tag{position:absolute;top:10px;right:12px;font-size:.75rem;font-family:var(--fd);font-weight:600;background:var(--ink);color:#fff;border-radius:999px;padding:2px 9px}
+.plan ol{padding-left:0;list-style:none;counter-reset:s;margin:10px 0 14px}
+.plan li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;margin:10px 0}
+.plan li::before{content:counter(s);width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-family:var(--fd);font-weight:700}
+.note{background:#EEF4FF;border-radius:12px;padding:10px 12px;margin-top:12px;font-size:.95rem}
+
+/* quiz */
+.dots{display:flex;gap:6px;justify-content:center;margin:12px 0 4px}
+.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink);background:#fff;transition:transform .2s}
+.dot.r{background:var(--good)} .dot.w{background:var(--bad)} .dot.cur{transform:scale(1.3);background:var(--gold)}
+.quiz-q{text-align:center;font-family:var(--fd);font-weight:500;font-size:1.35rem;margin:16px 0}
+.qnum{display:block;font-size:clamp(3rem,15vw,4.8rem);font-weight:700;line-height:1.1;margin:6px 0;font-variant-numeric:tabular-nums}
+.badge.big{font-size:1.6rem;padding:2px 14px;vertical-align:middle}
+.qbtns .btn{font-size:1.4rem;padding:12px 26px;min-width:130px}
+.fb{margin-top:16px;padding:14px;border-radius:16px;border:3px solid var(--ink);display:grid;gap:8px}
+.fb.good{background:var(--good-bg)} .fb.bad{background:var(--bad-bg)}
+.fb-h{font-family:var(--fd);font-weight:700;font-size:1.3rem}
+.fb .btn{justify-self:start}
+.stats{display:flex;justify-content:space-between;margin-top:16px;color:var(--muted)}
+.summary{text-align:center;padding:10px 0}
+.big-score{font-family:var(--fd);font-weight:700;font-size:4rem;line-height:1}
+
+/* crack */
+.stage{display:grid;place-items:center;padding:12px 0 6px;min-height:200px}
+.msg{min-height:56px;padding:12px 14px;border-radius:14px;background:#F4F5F9;margin:6px 0 14px}
+.msg>div{margin-top:4px}
+.msg.good{background:var(--good-bg)} .msg.bad{background:var(--bad-bg)} .msg.hint{background:var(--hint-bg)}
+.clue-line{font-size:.97rem} .clue-line.ok{color:var(--good)} .clue-line.no{color:var(--bad)}
+.label{font-family:var(--fd);font-weight:600;margin:0 0 8px}
+.divgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
+.divbtn{background:var(--c);color:#fff;padding:10px 0;font-size:1.25rem;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions .btn{flex:1 1 auto}
+.toggle{display:flex;align-items:center;gap:10px;margin-top:14px;font-weight:700;cursor:pointer}
+.toggle input{width:22px;height:22px;accent-color:var(--ink)}
+.dim{opacity:.35;pointer-events:none}
+.practice{border:3px dashed var(--ink);border-radius:16px;padding:14px;margin-bottom:14px;background:#FFFDF5;display:grid;gap:10px}
+.eq{display:flex;align-items:center;gap:10px;font-family:var(--fd);font-weight:600;font-size:1.4rem;flex-wrap:wrap}
+.ans{width:110px;font-family:var(--fd);font-weight:700;font-size:1.4rem;text-align:center;border:3px solid var(--ink);border-radius:12px;padding:6px;background:#fff;color:var(--ink)}
+.ans.right{border-color:var(--good);background:var(--good-bg)} .ans.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.custom{display:flex;gap:8px;align-items:center;margin:-4px 0 14px}
+.mine{display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;margin:14px 0 0}
+.fracin{display:inline-flex;flex-direction:column;align-items:center;gap:6px}
+.fracin input{width:130px;font-family:var(--fd);font-weight:700;font-size:1.8rem;text-align:center;border:3px solid var(--ink);border-radius:12px;padding:4px 6px;background:#FFFDF7;color:var(--ink)}
+.fracin .bar{width:140px;height:6px;background:var(--ink);border-radius:9px}
+.win{text-align:center;padding:16px;border:3px solid var(--ink);border-radius:18px;background:linear-gradient(180deg,#FFF5D1,#FFFFFF);margin-bottom:14px}
+.win-h{font-family:var(--fd);font-weight:700;font-size:1.7rem}
+.win-eq{font-size:2.2rem;margin:8px 0;font-family:var(--fd);font-weight:600}
+.stars{font-size:2.6rem;color:var(--gold);letter-spacing:6px;-webkit-text-stroke:1.5px var(--ink)}
+.stars .off{color:#E6E2D6}
+.notes{margin-top:8px;border-top:3px dotted #CFC8B4;padding-top:12px}
+.notes ol{margin:0;padding-left:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:1.15rem}
+.notes li{display:flex;align-items:center;gap:6px}
+.notes .op{font-family:var(--fd);font-weight:600;color:var(--muted);font-size:.95rem}
+
+/* show me */
+.steps{display:grid;gap:12px;margin-top:16px}
+.step{border:3px solid var(--ink);border-radius:16px;padding:12px 14px;background:#F6F6FA;animation:pop .35s ease-out}
+.step.good{background:var(--good-bg)} .step.smart{background:var(--hint-bg)} .step.start{background:#EEF4FF}
+.step.done{background:linear-gradient(180deg,#FFF5D1,#fff);text-align:center}
+.step-h{font-family:var(--fd);font-weight:600;font-size:1.15rem;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.step.done .step-h{justify-content:center;font-size:1.4rem}
+.calc{font-family:var(--fd);font-weight:500;font-size:1.1rem;margin:4px 0}
+.result{font-size:1.6rem;margin-top:6px;display:flex;align-items:center;gap:8px}
+.show-in{display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px}
+
+/* misc */
+.modal{position:fixed;inset:0;background:rgba(30,38,64,.55);display:grid;place-items:center;padding:16px;z-index:40}
+.modal .card{max-width:380px;width:100%;text-align:center;margin:0}
+.modal input{width:100%;font-family:var(--fd);font-weight:600;font-size:1.4rem;text-align:center;border:3px solid var(--ink);border-radius:12px;padding:8px;margin:10px 0 14px;color:var(--ink)}
+.big-emoji{font-size:3.2rem;line-height:1.1}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+footer{text-align:center;color:var(--muted);font-size:.9rem;margin-top:10px}
+@keyframes pop{0%{transform:scale(.85);opacity:0}70%{transform:scale(1.04);opacity:1}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+.pop{animation:pop .45s ease-out} .shake{animation:shake .4s} .bump{animation:bump .5s}
+@media (max-width:420px){
+  .card{padding:14px} .tab{font-size:.85rem} .divbtn{font-size:1.05rem}
+  .qbtns .btn{min-width:0;flex:1} .hero-eg{gap:10px} .frac.md{font-size:2.2rem}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">🕵️</div>
+    <div>
+      <h1>Fraction Detective</h1>
+      <button class="whoami" id="whoBtn" title="Change your name"><span id="rankTxt">Rookie Detective</span> <b id="nameTxt"></b> <span aria-hidden="true">✏️</span></button>
+    </div>
+  </div>
+  <div class="hud">
+    <div class="pill" id="starPill" title="Stars earned"><span aria-hidden="true">⭐</span><b id="starCount">0</b></div>
+    <button class="pill" id="soundBtn" aria-label="Sound on">🔊</button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Game sections">
+  <button class="tab" role="tab" data-tab="learn" aria-selected="true"><span aria-hidden="true">📚</span>Learn</button>
+  <button class="tab" role="tab" data-tab="quiz" aria-selected="false"><span aria-hidden="true">⚡</span>Quiz</button>
+  <button class="tab" role="tab" data-tab="crack" aria-selected="false"><span aria-hidden="true">🍕</span>Crack it</button>
+  <button class="tab" role="tab" data-tab="show" aria-selected="false"><span aria-hidden="true">🔍</span>Show me</button>
+</nav>
+
+<main>
+<!-- ================= LEARN ================= -->
+<section id="tab-learn" class="panel" role="tabpanel">
+  <div class="card">
+    <h2>Your mission 🎯</h2>
+    <p>Make a fraction as <b>simple</b> as it can be. Divide the top <b>and</b> the bottom by the same number, again and again, until no number (except 1) can divide both.</p>
+    <div class="hero-eg" aria-label="134 over 56 becomes 67 over 28">
+      <span class="frac md"><span>134</span><span class="bar"></span><span>56</span></span>
+      <span class="arrow">÷2 →</span>
+      <span class="frac md"><span>67</span><span class="bar"></span><span>28</span></span>
+    </div>
+    <p class="muted">Your <b>clues</b> are the divisibility tricks below. They tell you if a big number can be divided, without doing the whole division!</p>
+  </div>
+
+  <div class="card">
+    <h2>🔎 Number Detective</h2>
+    <p class="muted">Type any number to see which clues it passes.</p>
+    <input id="ndInput" class="numbig" inputmode="numeric" autocomplete="off" value="134" aria-label="Number to check">
+    <div id="ndOut"></div>
+  </div>
+
+  <h2 class="section-title">The clues</h2>
+  <div class="rules">
+    <article class="rule" style="--c:var(--c2)">
+      <div class="rule-h"><div class="num">÷2</div><h3>Even ending</h3></div>
+      <p>Last digit is <b>0, 2, 4, 6 or 8</b>? Then it divides by 2.</p>
+      <div class="ex ok">134 → ends in 4</div>
+      <div class="ex no">67 → ends in 7</div>
+      <p class="tip-s">Keep dividing by 2 until one number turns odd!</p>
+    </article>
+    <article class="rule" style="--c:var(--c3)">
+      <div class="rule-h"><div class="num">÷3</div><h3>Digit sum</h3></div>
+      <p><b>Add up all the digits.</b> If the total is in the 3× table, the number divides by 3.</p>
+      <div class="ex ok">249 → 2+4+9 = 15</div>
+      <div class="ex no">67 → 6+7 = 13</div>
+      <p class="tip-s">Works for ANY size of number, even 1,000,002!</p>
+    </article>
+    <article class="rule" style="--c:var(--c4)">
+      <div class="rule-h"><div class="num">÷4</div><h3>Last two digits</h3></div>
+      <p>Look <b>only at the last two digits</b>. If they divide by 4, the whole number does.</p>
+      <div class="ex ok">1,316 → 16 = 4 × 4</div>
+      <div class="ex no">134 → 34 isn't in the 4× table</div>
+      <p class="tip-s">Why? 100 always divides by 4, so only the end matters.</p>
+    </article>
+    <article class="rule" style="--c:var(--c5)">
+      <div class="rule-h"><div class="num">÷5</div><h3>0 or 5 ending</h3></div>
+      <p>Ends in <b>0 or 5</b>? Then it divides by 5.</p>
+      <div class="ex ok">245 → ends in 5</div>
+      <div class="ex no">134 → ends in 4</div>
+      <p class="tip-s">Ends in 0? It passes ÷2 AND ÷5. That means ÷10!</p>
+    </article>
+    <article class="rule" style="--c:var(--c6)">
+      <div class="rule-h"><div class="num">÷6</div><h3>Double check</h3></div>
+      <p>Must pass <b>both</b> the ÷2 clue <b>and</b> the ÷3 clue.</p>
+      <div class="ex ok">114 → even, 1+1+4 = 6</div>
+      <div class="ex no">134 → even, but 1+3+4 = 8</div>
+      <p class="tip-s">Because 6 = 2 × 3.</p>
+    </article>
+    <article class="rule" style="--c:var(--c9)">
+      <div class="rule-h"><div class="num">÷9</div><h3>Digit sum again</h3></div>
+      <p>Add up the digits. If the total is in the <b>9× table</b>, the number divides by 9.</p>
+      <div class="ex ok">729 → 7+2+9 = 18</div>
+      <div class="ex no">134 → 1+3+4 = 8</div>
+      <p class="tip-s">If it passes ÷9, it passes ÷3 too.</p>
+    </article>
+    <article class="rule" style="--c:var(--c10)">
+      <div class="rule-h"><div class="num">÷10</div><h3>Ends in 0</h3></div>
+      <p>Ends in <b>0</b>? Then it divides by 10.</p>
+      <div class="ex ok">560 → ends in 0</div>
+      <div class="ex no">56 → ends in 6</div>
+      <p class="tip-s">Just knock off the 0: 560 ÷ 10 = 56.</p>
+    </article>
+    <article class="rule" style="--c:var(--c7)">
+      <span class="tag">★ Expert</span>
+      <div class="rule-h"><div class="num">÷7</div><h3>Chop &amp; double</h3></div>
+      <p><b>Chop off the last digit and double it.</b> Take that away from what's left. If the answer is in the 7× table (or 0), it divides by 7.</p>
+      <div class="ex ok">343 → 34 − 6 = 28</div>
+      <div class="ex no">134 → 13 − 8 = 5</div>
+      <p class="tip-s">For numbers up to 70, just use your 7× table.</p>
+    </article>
+    <article class="rule" style="--c:var(--c11)">
+      <span class="tag">★ Expert</span>
+      <div class="rule-h"><div class="num">÷11</div><h3>Zig-zag</h3></div>
+      <p>Go <b>minus, plus, minus</b> across the digits: first − second + third… Get 0 or an 11× table number? It divides by 11.</p>
+      <div class="ex ok">286 → 2 − 8 + 6 = 0</div>
+      <div class="ex no">134 → 1 − 3 + 4 = 2</div>
+      <p class="tip-s">2-digit numbers: both digits the same, like 44 or 77.</p>
+    </article>
+    <article class="rule smart" style="--c:var(--gold)">
+      <span class="tag">🧠 Big trick</span>
+      <div class="rule-h"><div class="num" style="color:var(--ink)">🧩</div><h3>Smart trick</h3></div>
+      <p>Break the <b>smaller</b> number into prime pieces. Only those pieces can be shared with the other number!</p>
+      <div class="ex ok">67/28: 28 = 2 × 2 × 7</div>
+      <p class="tip-s">So for 67/28 you only need to test 2 and 7. Neither divides 67, so you're done!</p>
+    </article>
+  </div>
+
+  <div class="card plan">
+    <h2>🗺️ The Detective's Plan</h2>
+    <ol>
+      <li><span>Both <b>even</b>? Divide by 2. Repeat until one is odd.</span></li>
+      <li><span>Both <b>digit sums</b> in the 3× table? Divide by 3. Repeat.</span></li>
+      <li><span>Both end in <b>0 or 5</b>? Divide by 5. Repeat.</span></li>
+      <li><span><b>Smart trick:</b> break the smaller number into primes and test only those (like 7, 11, 13…).</span></li>
+      <li><span>Nothing divides both? <b>Case closed.</b> It's in simplest form! 🎉</span></li>
+    </ol>
+    <div class="row gap wrapf">
+      <button class="btn dark" id="watchBtn">Watch me crack 134/56 ▶</button>
+      <button class="btn primary" data-goto="crack">Let me try! 🍕</button>
+    </div>
+    <p class="note">🏅 <b>Fancy word:</b> all the numbers you divided by, multiplied together, make the <b>Greatest Common Factor (GCF)</b>: the biggest number that divides both. For 134/56 it's 2.</p>
+  </div>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section id="tab-quiz" class="panel" role="tabpanel" hidden>
+  <div class="card">
+    <div class="row between wrapf gap">
+      <h2 style="margin:0">⚡ Clue Quiz</h2>
+      <div class="levels" id="quizLevels">
+        <button class="chip" data-level="easy">Easy</button>
+        <button class="chip" data-level="medium">Medium</button>
+        <button class="chip" data-level="expert">Expert ★</button>
+      </div>
+    </div>
+    <p class="muted small" id="quizInfo"></p>
+    <div class="dots" id="quizDots" aria-hidden="true"></div>
+    <div id="quizBody">
+      <div class="quiz-q">Can <span class="qnum" id="qNum">0</span> be divided evenly by <span class="badge big" id="qDiv">2</span> ?</div>
+      <div class="row center gap qbtns" id="qBtns">
+        <button class="btn yes" id="qYes">✓ Yes</button>
+        <button class="btn no" id="qNo">✗ No</button>
+      </div>
+      <div id="quizFb" aria-live="polite"></div>
+    </div>
+    <div id="quizSum" hidden></div>
+    <div class="stats small"><span>Streak 🔥 <b id="qStreak">0</b></span><span>Best streak 🏆 <b id="qBest">0</b></span></div>
+  </div>
+</section>
+
+<!-- ================= CRACK IT ================= -->
+<section id="tab-crack" class="panel" role="tabpanel" hidden>
+  <div class="card">
+    <div class="row between wrapf gap">
+      <h2 style="margin:0">🍕 Crack the Fraction</h2>
+      <div class="levels" id="crackLevels">
+        <button class="chip" data-level="easy">Easy</button>
+        <button class="chip" data-level="medium">Medium</button>
+        <button class="chip" data-level="hard">Hard</button>
+        <button class="chip" data-level="mine">✏️ Mine</button>
+      </div>
+    </div>
+    <div class="mine" id="mineBox" hidden>
+      <div class="fracin">
+        <input id="mTop" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="Top number" placeholder="134">
+        <span class="bar"></span>
+        <input id="mBot" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="Bottom number" placeholder="56">
+      </div>
+      <button class="btn dark" id="mGo">Start ▶</button>
+    </div>
+    <div class="stage"><div class="frac big" id="cFrac"><span id="cTop">?</span><span class="bar"></span><span id="cBot">?</span></div></div>
+    <div class="msg" id="cMsg" aria-live="polite"></div>
+    <div class="practice" id="cPractice" hidden></div>
+    <div class="win" id="cWin" hidden></div>
+    <div id="cControls">
+      <p class="label">Divide the top <u>and</u> bottom by…</p>
+      <div class="divgrid" id="divGrid"></div>
+      <div class="custom" id="customRow" hidden>
+        <span class="eq">÷</span>
+        <input class="ans" id="customD" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="Divide by">
+        <button class="btn dark" id="customGo">Go</button>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="cDone">✅ It's simplest!</button>
+        <button class="btn" id="cHint">💡 Clue</button>
+        <button class="btn" id="cNew">🔄 New</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="cPracticeToggle"> ✏️ I'll do the dividing myself</label>
+    </div>
+    <div class="notes"><h3>📝 Case notes</h3><ol id="cNotes"></ol></div>
+  </div>
+</section>
+
+<!-- ================= SHOW ME ================= -->
+<section id="tab-show" class="panel" role="tabpanel" hidden>
+  <div class="card">
+    <h2>🔍 Watch Me Crack It</h2>
+    <p class="muted">Type a fraction and I'll solve it one clue at a time.</p>
+    <div class="show-in">
+      <div class="fracin">
+        <input id="sTop" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="Top number" value="134">
+        <span class="bar"></span>
+        <input id="sBot" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="Bottom number" value="56">
+      </div>
+      <button class="btn primary" id="sGo">Solve it! ▶</button>
+    </div>
+    <div class="steps" id="sSteps" aria-live="polite"></div>
+    <div class="row gap center" id="sNav" style="margin-top:14px" hidden>
+      <button class="btn dark" id="sNext">Next clue ▶</button>
+      <button class="btn" id="sAll">Show all</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>Made for young math detectives 🕵️ · Grown-ups: use <b>✏️ Mine</b> in “Crack it” or <b>Show me</b> to set your own fractions.</footer>
+</div>
+
+<div class="modal" id="nameModal" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="nmTitle">
+    <div class="big-emoji" aria-hidden="true">🕵️</div>
+    <h2 id="nmTitle">Hello, Detective!</h2>
+    <p class="muted">What should we call you?</p>
+    <input id="nameInput" maxlength="16" autocomplete="off" placeholder="Your name">
+    <button class="btn primary" id="nameGo">Let's go! ▶</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Pure math helpers (no page access) ---------- */
+'use strict';
+const MINUS = '\u2212';
+function gcd(a, b){ a = Math.abs(a); b = Math.abs(b); while (b){ const t = a % b; a = b; b = t; } return a; }
+function randInt(lo, hi){ return lo + Math.floor(Math.random() * (hi - lo + 1)); }
+function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+function digitsOf(n){ return String(Math.abs(n)).split('').map(Number); }
+function primeFactors(n){ const f = []; let d = 2; while (n > 1 && d * d <= n){ while (n % d === 0){ f.push(d); n = n / d; } d++; } if (n > 1) f.push(n); return f; }
+function fmt(n){ return Number(n).toLocaleString('en-US'); }
+
+/* Explain whether n divides by d, the way a kid would check it. */
+function clue(n, d){
+  const ds = digitsOf(n), sum = ds.reduce((s, x) => s + x, 0), last = n % 10, N = fmt(n);
+  const sumTxt = ds.length > 1 ? ds.join(' + ') + ' = ' + sum : String(sum);
+  let ok, text;
+  switch (d){
+    case 2: ok = last % 2 === 0; text = `${N} ends in ${last} → ${ok ? 'even' : 'odd'}`; break;
+    case 3: ok = sum % 3 === 0; text = `${N}: ${sumTxt} → ${sum} ${ok ? 'is' : 'is not'} in the 3× table`; break;
+    case 4: {
+      const l2 = n % 100; ok = l2 % 4 === 0;
+      text = n < 100 ? `${N} ${ok ? 'is' : 'is not'} in the 4× table`
+                     : `${N}: last two digits ${String(l2).padStart(2, '0')} → ${ok ? '' : 'not '}in the 4× table`;
+      break;
+    }
+    case 5: ok = last === 0 || last === 5; text = `${N} ends in ${last} → ${ok ? 'yes, a 0 or 5' : 'not a 0 or 5'}`; break;
+    case 6: {
+      const e = last % 2 === 0, t = sum % 3 === 0; ok = e && t;
+      text = `${N}: ${e ? 'even ✓' : 'odd ✗'} and digit sum ${sum} ${t ? '✓' : '✗'} (needs both)`;
+      break;
+    }
+    case 9: ok = sum % 9 === 0; text = `${N}: ${sumTxt} → ${sum} ${ok ? 'is' : 'is not'} in the 9× table`; break;
+    case 10: ok = last === 0; text = `${N} ends in ${last} → ${ok ? 'yes, a 0' : 'not a 0'}`; break;
+    case 7: {
+      ok = n % 7 === 0; let x = n; const chain = [];
+      while (Math.abs(x) > 70){
+        const r = Math.trunc(x / 10), dd = Math.abs(x % 10), nx = r - 2 * dd;
+        chain.push(`${r} ${MINUS} ${2 * dd} = ${nx < 0 ? MINUS + (-nx) : nx}`);
+        x = nx;
+      }
+      const ax = Math.abs(x);
+      text = chain.length
+        ? `${N}: chop & double → ${chain.join(', then ')} → ${ax} ${ax % 7 === 0 ? 'is' : 'is not'} in the 7× table`
+        : `${N} ${ok ? 'is' : 'is not'} in the 7× table`;
+      break;
+    }
+    case 11: {
+      ok = n % 11 === 0;
+      if (n < 100){
+        text = n < 11 ? `${N} is smaller than 11` : `${N}: ${ok ? 'both digits match' : 'the digits don’t match'}`;
+      } else {
+        let alt = 0;
+        const parts = ds.map((x, i) => { alt += (i % 2 ? -x : x); return i === 0 ? String(x) : (i % 2 ? ` ${MINUS} ${x}` : ` + ${x}`); }).join('');
+        const aa = Math.abs(alt);
+        text = `${N}: zig-zag ${parts} = ${alt < 0 ? MINUS + aa : alt} → ${ok ? (aa === 0 ? '0 means yes!' : `${aa} is in the 11× table`) : 'not 0 or in the 11× table'}`;
+      }
+      break;
+    }
+    default: {
+      const q = Math.floor(n / d), r = n % d; ok = r === 0;
+      text = ok ? `${N} ÷ ${d} = ${fmt(q)} exactly` : `${N} ÷ ${d} = ${fmt(q)} remainder ${r}`;
+    }
+  }
+  return { ok, text };
+}
+
+/* Break n into easy chunks for dividing by d (e.g. 134 ÷ 2 → 120 + 14). */
+function chunks(n, d){
+  const out = []; let rest = n;
+  while (rest > 0){
+    let best = rest;
+    for (let p = 1; d * p <= rest; p *= 10){ best = d * p * Math.floor(rest / (d * p)); }
+    out.push(best); rest -= best;
+  }
+  return out;
+}
+
+/* Make a fraction for a level. Common factors only use primes the clues cover. */
+function genFraction(level, avoid){
+  for (let t = 0; t < 2000; t++){
+    let a, b, g, max, min = 2;
+    if (level === 'easy'){
+      b = randInt(2, 10); a = randInt(1, b - 1); g = pick([2, 2, 3, 4, 5, 5, 6, 10]); max = 100;
+    } else if (level === 'medium'){
+      b = randInt(3, 20); a = Math.random() < 0.25 ? randInt(b + 1, b * 3) : randInt(1, b - 1);
+      g = pick([4, 6, 8, 9, 10, 12, 15, 16, 18, 20, 24, 30]); max = 400;
+    } else {
+      a = randInt(2, 99); b = randInt(2, 60);
+      g = Math.random() < 0.1 ? 1 : pick([2, 3, 4, 6, 7, 8, 9, 11, 12, 14, 15, 18, 21, 22, 28, 33, 35]);
+      max = 999; min = g === 1 ? 20 : 12;
+    }
+    if (a === b || gcd(a, b) !== 1) continue;
+    const A = a * g, B = b * g;
+    if (A > max || B > max || A < min || B < min) continue;
+    if (avoid && avoid[0] === A && avoid[1] === B) continue;
+    return [A, B];
+  }
+  return [134, 56];
+}
+
+/* The detective's plan as a list of steps: 2, 3, 5, then the smart trick. */
+function solveSteps(a0, b0){
+  let a = a0, b = b0;
+  const steps = [{ kind: 'start', a, b }], used = [];
+  const tryPrime = p => {
+    while (true){
+      const ra = clue(a, p), rb = clue(b, p);
+      if (ra.ok && rb.ok){
+        steps.push({ kind: 'div', p, a, b, ra, rb, na: a / p, nb: b / p });
+        a /= p; b /= p; used.push(p);
+        if (Math.min(a, b) === 1) return;
+      } else { steps.push({ kind: 'fail', p, a, b, ra, rb }); return; }
+    }
+  };
+  for (const p of [2, 3, 5]){ if (Math.min(a, b) === 1) break; tryPrime(p); }
+  if (Math.min(a, b) > 1){
+    const m = Math.min(a, b), M = Math.max(a, b), f = primeFactors(m);
+    const cands = [...new Set(f)].filter(q => q > 5);
+    steps.push({ kind: 'smart', m, M, f, cands });
+    for (const q of cands){ if (Math.min(a, b) === 1) break; tryPrime(q); }
+  }
+  steps.push({ kind: 'done', a0, b0, a, b, used });
+  return steps;
+}
+</script>
+
+<script>
+/* ---------- Page / game logic ---------- */
+(function(){
+'use strict';
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('fracdet_' + k); return v === null ? d : JSON.parse(v); } catch (e){ return d; } },
+  set(k, v){ try { localStorage.setItem('fracdet_' + k, JSON.stringify(v)); } catch (e){} }
+};
+const COLORS = { 2: 'var(--c2)', 3: 'var(--c3)', 4: 'var(--c4)', 5: 'var(--c5)', 6: 'var(--c6)', 7: 'var(--c7)', 9: 'var(--c9)', 10: 'var(--c10)', 11: 'var(--c11)' };
+const colorOf = d => COLORS[d] || 'var(--c11)';
+const mini = (a, b) => `<span class="mini"><span>${a}</span><span>${b}</span></span>`;
+const line = r => `<div class="clue-line ${r.ok ? 'ok' : 'no'}">${r.ok ? '✓' : '✗'} ${r.text}</div>`;
+const restart = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+const digitsOnly = el => el.addEventListener('input', () => { const v = el.value.replace(/\D/g, ''); if (v !== el.value) el.value = v; });
+const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/* ----- sound ----- */
+let soundOn = store.get('sound', true), actx = null;
+function sfx(kind){
+  if (!soundOn) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const now = actx.currentTime;
+    const play = (f, t, d, type = 'triangle', v = 0.12) => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = type; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, now + t);
+      g.gain.exponentialRampToValueAtTime(v, now + t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + t + d);
+      o.connect(g); g.connect(actx.destination);
+      o.start(now + t); o.stop(now + t + d + 0.05);
+    };
+    if (kind === 'good'){ play(660, 0, .15); play(880, .1, .2); }
+    else if (kind === 'bad'){ play(196, 0, .25, 'sawtooth', .05); }
+    else if (kind === 'win'){ [523, 659, 784, 1047].forEach((f, i) => play(f, i * .11, .3)); }
+    else { play(440, 0, .06, 'sine', .05); }
+  } catch (e){}
+}
+function renderSound(){ const b = $('#soundBtn'); b.textContent = soundOn ? '🔊' : '🔇'; b.setAttribute('aria-label', soundOn ? 'Sound on' : 'Sound off'); }
+$('#soundBtn').addEventListener('click', () => { soundOn = !soundOn; store.set('sound', soundOn); renderSound(); sfx('tap'); });
+
+/* ----- confetti ----- */
+const cv = $('#confetti'), cx = cv.getContext('2d');
+let bits = [], raf = null;
+function confetti(count = 140){
+  if (reduceMotion) return;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const cols = ['#2F80ED', '#8E5CE0', '#F08A2C', '#1F9D63', '#E2557B', '#F5B301'];
+  for (let i = 0; i < count; i++){
+    bits.push({ x: innerWidth / 2 + (Math.random() - .5) * 140, y: innerHeight * .35, vx: (Math.random() - .5) * 13, vy: -Math.random() * 12 - 4,
+      s: 6 + Math.random() * 7, r: Math.random() * 6, vr: (Math.random() - .5) * .3, c: pick(cols), life: 0 });
+  }
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function tick(){
+  cx.clearRect(0, 0, innerWidth, innerHeight);
+  for (const p of bits){
+    p.vy += .35; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life++;
+    cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); cx.restore();
+  }
+  bits = bits.filter(p => p.y < innerHeight + 40 && p.life < 260);
+  if (bits.length) raf = requestAnimationFrame(tick); else { raf = null; cx.clearRect(0, 0, innerWidth, innerHeight); }
+}
+
+/* ----- player: name, stars, rank ----- */
+let playerName = store.get('name', ''), stars = store.get('stars', 0);
+const RANKS = [[0, 'Rookie'], [10, 'Junior'], [30, 'Clever'], [60, 'Senior'], [100, 'Chief'], [200, 'Legendary']];
+const rankOf = s => RANKS.reduce((r, [t, n]) => s >= t ? n : r, 'Rookie');
+function renderHud(){
+  $('#starCount').textContent = stars;
+  $('#rankTxt').textContent = rankOf(stars) + ' Detective';
+  $('#nameTxt').textContent = playerName;
+}
+function addStars(k){ stars += k; store.set('stars', stars); renderHud(); restart($('#starPill'), 'bump'); }
+function openName(){ $('#nameModal').hidden = false; $('#nameInput').value = playerName; setTimeout(() => $('#nameInput').focus(), 60); }
+function saveName(){ playerName = $('#nameInput').value.trim().slice(0, 16); store.set('name', playerName); store.set('welcomed', true); $('#nameModal').hidden = true; renderHud(); sfx('good'); }
+$('#nameGo').addEventListener('click', saveName);
+$('#nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveName(); });
+$('#whoBtn').addEventListener('click', openName);
+
+/* ----- tabs ----- */
+function showTab(id){
+  if (!['learn', 'quiz', 'crack', 'show'].includes(id)) id = 'learn';
+  $$('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
+  $$('.panel').forEach(p => { p.hidden = p.id !== 'tab-' + id; });
+  store.set('tab', id);
+  if (id === 'quiz' && !quiz.n) newRound();
+  if (id === 'crack' && !game.started) newFraction();
+}
+$$('.tab').forEach(t => t.addEventListener('click', () => { showTab(t.dataset.tab); sfx('tap'); }));
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-goto]');
+  if (g){ showTab(g.dataset.goto); window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' }); }
+});
+const setPressed = (box, level) => $$('.chip', box).forEach(c => c.setAttribute('aria-pressed', String(c.dataset.level === level)));
+
+/* ----- LEARN: number detective ----- */
+const ND = [2, 3, 4, 5, 6, 9, 10, 7, 11];
+function renderND(){
+  const raw = $('#ndInput').value.replace(/\D/g, '').slice(0, 7), out = $('#ndOut');
+  if (!raw){ out.innerHTML = '<p class="muted">Type a number above 👆</p>'; return; }
+  const n = parseInt(raw, 10);
+  if (n < 2){ out.innerHTML = '<p class="muted">Try a number bigger than 1.</p>'; return; }
+  const rows = ND.map(d => { const c = clue(n, d); return `<div class="clue ${c.ok ? 'yes' : 'no'}"><span class="badge" style="--c:${colorOf(d)}">÷${d}</span><span class="mark">${c.ok ? '✓' : '✗'}</span><span>${c.text}</span></div>`; }).join('');
+  const pf = primeFactors(n);
+  const sum = pf.length === 1
+    ? `🔒 <b>${fmt(n)} is a prime number.</b> Only 1 and ${fmt(n)} divide it.`
+    : `🧩 <b>Prime pieces:</b> ${fmt(n)} = ${pf.join(' × ')}`;
+  out.innerHTML = `<div class="nd-sum">${sum}</div><div class="clues">${rows}</div>`;
+}
+$('#ndInput').addEventListener('input', e => { const v = e.target.value.replace(/\D/g, '').slice(0, 7); if (v !== e.target.value) e.target.value = v; renderND(); });
+renderND();
+$('#watchBtn').addEventListener('click', () => { $('#sTop').value = 134; $('#sBot').value = 56; showTab('show'); startShow(); window.scrollTo({ top: 0 }); });
+
+/* ----- QUIZ ----- */
+const QUIZ = {
+  easy:   { ds: [2, 5, 10],               lo: 10,  hi: 300,  info: 'Clues for 2, 5 and 10.' },
+  medium: { ds: [2, 3, 4, 5, 6, 9, 10],   lo: 100, hi: 9999, info: 'Clues for 2, 3, 4, 5, 6, 9 and 10.' },
+  expert: { ds: [3, 4, 6, 7, 9, 11],      lo: 100, hi: 999,  info: 'Tricky ones: 3, 4, 6, 7, 9 and 11.' }
+};
+const quiz = { level: store.get('quizLevel', 'easy'), n: 0, d: 0, i: 0, results: [], streak: 0, best: store.get('best', 0), answered: false };
+if (!QUIZ[quiz.level]) quiz.level = 'easy';
+function newRound(){ quiz.i = 0; quiz.results = []; $('#quizBody').hidden = false; $('#quizSum').hidden = true; $('#quizInfo').textContent = QUIZ[quiz.level].info; newQuestion(); }
+function newQuestion(){
+  const L = QUIZ[quiz.level], d = pick(L.ds); let n;
+  do {
+    if (Math.random() < 0.5) n = d * randInt(Math.ceil(L.lo / d), Math.floor(L.hi / d));
+    else { do { n = randInt(L.lo, L.hi); } while (n % d === 0); }
+  } while (n === quiz.n);
+  quiz.n = n; quiz.d = d; quiz.answered = false;
+  $('#qNum').textContent = fmt(n);
+  const b = $('#qDiv'); b.textContent = d; b.style.setProperty('--c', colorOf(d));
+  $('#quizFb').innerHTML = ''; $('#qYes').disabled = false; $('#qNo').disabled = false;
+  restart($('#qNum'), 'pop'); renderDots();
+}
+function renderDots(){
+  $('#quizDots').innerHTML = Array.from({ length: 10 }, (_, k) => {
+    const r = quiz.results[k];
+    const cls = r === true ? 'r' : r === false ? 'w' : (k === quiz.i && !quiz.answered ? 'cur' : '');
+    return `<span class="dot ${cls}"></span>`;
+  }).join('');
+}
+function answer(yes){
+  if (quiz.answered) return;
+  quiz.answered = true;
+  const truth = quiz.n % quiz.d === 0, right = yes === truth, c = clue(quiz.n, quiz.d);
+  quiz.results.push(right); quiz.i++;
+  if (right){ quiz.streak++; addStars(1); sfx('good'); } else { quiz.streak = 0; sfx('bad'); }
+  if (quiz.streak > quiz.best){ quiz.best = quiz.streak; store.set('best', quiz.best); }
+  $('#qStreak').textContent = quiz.streak; $('#qBest').textContent = quiz.best;
+  const verdict = truth ? `So yes! ${fmt(quiz.n)} ÷ ${quiz.d} = <b>${fmt(quiz.n / quiz.d)}</b>` : `So no, ${fmt(quiz.n)} can't be divided evenly by ${quiz.d}.`;
+  const last = quiz.i >= 10;
+  $('#quizFb').innerHTML = `<div class="fb ${right ? 'good' : 'bad'}">
+      <div class="fb-h">${right ? pick(['✓ Correct!', '✓ Nailed it!', '✓ Great detective work!', '✓ Yes, you cracked it!']) : '✗ Not quite!'}</div>
+      <div>🔎 ${c.text}</div><div>${verdict}</div>
+      <button class="btn dark" id="qNext">${last ? 'See my score 🏁' : 'Next ▶'}</button></div>`;
+  $('#qYes').disabled = true; $('#qNo').disabled = true;
+  $('#qNext').addEventListener('click', last ? showQuizSummary : newQuestion);
+  $('#qNext').focus({ preventScroll: true });
+  renderDots();
+}
+function showQuizSummary(){
+  const score = quiz.results.filter(Boolean).length;
+  const msg = score === 10 ? 'PERFECT! You are a clue master! 🏆'
+    : score >= 8 ? 'Awesome detective work! 🌟'
+    : score >= 5 ? 'Good job! Keep practising those clues 💪'
+    : 'Every detective starts somewhere. Peek at the Learn page and try again! 📚';
+  $('#quizBody').hidden = true;
+  const s = $('#quizSum'); s.hidden = false;
+  s.innerHTML = `<div class="summary"><div class="big-score">${score}/10</div><p>${msg}</p><p class="muted">⭐ +${score} stars this round</p><button class="btn primary" id="qAgain">Play again ▶</button></div>`;
+  $('#qAgain').addEventListener('click', newRound);
+  if (score >= 8){ confetti(); sfx('win'); }
+}
+$('#qYes').addEventListener('click', () => answer(true));
+$('#qNo').addEventListener('click', () => answer(false));
+$('#quizLevels').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  quiz.level = c.dataset.level; store.set('quizLevel', quiz.level); setPressed($('#quizLevels'), quiz.level); newRound();
+});
+setPressed($('#quizLevels'), quiz.level);
+$('#qBest').textContent = quiz.best;
+
+/* ----- CRACK THE FRACTION ----- */
+const DIVS = [2, 3, 4, 5, 6, 7, 9, 10, 11];
+const HINT1 = {
+  2: '👀 Look at the <b>last digit</b> of both numbers. Are they both even?',
+  3: '➕ <b>Add up the digits</b> of each number. Are both totals in the 3× table?',
+  5: '🖐️ Look at how both numbers <b>end</b>. Both 0 or 5?',
+  7: '7️⃣ Think <b>7× table</b>, or try the chop-and-double trick on both numbers.',
+  11: '🔁 Try the <b>÷11 zig-zag</b> trick on both numbers.'
+};
+const game = { level: store.get('crackLevel', 'easy'), a: 0, b: 0, oa: 0, ob: 0, hints: 0, mistakes: 0, hintLv: 0, notes: [], pending: 0, tries: 0, solved: false, started: false, practice: store.get('practice', true) };
+if (!['easy', 'medium', 'hard', 'mine'].includes(game.level)) game.level = 'easy';
+
+$('#divGrid').innerHTML = DIVS.map(d => `<button class="btn divbtn" data-d="${d}" style="--c:${colorOf(d)}" aria-label="Divide both by ${d}">÷${d}</button>`).join('')
+  + '<button class="btn divbtn" data-d="?" style="--c:var(--ink)" aria-label="Divide by another number">÷ ?</button>';
+
+function setMsg(kind, html){ const m = $('#cMsg'); m.className = 'msg ' + (kind || ''); m.innerHTML = html; }
+function renderNotes(){
+  const ol = $('#cNotes');
+  if (!game.a){ ol.innerHTML = '<li class="muted small">Your steps will appear here.</li>'; return; }
+  ol.innerHTML = `<li>${mini(game.oa, game.ob)}</li>` + game.notes.map(n => `<li><span class="op">÷${n.d} →</span>${mini(n.ta, n.tb)}</li>`).join('');
+}
+function showFrac(pop){ $('#cTop').textContent = game.a || '?'; $('#cBot').textContent = game.b || '?'; if (pop) restart($('#cFrac'), 'pop'); }
+function controlsLocked(on){ $('#cControls').classList.toggle('dim', on); }
+
+function newFraction(custom){
+  game.started = true;
+  $('#mineBox').hidden = game.level !== 'mine';
+  if (!custom && game.level === 'mine'){
+    Object.assign(game, { a: 0, b: 0, oa: 0, ob: 0, notes: [], pending: 0, solved: false });
+    showFrac(false); $('#cWin').hidden = true; $('#cPractice').hidden = true; $('#cControls').hidden = true;
+    setMsg('', 'Type any fraction above and press <b>Start</b>. (Grown-ups: this is where you set the challenge!)');
+    renderNotes(); return;
+  }
+  const [A, B] = custom || genFraction(game.level, game.oa ? [game.oa, game.ob] : null);
+  Object.assign(game, { a: A, b: B, oa: A, ob: B, hints: 0, mistakes: 0, hintLv: 0, notes: [], pending: 0, tries: 0, solved: false });
+  showFrac(true);
+  $('#cWin').hidden = true; $('#cPractice').hidden = true; $('#cControls').hidden = false; $('#customRow').hidden = true; controlsLocked(false);
+  setMsg('', 'Which clue works for <b>both</b> numbers? Pick a divider below 👇');
+  renderNotes();
+}
+
+function tryDivide(d){
+  if (game.solved || game.pending || !game.a || !(d >= 2)) return;
+  const ra = clue(game.a, d), rb = clue(game.b, d);
+  if (ra.ok && rb.ok){
+    sfx('good');
+    if (game.practice){ startPractice(d, line(ra) + line(rb)); }
+    else applyDivide(d, line(ra) + line(rb));
+  } else {
+    game.mistakes++; sfx('bad'); restart($('#cFrac'), 'shake');
+    setMsg('bad', `<b>÷${d} doesn't work for both.</b>${line(ra)}${line(rb)}<div class="small">Both numbers must pass the clue. Try another one!</div>`);
+  }
+}
+function applyDivide(d, why){
+  const fa = game.a, fb = game.b;
+  game.a = fa / d; game.b = fb / d; game.hintLv = 0;
+  game.notes.push({ d, ta: game.a, tb: game.b });
+  showFrac(true); renderNotes();
+  setMsg('good', `<b>${why ? `Both pass the ÷${d} clue!` : 'Great dividing! ✏️'}</b>${why || ''}<div>${fa} ÷ ${d} = <b>${game.a}</b> and ${fb} ÷ ${d} = <b>${game.b}</b></div><div class="small">Can you go further? Or is it already the simplest?</div>`);
+}
+
+/* practice: the kid does the division */
+function startPractice(d, why){
+  game.pending = d; game.tries = 0;
+  setMsg('good', `<b>Yes! Both pass the ÷${d} clue.</b>${why}<div>Now you do the dividing ✏️</div>`);
+  const p = $('#cPractice');
+  p.innerHTML = `<div class="eq"><span>${game.a} ÷ ${d} =</span><input class="ans" id="pA" inputmode="numeric" autocomplete="off" aria-label="${game.a} divided by ${d}"></div>
+    <div class="eq"><span>${game.b} ÷ ${d} =</span><input class="ans" id="pB" inputmode="numeric" autocomplete="off" aria-label="${game.b} divided by ${d}"></div>
+    <div class="row gap wrapf"><button class="btn primary" id="pCheck">Check ✓</button><button class="btn" id="pSkip">Show me the answer</button></div>
+    <div id="pMsg" class="small"></div>`;
+  p.hidden = false; controlsLocked(true);
+  digitsOnly($('#pA')); digitsOnly($('#pB'));
+  ['#pA', '#pB'].forEach(s => $(s).addEventListener('keydown', e => { if (e.key === 'Enter') checkPractice(); }));
+  $('#pCheck').addEventListener('click', checkPractice);
+  $('#pSkip').addEventListener('click', revealPractice);
+  $('#pA').focus({ preventScroll: true });
+}
+function checkPractice(){
+  const d = game.pending, wa = game.a / d, wb = game.b / d;
+  const A = $('#pA'), B = $('#pB'), va = parseInt(A.value, 10), vb = parseInt(B.value, 10);
+  A.classList.toggle('right', va === wa); A.classList.toggle('wrong', va !== wa);
+  B.classList.toggle('right', vb === wb); B.classList.toggle('wrong', vb !== wb);
+  if (va === wa && vb === wb){ sfx('good'); endPractice(d); return; }
+  game.tries++; sfx('bad');
+  if (game.tries >= 2){ revealPractice(); return; }
+  const n = va !== wa ? game.a : game.b;
+  const ch = chunks(n, d);
+  $('#pMsg').innerHTML = ch.length > 1
+    ? `Not quite! Tip: break ${n} into chunks: ${ch.map(c => `${c} ÷ ${d} = ${c / d}`).join(', ')}. Now add those up!`
+    : `Not quite! Tip: ${d} × <b>?</b> = ${n}. Count up in ${d}s.`;
+}
+function revealPractice(){
+  const d = game.pending;
+  $('#pA').value = game.a / d; $('#pB').value = game.b / d;
+  $('#pMsg').innerHTML = `Here's the answer: <b>${game.a / d}</b> and <b>${game.b / d}</b>. <button class="btn dark" id="pOk" style="margin-left:6px">Keep going ▶</button>`;
+  $('#pOk').addEventListener('click', () => endPractice(d));
+}
+function endPractice(d){ game.pending = 0; $('#cPractice').hidden = true; controlsLocked(false); applyDivide(d, ''); }
+
+function giveHint(){
+  if (game.solved || game.pending || !game.a) return;
+  game.hints++; game.hintLv = Math.min(game.hintLv + 1, 2);
+  const { a, b } = game, g = gcd(a, b), m = Math.min(a, b), M = Math.max(a, b);
+  let h;
+  if (g === 1){
+    if (m === 1) h = '🤔 One of the numbers is 1, and nothing bigger than 1 can divide 1. So it\'s already as simple as it gets! Press <b>It\'s simplest!</b>';
+    else if (game.hintLv === 1) h = `🤔 Check the clues for 2, 3 and 5. Then use the <b>smart trick</b> on ${m}. Does ANY number divide both?`;
+    else {
+      const pf = primeFactors(m);
+      h = `🧩 ${pf.length === 1 ? `${m} is a prime number` : `${m} = ${pf.join(' × ')}`}, and none of those pieces divide ${M}. It's already as simple as it gets! Press <b>It's simplest!</b>`;
+    }
+  } else {
+    const p = primeFactors(g)[0];
+    if (game.hintLv === 1) h = HINT1[p] || `🧩 <b>Smart trick:</b> break the smaller number into primes: ${m} = ${primeFactors(m).join(' × ')}. Test those on ${M}!`;
+    else h = `👉 Try <b>÷${p}</b>!${DIVS.includes(p) ? '' : ' Use the <b>÷ ?</b> button.'}${line(clue(a, p))}${line(clue(b, p))}`;
+  }
+  sfx('tap'); setMsg('hint', h);
+}
+
+function claimSimplest(){
+  if (game.solved || game.pending || !game.a) return;
+  if (gcd(game.a, game.b) === 1){ win(); return; }
+  game.mistakes++; sfx('bad'); restart($('#cFrac'), 'shake');
+  setMsg('bad', `<b>Not yet!</b> There's still a number that divides both ${game.a} and ${game.b}. 🕵️ Tap <b>💡 Clue</b> if you're stuck.`);
+}
+function win(){
+  game.solved = true;
+  const slips = game.hints + game.mistakes, s = slips === 0 ? 3 : slips <= 2 ? 2 : 1;
+  addStars(s); sfx('win'); confetti();
+  const used = game.notes.map(n => n.d), G = used.reduce((x, y) => x * y, 1);
+  let gcf;
+  if (!used.length) gcf = '<p>Trick case! It was already in simplest form. 😎</p>';
+  else if (used.length === 1) gcf = `<p>You divided by ${G}. That's the <b>Greatest Common Factor</b>!</p>`;
+  else gcf = `<p>You divided by ${used.join(', ')}. So ${used.join(' × ')} = <b>${G}</b> is the <b>Greatest Common Factor</b>. Shortcut: ${game.oa} ÷ ${G} and ${game.ob} ÷ ${G} in one go!</p>`;
+  let bonus = '';
+  if (game.b === 1) bonus = `<p>🎁 Bonus: the bottom is 1, so it's just the whole number <b>${game.a}</b>!</p>`;
+  else if (game.a > game.b) bonus = `<p>🎁 Bonus: as a mixed number that's <b>${Math.floor(game.a / game.b)}</b> and ${mini(game.a % game.b, game.b)}</p>`;
+  const who = playerName ? ', ' + esc(playerName) : '';
+  const cheer = s === 3 ? 'Perfect, no clues needed!' : s === 2 ? 'Nice work!' : 'You got there!';
+  const w = $('#cWin');
+  w.innerHTML = `<div class="win-h">🎉 Case cracked${who}!</div>
+    <div class="win-eq">${mini(game.oa, game.ob)} = ${mini(game.a, game.b)}</div>
+    <div class="stars" aria-label="${s} stars">${'★'.repeat(s)}<span class="off">${'★'.repeat(3 - s)}</span></div>
+    <p><b>${cheer}</b></p>${gcf}${bonus}
+    <button class="btn primary" id="cNext">Next case ▶</button>`;
+  w.hidden = false; $('#cControls').hidden = true;
+  setMsg('good', `<b>${game.a}/${game.b}</b>: nothing (except 1) divides both. Case closed!`);
+  $('#cNext').addEventListener('click', () => { newFraction(); if (game.level === 'mine') $('#mTop').focus(); });
+}
+
+$('#divGrid').addEventListener('click', e => {
+  const b = e.target.closest('[data-d]'); if (!b) return;
+  if (b.dataset.d === '?'){ const r = $('#customRow'); r.hidden = !r.hidden; if (!r.hidden) $('#customD').focus(); return; }
+  tryDivide(+b.dataset.d);
+});
+digitsOnly($('#customD'));
+$('#customGo').addEventListener('click', () => { const d = parseInt($('#customD').value, 10); if (d >= 2) tryDivide(d); else setMsg('bad', 'Type a number bigger than 1 to divide by.'); });
+$('#customD').addEventListener('keydown', e => { if (e.key === 'Enter') $('#customGo').click(); });
+$('#cDone').addEventListener('click', claimSimplest);
+$('#cHint').addEventListener('click', giveHint);
+$('#cNew').addEventListener('click', () => { sfx('tap'); newFraction(); });
+$('#cPracticeToggle').checked = game.practice;
+$('#cPracticeToggle').addEventListener('change', e => { game.practice = e.target.checked; store.set('practice', game.practice); });
+$('#crackLevels').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  game.level = c.dataset.level; store.set('crackLevel', game.level); setPressed($('#crackLevels'), game.level);
+  game.oa = 0; newFraction();
+});
+setPressed($('#crackLevels'), game.level);
+digitsOnly($('#mTop')); digitsOnly($('#mBot'));
+$('#mGo').addEventListener('click', () => {
+  const A = parseInt($('#mTop').value, 10), B = parseInt($('#mBot').value, 10);
+  if (!(A >= 1 && B >= 1)){ setMsg('bad', 'Type a whole number on the top and on the bottom (bigger than 0).'); return; }
+  newFraction([A, B]);
+});
+$('#mBot').addEventListener('keydown', e => { if (e.key === 'Enter') $('#mGo').click(); });
+
+/* ----- SHOW ME ----- */
+const show = { steps: [], i: 0 };
+function renderStep(st, prev, next){
+  const badge = p => `<span class="badge" style="--c:${colorOf(p)}">÷${p}</span>`;
+  switch (st.kind){
+    case 'start':
+      return `<div class="step start"><div class="step-h">📁 Case file: ${mini(st.a, st.b)}</div><p>Let's check the clues one at a time, always on <b>both</b> numbers.</p></div>`;
+    case 'div':
+      return `<div class="step good"><div class="step-h">${badge(st.p)} clue</div>${line(st.ra)}${line(st.rb)}
+        <p>Both pass! Divide the top and bottom by ${st.p}:</p>
+        <div class="calc">${st.a} ÷ ${st.p} = <b>${st.na}</b> &nbsp;·&nbsp; ${st.b} ÷ ${st.p} = <b>${st.nb}</b></div>
+        <div class="result">${mini(st.a, st.b)} <span class="arrow">→</span> ${mini(st.na, st.nb)}</div></div>`;
+    case 'fail': {
+      const again = prev && prev.kind === 'div' && prev.p === st.p;
+      return `<div class="step"><div class="step-h">${badge(st.p)} clue</div>${line(st.ra)}${line(st.rb)}<p>${next && next.kind === 'done' ? (again ? `No more ÷${st.p}, and that was the last clue to check!` : 'They don\'t both pass, and that was the last clue to check!') : again ? `No more ÷${st.p}. On to the next clue!` : 'They don\'t both pass. Next clue!'}</p></div>`;
+    }
+    case 'smart': {
+      const fTxt = st.f.length === 1 ? `<b>${st.m}</b> is a <b>prime</b> number, so it can't be broken down.` : `<b>${st.m} = ${st.f.join(' × ')}</b>`;
+      const test = !st.cands.length
+        ? 'Its pieces are only 2, 3 or 5, and we already checked those. Nothing new to test!'
+        : `We already checked 2, 3 and 5, so only <b>${st.cands.join(' and ')}</b> ${st.cands.length === 1 ? 'is' : 'are'} left to test on ${st.M}.`;
+      return `<div class="step smart"><div class="step-h">🧩 Smart trick</div><p>Break the smaller number into prime pieces. Any number that divides both must be made of these pieces.</p><p>${fTxt}</p><p>${test}</p></div>`;
+    }
+    case 'done': {
+      const G = st.used.reduce((x, y) => x * y, 1);
+      let gcf;
+      if (!st.used.length) gcf = 'Nothing divides both, so it was already in simplest form!';
+      else if (st.used.length === 1) gcf = `We divided by ${G}, the <b>Greatest Common Factor</b>.`;
+      else gcf = `We divided by ${st.used.join(', ')}. ${st.used.join(' × ')} = <b>${G}</b> is the <b>Greatest Common Factor</b>. Shortcut: divide both by ${G} in one go!`;
+      let bonus = '';
+      if (st.b === 1) bonus = `<p>🎁 The bottom is 1, so it's just the whole number <b>${st.a}</b>!</p>`;
+      else if (st.a > st.b) bonus = `<p>🎁 As a mixed number: <b>${Math.floor(st.a / st.b)}</b> and ${mini(st.a % st.b, st.b)}</p>`;
+      return `<div class="step done"><div class="step-h">🎉 Case closed!</div><div class="win-eq">${mini(st.a0, st.b0)} = ${mini(st.a, st.b)}</div><p>${gcf}</p>${bonus}<button class="btn primary" data-goto="crack">🍕 Now I'll try one!</button></div>`;
+    }
+  }
+  return '';
+}
+function startShow(){
+  const A = parseInt($('#sTop').value, 10), B = parseInt($('#sBot').value, 10);
+  if (!(A >= 1 && B >= 1)){
+    $('#sSteps').innerHTML = '<div class="step">Type a whole number on the top and bottom (bigger than 0) 🙂</div>'; $('#sNav').hidden = true; return;
+  }
+  show.steps = solveSteps(A, B); show.i = 0; $('#sSteps').innerHTML = ''; $('#sNav').hidden = false;
+  nextStep(false);
+}
+function nextStep(quiet){
+  if (show.i >= show.steps.length) return;
+  const st = show.steps[show.i], prev = show.steps[show.i - 1];
+  show.i++;
+  $('#sSteps').insertAdjacentHTML('beforeend', renderStep(st, prev, show.steps[show.i]));
+  if (show.i >= show.steps.length){ $('#sNav').hidden = true; confetti(70); sfx('win'); }
+  else if (!quiet) sfx('tap');
+  if (!quiet){ const el = $('#sSteps').lastElementChild; if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' }); }
+}
+$('#sGo').addEventListener('click', startShow);
+$('#sNext').addEventListener('click', () => nextStep(false));
+$('#sAll').addEventListener('click', () => { while (show.i < show.steps.length) nextStep(true); });
+digitsOnly($('#sTop')); digitsOnly($('#sBot'));
+$('#sBot').addEventListener('keydown', e => { if (e.key === 'Enter') startShow(); });
+
+/* ----- start ----- */
+renderHud(); renderSound(); renderNotes();
+showTab(store.get('tab', 'learn'));
+if (!store.get('welcomed', false)) openName();
+})();
+</script>
+</body>
+</html>

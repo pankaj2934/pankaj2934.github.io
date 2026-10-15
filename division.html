@@ -1,0 +1,397 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Math Word Problems (500)</title>
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#0b1020;color:#fff}
+    .wrap{max-width:900px;margin:0 auto;padding:14px}
+    .card{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:14px;margin-bottom:12px}
+    h1{margin:0 0 6px;font-size:22px}
+    .muted{color:rgba(255,255,255,.72)}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .pill{padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);font-weight:800;font-size:12px}
+    .bar{height:10px;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.25);margin-top:10px}
+    .bar>div{height:100%;width:0%;background:rgba(70,230,162,.6)}
+    .q{font-size:18px;font-weight:900;line-height:1.25;margin:0}
+    .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    @media (max-width:520px){.choices{grid-template-columns:1fr}}
+    button{min-height:52px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.10);color:#fff;font-weight:900;font-size:18px;cursor:pointer}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.10);font-weight:900}
+    .btn.primary{border-color:rgba(70,230,162,.5);background:rgba(70,230,162,.18)}
+    .hint{white-space:pre-wrap;line-height:1.35;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px}
+    .error{display:none;background:rgba(255,107,107,.18);border:1px solid rgba(255,107,107,.55);border-radius:14px;padding:12px;font-weight:900}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Math Word Problems (500)</h1>
+      <div class="muted">Easy addition/subtraction → harder → multiplication → division. Wrong answer shows a visual hint, then you try again.</div>
+      <div class="bar"><div id="barFill"></div></div>
+      <div class="row" style="margin-top:10px">
+        <div class="pill" id="pillLevel">Level 1</div>
+        <div class="pill" id="pillOp">Addition</div>
+        <div class="pill" id="pillProg">Problem 1/500</div>
+        <div class="pill" id="pillScore">Score 0</div>
+        <div class="pill" id="pillStreak">Streak 0</div>
+      </div>
+    </div>
+
+    <div class="error" id="errorBox">Loading…</div>
+
+    <div class="card">
+      <p class="q" id="questionText">If you can read this, the page loaded. The game will appear in a moment…</p>
+      <div class="muted" id="questionMeta" style="margin-top:8px"></div>
+
+      <div class="choices" id="choices"></div>
+
+      <div class="actions">
+        <button class="btn" id="btnRestart" type="button">Restart</button>
+        <button class="btn primary" id="btnNext" type="button" disabled>Next</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="hint" id="hintBox">Hint area: if you choose a wrong answer, you will see a visual explanation here.</div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  // Show any JS error clearly (so it never "spins silently")
+  var errorBox = document.getElementById("errorBox");
+  window.onerror = function(msg, src, line, col){
+    errorBox.style.display = "block";
+    errorBox.textContent = "JS Error: " + msg + " (line " + line + ")";
+    return false;
+  };
+
+  function $(id){ return document.getElementById(id); }
+
+  // Simple deterministic RNG (LCG)
+  function makeRng(seed){
+    var s = seed >>> 0;
+    return function(){
+      s = (s * 1664525 + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
+  }
+  function pick(rng, arr){ return arr[Math.floor(rng() * arr.length)]; }
+  function shuffle(rng, arr){
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(rng() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
+
+  var THEMES = [
+    {e:"🍎", one:"apple", many:"apples"},
+    {e:"🍪", one:"cookie", many:"cookies"},
+    {e:"🧁", one:"cupcake", many:"cupcakes"},
+    {e:"🍬", one:"candy", many:"candies"},
+    {e:"⭐", one:"sticker", many:"stickers"},
+    {e:"🪙", one:"coin", many:"coins"}
+  ];
+  var NAMES = ["Aadvik","Kiansh","Atharv","Mia","Leo","Zoe","Noah","Ivy","Kai","Eli","Uma","Ava"];
+
+  // 500 problems, staged difficulty (NO pre-generation, NO loops that can hang)
+  var STAGES = [
+    {count:200, level:1, label:"Easy +/− (≤10)"},
+    {count:170, level:2, label:"+/− (≤20)"},
+    {count:60,  level:3, label:"+/− (≤100)"},
+    {count:45,  level:4, label:"× (facts)"},
+    {count:15,  level:5, label:"× (bigger)"},
+    {count:10,  level:6, label:"÷ (sharing)"}
+  ];
+  var TOTAL = 500;
+
+  function stageForIndex(i){
+    var acc = 0;
+    for (var k=0;k<STAGES.length;k++){
+      if (i < acc + STAGES[k].count) return STAGES[k];
+      acc += STAGES[k].count;
+    }
+    return STAGES[STAGES.length-1];
+  }
+
+  function opLabel(op){
+    if (op==="add") return "Addition";
+    if (op==="sub") return "Subtraction";
+    if (op==="mul") return "Multiplication";
+    return "Division";
+  }
+
+  function generateProblem(index){
+    var st = stageForIndex(index);
+    var rng = makeRng(20260104 + index * 97);
+
+    var theme = pick(rng, THEMES);
+    var name  = pick(rng, NAMES);
+
+    // Build one problem object:
+    // {op, level, stageLabel, theme, name, a, b, ans, story}
+    if (st.level === 1){
+      var op1 = (rng() < 0.52) ? "add" : "sub";
+      if (op1 === "add"){
+        var a1 = 1 + Math.floor(rng()*9);
+        var b1 = 1 + Math.floor(rng()*(10 - a1));
+        return {op:op1, level:st.level, stageLabel:st.label, theme:theme, name:name, a:a1, b:b1, ans:a1+b1,
+          story: name + " has " + a1 + " " + (a1===1?theme.one:theme.many) + ". " + name + " gets " + b1 + " more. How many " + theme.many + " now?"
+        };
+      } else {
+        var a2 = 2 + Math.floor(rng()*9);
+        var b2 = 1 + Math.floor(rng()*(a2-1));
+        return {op:op1, level:st.level, stageLabel:st.label, theme:theme, name:name, a:a2, b:b2, ans:a2-b2,
+          story: name + " has " + a2 + " " + (a2===1?theme.one:theme.many) + ". " + name + " gives away " + b2 + ". How many " + theme.many + " are left?"
+        };
+      }
+    }
+
+    if (st.level === 2){
+      var op2 = (rng() < 0.52) ? "add" : "sub";
+      if (op2 === "add"){
+        var a3 = 1 + Math.floor(rng()*19);
+        var b3 = 1 + Math.floor(rng()*(20 - a3));
+        return {op:op2, level:st.level, stageLabel:st.label, theme:theme, name:name, a:a3, b:b3, ans:a3+b3,
+          story: name + " has " + a3 + " " + (a3===1?theme.one:theme.many) + ". " + name + " gets " + b3 + " more. How many " + theme.many + " now?"
+        };
+      } else {
+        var a4 = 2 + Math.floor(rng()*19);
+        var b4 = 1 + Math.floor(rng()*(a4-1));
+        return {op:op2, level:st.level, stageLabel:st.label, theme:theme, name:name, a:a4, b:b4, ans:a4-b4,
+          story: name + " has " + a4 + " " + (a4===1?theme.one:theme.many) + ". " + name + " gives away " + b4 + ". How many " + theme.many + " are left?"
+        };
+      }
+    }
+
+    if (st.level === 3){
+      var op3 = (rng() < 0.5) ? "add" : "sub";
+      var base = 10 * (1 + Math.floor(rng()*9)); // 10..90
+      var a5 = base + Math.floor(rng()*10);
+      if (op3 === "add"){
+        var maxB = 100 - a5;
+        var b5 = 1 + Math.floor(rng()*Math.max(1, maxB));
+        return {op:op3, level:st.level, stageLabel:st.label, theme:theme, name:name, a:a5, b:b5, ans:a5+b5,
+          story: name + " has " + a5 + " " + theme.many + ". " + name + " gets " + b5 + " more. How many " + theme.many + " now?"
+        };
+      } else {
+        var b6 = 1 + Math.floor(rng()*Math.min(a5, 35));
+        return {op:op3, level:st.level, stageLabel:st.label, theme:theme, name:name, a:a5, b:b6, ans:a5-b6,
+          story: name + " has " + a5 + " " + theme.many + ". " + name + " gives away " + b6 + ". How many " + theme.many + " are left?"
+        };
+      }
+    }
+
+    if (st.level === 4){
+      var g1 = 2 + Math.floor(rng()*4); //2..5
+      var p1 = 2 + Math.floor(rng()*9); //2..10
+      return {op:"mul", level:st.level, stageLabel:st.label, theme:theme, name:name, a:g1, b:p1, ans:g1*p1,
+        story: name + " has " + g1 + " bags. Each bag has " + p1 + " " + theme.many + ". How many " + theme.many + " in all?"
+      };
+    }
+
+    if (st.level === 5){
+      var g2 = 6 + Math.floor(rng()*5); //6..10
+      var p2 = 3 + Math.floor(rng()*10); //3..12
+      return {op:"mul", level:st.level, stageLabel:st.label, theme:theme, name:name, a:g2, b:p2, ans:g2*p2,
+        story: name + " has " + g2 + " boxes. Each box has " + p2 + " " + theme.many + ". How many " + theme.many + " in all?"
+      };
+    }
+
+    // division exact
+    var groups = 2 + Math.floor(rng()*5); //2..6
+    var each = 2 + Math.floor(rng()*9); //2..10
+    var total = groups * each;
+    return {op:"div", level:st.level, stageLabel:st.label, theme:theme, name:name, a:total, b:groups, ans:each,
+      story: name + " has " + total + " " + theme.many + ". " + name + " shares them equally with " + groups + " kids. How many does each kid get?"
+    };
+  }
+
+  function makeChoices(problem, index){
+    var correct = problem.ans;
+    var rng = makeRng(99991 + index*53 + correct*7);
+
+    var set = {};
+    set[correct] = true;
+
+    var deltas = (problem.op==="mul") ? [-6,-4,-3,-2,-1,1,2,3,4,6]
+               : (problem.op==="div") ? [-3,-2,-1,1,2,3]
+               : [-4,-3,-2,-1,1,2,3,4];
+
+    while (Object.keys(set).length < 4){
+      var d = pick(rng, deltas);
+      var v = correct + d;
+      if (v < 0) v = -v;
+      set[v] = true;
+    }
+
+    var arr = [];
+    for (var k in set) arr.push(Number(k));
+    return shuffle(rng, arr);
+  }
+
+  function repeatEmoji(e, n, max){
+    var show = Math.min(n, max);
+    var s = "";
+    for (var i=0;i<show;i++) s += e;
+    if (n > max) s += " …(+" + (n-max) + ")";
+    return s;
+  }
+
+  function visualHint(p){
+    var e = p.theme.e;
+    var max = 30;
+
+    if (p.op === "add"){
+      return "ADD = put together\n"
+        + repeatEmoji(e, p.a, max) + "  (" + p.a + ")\n"
+        + "+\n"
+        + repeatEmoji(e, p.b, max) + "  (" + p.b + ")\n"
+        + "=\n"
+        + repeatEmoji(e, p.ans, max) + "  (" + p.ans + ")";
+    }
+
+    if (p.op === "sub"){
+      var line = "";
+      var show = Math.min(p.a, max);
+      for (var i=0;i<show;i++){
+        line += (i < p.b) ? "✖" : e;
+      }
+      if (p.a > max) line += " …(+" + (p.a-max) + ")";
+      return "SUBTRACT = take away\n"
+        + line + "\n"
+        + "Cross out " + p.b + " → left " + p.ans;
+    }
+
+    if (p.op === "mul"){
+      var out = "MULTIPLY = equal groups\n";
+      var g = Math.min(p.a, 6);
+      for (var r=1;r<=g;r++){
+        out += "Group " + r + ": " + repeatEmoji(e, p.b, 12) + "\n";
+      }
+      if (p.a > 6) out += "... (more groups)\n";
+      out += "Total = " + p.ans;
+      return out;
+    }
+
+    // div
+    var out2 = "DIVIDE = share equally\n";
+    var gg = Math.min(p.b, 6);
+    for (var r2=1;r2<=gg;r2++){
+      out2 += "Kid " + r2 + ": " + repeatEmoji(e, p.ans, 12) + "\n";
+    }
+    if (p.b > 6) out2 += "... (more kids)\n";
+    out2 += "Each kid gets " + p.ans;
+    return out2;
+  }
+
+  // ---------- UI ----------
+  var pillLevel = $("pillLevel");
+  var pillOp = $("pillOp");
+  var pillProg = $("pillProg");
+  var pillScore = $("pillScore");
+  var pillStreak = $("pillStreak");
+  var barFill = $("barFill");
+
+  var questionText = $("questionText");
+  var questionMeta = $("questionMeta");
+  var choicesEl = $("choices");
+  var hintBox = $("hintBox");
+  var btnNext = $("btnNext");
+  var btnRestart = $("btnRestart");
+
+  var state = { i:0, score:0, streak:0, solved:false, p:null };
+
+  function render(){
+    state.solved = false;
+    btnNext.disabled = true;
+
+    var p = generateProblem(state.i);
+    state.p = p;
+
+    pillLevel.textContent = "Level " + p.level;
+    pillOp.textContent = opLabel(p.op);
+    pillProg.textContent = "Problem " + (state.i+1) + "/500";
+    pillScore.textContent = "Score " + state.score;
+    pillStreak.textContent = "Streak " + state.streak;
+
+    barFill.style.width = ((state.i / 500) * 100).toFixed(1) + "%";
+
+    questionText.textContent = p.story;
+    questionMeta.textContent = p.stageLabel;
+
+    hintBox.textContent = "Hint area: if you choose a wrong answer, you will see a visual explanation here.";
+
+    var choices = makeChoices(p, state.i);
+    choicesEl.innerHTML = "";
+
+    for (var c=0;c<choices.length;c++){
+      (function(val){
+        var b = document.createElement("button");
+        b.className = "choice";
+        b.type = "button";
+        b.textContent = String(val);
+        b.onclick = function(){
+          if (state.solved) return;
+
+          if (val === p.ans){
+            state.solved = true;
+            state.score += 10;
+            state.streak += 1;
+
+            // lock all
+            var btns = choicesEl.querySelectorAll("button");
+            for (var k=0;k<btns.length;k++) btns[k].disabled = true;
+
+            b.disabled = true;
+            b.style.borderColor = "rgba(70,230,162,.55)";
+            b.style.background = "rgba(70,230,162,.18)";
+
+            hintBox.textContent = "✅ Correct! " + opLabel(p.op) + " answer = " + p.ans + "\n\n" + visualHint(p);
+            btnNext.disabled = false;
+
+            pillScore.textContent = "Score " + state.score;
+            pillStreak.textContent = "Streak " + state.streak;
+            barFill.style.width = (((state.i+1) / 500) * 100).toFixed(1) + "%";
+          } else {
+            state.streak = 0;
+            pillStreak.textContent = "Streak 0";
+
+            b.disabled = true;
+            b.style.borderColor = "rgba(255,107,107,.55)";
+            b.style.background = "rgba(255,107,107,.18)";
+
+            hintBox.textContent = "❌ Not quite. Look at this visual hint, then choose again:\n\n" + visualHint(p);
+          }
+        };
+        choicesEl.appendChild(b);
+      })(choices[c]);
+    }
+  }
+
+  btnNext.onclick = function(){
+    if (!state.solved) return;
+    state.i = clamp(state.i + 1, 0, 499);
+    render();
+  };
+
+  btnRestart.onclick = function(){
+    state.i = 0; state.score = 0; state.streak = 0;
+    render();
+  };
+
+  // If we got here, JS is running
+  errorBox.style.display = "none";
+  render();
+
+})();
+</script>
+</body>
+</html>

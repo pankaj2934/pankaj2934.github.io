@@ -1,0 +1,165 @@
+<html>
+      <span class="number-large" id="greaterLeft" onclick="chooseGreater('left')" style="cursor: pointer; border: 2px solid #ccc; padding: 10px; border-radius: 10px; margin: 10px;"></span>
+      <span class="number-large" id="greaterRight" onclick="chooseGreater('right')" style="cursor: pointer; border: 2px solid #ccc; padding: 10px; border-radius: 10px; margin: 10px;"></span>
+    </div>
+  </div>
+
+  <div class="question-section" id="symbolCompare">
+    <p>Select the correct symbol to go between:</p>
+    <div class="symbol-compare-box">
+      <span id="leftNumBox"></span>
+      <span style="padding: 0 20px; border: 2px dashed #aaa; min-width: 50px; display: inline-block;">?</span>
+      <span id="rightNumBox"></span>
+    </div>
+    <div class="symbol-buttons">
+      <button onclick="checkSymbol('<')">&lt;</button>
+      <button onclick="checkSymbol('=')">=</button>
+      <button onclick="checkSymbol('>')">&gt;</button>
+    </div>
+  </div>
+
+  <div class="footer-note">More apples = Greater number 🍎</div>
+
+  <script>
+    let leftCount = 0;
+    let rightCount = 0;
+    let selectedGreater = '';
+    let playerName = '';
+    const cheers = [
+      "Great job",
+      "Woo hoo",
+      "Fantastic",
+      "Amazing work",
+      "You did it"
+    ];
+    let currentUtterance = null;
+
+    function capitalizeName(name) {
+      return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    }
+
+    function askPlayerName() {
+      const allowedNames = ["kiyansh", "aadvik"];
+      while (!playerName) {
+        const response = prompt("Who is playing today? Kiyansh or Aadvik?");
+        if (!response) continue;
+        const trimmed = response.trim().toLowerCase();
+        if (allowedNames.includes(trimmed)) {
+          playerName = capitalizeName(trimmed);
+        }
+      }
+    }
+
+    function getCheer() {
+      const index = Math.floor(Math.random() * cheers.length);
+      return cheers[index];
+    }
+
+    function speakCheer(message) {
+      if (!('speechSynthesis' in window)) return;
+
+      if (currentUtterance) {
+        window.speechSynthesis.cancel();
+      }
+
+      currentUtterance = new SpeechSynthesisUtterance(message);
+      currentUtterance.rate = 1.1;
+      currentUtterance.onend = () => {
+        currentUtterance = null;
+      };
+      currentUtterance.onerror = () => {
+        currentUtterance = null;
+      };
+      window.speechSynthesis.speak(currentUtterance);
+    }
+
+    function generateGroups() {
+      leftCount = Math.floor(Math.random() * 5) + 1;
+      rightCount = Math.floor(Math.random() * 5) + 1;
+      if (leftCount === rightCount) rightCount += 1;
+
+      const leftGroup = document.getElementById("leftGroup");
+      const rightGroup = document.getElementById("rightGroup");
+      const leftLabel = document.getElementById("leftCountLabel");
+      const rightLabel = document.getElementById("rightCountLabel");
+
+      leftGroup.innerHTML = "";
+      rightGroup.innerHTML = "";
+      leftLabel.innerHTML = `${leftCount}`;
+      rightLabel.innerHTML = `${rightCount}`;
+      leftGroup.appendChild(leftLabel);
+      rightGroup.appendChild(rightLabel);
+
+      for (let i = 0; i < leftCount; i++) leftGroup.innerHTML += "🍎";
+      for (let i = 0; i < rightCount; i++) rightGroup.innerHTML += "🍎";
+
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("numberCompare").style.display = 'none';
+      document.getElementById("symbolCompare").style.display = 'none';
+    }
+
+    function checkAnswer(selected) {
+      const isCorrect = (selected === 'left' && leftCount > rightCount) ||
+                        (selected === 'right' && rightCount > leftCount);
+      const feedback = document.getElementById("feedback");
+
+      if (isCorrect) {
+        feedback.textContent = "✅ Correct! More means greater!";
+        const message = `${getCheer()} ${playerName}! More means greater!`;
+        feedback.textContent = `✅ ${message}`;
+        feedback.className = "feedback highlight-correct";
+        document.getElementById("greaterLeft").textContent = leftCount;
+        document.getElementById("greaterRight").textContent = rightCount;
+        document.getElementById("numberCompare").style.display = 'block';
+        speakCheer(message);
+      } else {
+        feedback.textContent = "❌ Try again. Count the apples.";
+        feedback.className = "feedback highlight-wrong";
+      }
+    }
+
+    function chooseGreater(selected) {
+      const isCorrect = (selected === 'left' && leftCount > rightCount) ||
+                        (selected === 'right' && rightCount > leftCount);
+      if (isCorrect) {
+        selectedGreater = selected;
+        document.getElementById("feedback").textContent = "✅ Great! Now choose the correct symbol.";
+        const message = `${getCheer()} ${playerName}! Now choose the correct symbol.`;
+        document.getElementById("feedback").textContent = `✅ ${message}`;
+        document.getElementById("feedback").className = "feedback highlight-correct";
+        document.getElementById("leftNumBox").textContent = leftCount;
+        document.getElementById("rightNumBox").textContent = rightCount;
+        document.getElementById("symbolCompare").style.display = 'block';
+        speakCheer(message);
+      } else {
+        document.getElementById("feedback").textContent = "❌ Oops! Try again.";
+        document.getElementById("feedback").className = "feedback highlight-wrong";
+      }
+    }
+
+    function checkSymbol(symbol) {
+      let correct;
+      if (leftCount > rightCount) correct = '>';
+      else if (leftCount < rightCount) correct = '<';
+      else correct = '=';
+
+      const selectedVal = `${leftCount} ${symbol} ${rightCount}`;
+
+      if (symbol === correct) {
+        document.getElementById("feedback").textContent = `🎉 ${selectedVal} is correct!`;
+        const message = `${getCheer()} ${playerName}! ${selectedVal} is correct!`;
+        document.getElementById("feedback").textContent = `🎉 ${message}`;
+        document.getElementById("feedback").className = "feedback highlight-correct";
+        speakCheer(message);
+        setTimeout(generateGroups, 3000);
+      } else {
+        document.getElementById("feedback").textContent = `❌ ${selectedVal} is incorrect. Try again!`;
+        document.getElementById("feedback").className = "feedback highlight-wrong";
+      }
+    }
+
+    askPlayerName();
+    generateGroups();
+  </script>
+</body>
+</html>
