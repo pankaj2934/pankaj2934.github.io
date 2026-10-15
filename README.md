@@ -12,6 +12,7 @@ These pages are hosted via GitHub Pages.
 - [numbers](https://pankaj2934.github.io/numbers.html)
 - [series](https://pankaj2934.github.io/series.html)
 - [fraction](https://pankaj2934.github.io/fraction.html)
+- [fractionnew](https://pankaj2934.github.io/fractionnew.html)
 
 ## 📄 Word Games
 - [Words](https://pankaj2934.github.io/cannon.html)
