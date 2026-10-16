@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="description" content="Munchy's Letter Sounds: a touch-friendly phonics game for 5-year-olds. Meet the letters, feed Munchy the monster and pop letter bubbles.">
+<meta name="theme-color" content="#7FD3F7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Munchy's Letter Sounds</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%91%BE%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2B2550; --sky1:#7FD3F7; --sky2:#C9F0FF; --grass:#7ED957; --grass2:#5DBB3A;
+  --purple:#7C5CFF; --pink:#FF6FA8; --yellow:#FFD23F; --orange:#FF9F43; --green:#2ECC71; --red:#FF6B6B; --white:#fff;
+  --fd:'Baloo 2','Comic Sans MS',system-ui,sans-serif; --letter:'Andika','Century Gothic','Trebuchet MS',system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;font-family:var(--fd);color:var(--ink);background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 70%,var(--grass) 70%,var(--grass2) 100%);background-attachment:fixed;overflow-x:hidden;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+[hidden]{display:none!important}
+.app{max-width:1000px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding:10px 16px 20px}
+
+/* clouds */
+.cloud{position:fixed;background:#fff;border-radius:999px;opacity:.85;z-index:-1;animation:drift 60s linear infinite}
+.cloud::before,.cloud::after{content:'';position:absolute;background:#fff;border-radius:50%}
+.cloud::before{width:55%;height:160%;left:15%;top:-70%}
+.cloud::after{width:40%;height:130%;right:12%;top:-50%}
+@keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+
+/* top bar */
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.round{width:56px;height:56px;border-radius:18px;background:#fff;border:4px solid var(--ink);box-shadow:0 5px 0 var(--ink);font-size:1.7rem;display:grid;place-items:center;flex:none}
+.round:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.bar .title{flex:1;font-weight:800;font-size:clamp(1.1rem,4.5vw,1.6rem);text-align:center;text-shadow:0 2px 0 #fff;line-height:1.1}
+.starbox{display:flex;align-items:center;gap:6px;background:#fff;border:4px solid var(--ink);border-radius:999px;padding:4px 14px;font-weight:800;font-size:1.4rem;box-shadow:0 5px 0 var(--ink)}
+.starbox.bump{animation:bump .5s}
+@keyframes bump{40%{transform:scale(1.3)}}
+
+.screen{flex:1;display:flex;flex-direction:column}
+.big-btn{background:#fff;border:5px solid var(--ink);border-radius:28px;box-shadow:0 8px 0 var(--ink);padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:800;font-size:1.5rem}
+.big-btn:active{transform:translateY(5px);box-shadow:0 3px 0 var(--ink)}
+.big-btn .ico{font-size:4rem;line-height:1}
+.pill-btn{background:#fff;border:4px solid var(--ink);border-radius:999px;box-shadow:0 5px 0 var(--ink);padding:8px 18px;font-weight:800;font-size:1.2rem;min-height:56px}
+.pill-btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.pill-btn.yellow{background:var(--yellow)} .pill-btn.pink{background:var(--pink);color:#fff}
+
+/* home */
+.hello{display:flex;align-items:center;justify-content:center;gap:10px;margin:4px 0 14px}
+.hello .bubble-talk{background:#fff;border:4px solid var(--ink);border-radius:24px;padding:10px 18px;font-weight:800;font-size:clamp(1.2rem,5vw,1.8rem);position:relative}
+.hello .bubble-talk::after{content:'';position:absolute;left:-16px;top:40%;border:10px solid transparent;border-right:14px solid var(--ink)}
+.hello .munchy{width:130px;height:130px}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.modes .big-btn:nth-child(1){background:#FFF3B0} .modes .big-btn:nth-child(2){background:#E3DAFF} .modes .big-btn:nth-child(3){background:#CFF5FF}
+.home-small{display:flex;justify-content:center;gap:12px;margin-top:20px;flex-wrap:wrap}
+
+/* munchy */
+.munchy{display:block;overflow:visible}
+.munchy .mouth{transform-box:fill-box;transform-origin:50% 0;transition:transform .15s}
+.munchy.open .mouth{transform:scaleY(1.45)}
+.munchy.chomp .mouth{animation:chomp .5s 2}
+.munchy.chomp .body{animation:belly .5s 2}
+.munchy.no{animation:headshake .6s}
+.munchy.happy{animation:hop .6s 2}
+.munchy .pupil{transition:transform .1s}
+@keyframes chomp{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.15)}}
+@keyframes belly{50%{transform:scale(1.05,.95)}}
+@keyframes headshake{20%{transform:rotate(-8deg)}40%{transform:rotate(8deg)}60%{transform:rotate(-5deg)}80%{transform:rotate(5deg)}}
+@keyframes hop{50%{transform:translateY(-22px)}}
+
+/* meet: letter grid */
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:10px}
+.ltile{aspect-ratio:1;background:#fff;border:4px solid var(--ink);border-radius:20px;box-shadow:0 5px 0 var(--ink);font-family:var(--letter);font-weight:700;font-size:2.6rem;display:grid;place-items:center;position:relative;color:var(--c)}
+.ltile:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.ltile.off{opacity:.5}
+.ltile .dot{position:absolute;top:4px;right:6px;font-size:.9rem}
+.hint-txt{text-align:center;font-weight:700;margin:4px 0 12px;font-size:1.15rem}
+
+/* meet: letter card */
+.lcard{background:#fff;border:5px solid var(--ink);border-radius:32px;box-shadow:0 8px 0 var(--ink);padding:16px;display:grid;gap:14px;animation:pop .35s}
+.lcard-top{display:flex;align-items:center;justify-content:center;gap:16px;position:relative}
+.bigletter{font-family:var(--letter);font-weight:700;font-size:clamp(7rem,32vw,12rem);line-height:1;color:var(--c);text-shadow:0 6px 0 rgba(43,37,80,.15)}
+.trace-wrap{position:relative;display:grid;place-items:center;width:100%;min-height:clamp(200px,45vw,320px)}
+.trace-wrap .bigletter.ghost{color:transparent;-webkit-text-stroke:4px #D9D4F0;text-shadow:none}
+.trace-wrap canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;border-radius:20px}
+.pics{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.pic{width:clamp(96px,24vw,140px);aspect-ratio:1;border-radius:26px;background:#F4F1FF;border:4px solid var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 5px 0 var(--ink)}
+.pic:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.pic .em{font-size:clamp(2.8rem,10vw,4rem);line-height:1}
+.pic .em svg{width:1.1em;height:1.1em;display:block}
+.pic .wd{font-family:var(--letter);font-size:1.15rem;font-weight:700}
+.pic .wd b{color:var(--c)}
+.pic.talking{background:var(--yellow)}
+.card-nav{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* feed */
+.sign{display:flex;align-items:center;justify-content:center;gap:12px;background:#fff;border:5px solid var(--ink);border-radius:26px;box-shadow:0 6px 0 var(--ink);padding:8px 16px;align-self:center;position:relative}
+.sign .bigl{font-family:var(--letter);font-weight:700;font-size:4.2rem;line-height:1;color:var(--c)}
+.sign .em{font-size:3.6rem;line-height:1}
+.sign .em svg{width:1em;height:1em;display:block}
+.sign .say{width:56px;height:56px;border-radius:50%;background:var(--yellow);border:4px solid var(--ink);font-size:1.6rem}
+.opts{display:flex;gap:clamp(10px,4vw,28px);justify-content:center;margin:22px 0 6px;min-height:150px;flex-wrap:wrap}
+.food{width:clamp(104px,26vw,150px);aspect-ratio:1;border-radius:50%;background:#fff;border:5px solid var(--ink);box-shadow:0 6px 0 var(--ink);display:grid;place-items:center;font-size:clamp(3rem,11vw,4.6rem);touch-action:none;position:relative;z-index:2}
+.food svg{width:1em;height:1em}
+.food.dragging{z-index:20;box-shadow:0 14px 20px rgba(0,0,0,.25);transition:none}
+.food.back{transition:transform .3s}
+.food.wiggle{animation:headshake .5s}
+.food.gone{opacity:0;transform:scale(.2)!important;transition:all .35s}
+.munchy-zone{display:grid;place-items:center;margin-top:auto}
+.munchy-zone .munchy{width:clamp(190px,48vw,260px);height:auto}
+.dots{display:flex;gap:8px;justify-content:center;margin-top:8px}
+.dots span{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--ink)}
+.dots span.on{background:var(--yellow)}
+
+/* bubbles */
+.bstage{position:relative;flex:1;min-height:58vh;border-radius:30px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,.05));border:4px dashed rgba(43,37,80,.25);margin-top:14px;touch-action:none}
+.bub{position:absolute;left:0;top:0;width:var(--s);height:var(--s);border-radius:50%;display:grid;place-items:center;font-family:var(--letter);font-weight:700;font-size:calc(var(--s) * .52);color:var(--c);
+  background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.95) 0 10%,rgba(255,255,255,.35) 22%,rgba(255,255,255,.15) 60%,rgba(170,220,255,.35) 100%);
+  border:3px solid rgba(255,255,255,.9);box-shadow:inset -6px -8px 16px rgba(124,92,255,.25),0 4px 10px rgba(0,0,0,.08);will-change:transform}
+.bub.nope{animation:headshake .5s}
+.burst{position:absolute;width:12px;height:12px;border-radius:50%;pointer-events:none}
+
+/* stickers & grown-ups */
+.panel{background:#fff;border:5px solid var(--ink);border-radius:28px;box-shadow:0 8px 0 var(--ink);padding:16px}
+.panel h2{margin:0 0 6px;font-size:1.6rem}
+.book{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px;margin-top:10px}
+.slot{aspect-ratio:1;border-radius:20px;border:4px dashed #CFC8EE;display:grid;place-items:center;font-size:2.6rem;position:relative}
+.slot.got{border:4px solid var(--ink);background:#FFF8D6}
+.slot .n{position:absolute;bottom:2px;right:6px;font-size:.85rem;font-weight:800}
+.g-sec{margin-top:18px}
+.g-sec h3{margin:0 0 6px;font-size:1.25rem}
+.g-sec p{margin:4px 0 8px;font-family:system-ui,sans-serif;font-size:.95rem;font-weight:500;line-height:1.4}
+.g-letters{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px}
+.g-letters button{height:52px;border-radius:14px;border:3px solid var(--ink);font-family:var(--letter);font-weight:700;font-size:1.6rem;background:#fff}
+.g-letters button[aria-pressed="true"]{background:var(--purple);color:#fff}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:3px solid var(--ink);border-radius:999px;padding:6px 14px;font-weight:700;background:#fff;min-height:44px}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff}
+.recs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.rec{display:flex;align-items:center;gap:6px;border:3px solid var(--ink);border-radius:16px;padding:6px 8px;background:#FAF8FF}
+.rec .rl{font-family:var(--letter);font-weight:700;font-size:1.6rem;width:34px;text-align:center}
+.rec button{width:40px;height:40px;border-radius:12px;border:2.5px solid var(--ink);background:#fff;font-size:1.1rem}
+.rec button.live{background:var(--red);color:#fff;animation:bump 1s infinite}
+.rec button:disabled{opacity:.3}
+.g-in{font:inherit;font-weight:700;font-size:1.2rem;border:3px solid var(--ink);border-radius:12px;padding:6px 12px;width:200px}
+
+/* celebration */
+.overlay{position:fixed;inset:0;background:rgba(43,37,80,.6);display:grid;place-items:center;z-index:50;padding:16px}
+.celebrate{background:#fff;border:6px solid var(--ink);border-radius:36px;padding:24px 30px;text-align:center;animation:pop .5s;max-width:420px;width:100%}
+.celebrate .sticker{font-size:8rem;line-height:1.1;animation:spin 1.2s ease-out}
+.celebrate h2{margin:6px 0;font-size:2rem}
+@keyframes spin{0%{transform:scale(0) rotate(-200deg)}70%{transform:scale(1.2) rotate(10deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes pop{0%{transform:scale(.7);opacity:0}70%{transform:scale(1.05);opacity:1}100%{transform:scale(1)}}
+.flystar{position:fixed;font-size:2.4rem;z-index:60;pointer-events:none;transition:transform .8s cubic-bezier(.5,-0.3,.6,1),opacity .8s}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:70}
+
+@media (max-width:600px){
+  .modes{grid-template-columns:1fr;gap:12px}
+  .modes .big-btn{flex-direction:row;justify-content:center;gap:16px;font-size:1.6rem}
+  .modes .big-btn .ico{font-size:3.2rem}
+  .hello .munchy{width:100px;height:100px}
+  .lgrid{grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}
+  .ltile{font-size:2.2rem}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important}.cloud{display:none}}
+</style>
+</head>
+<body>
+<div class="cloud" style="top:6%;width:140px;height:44px;animation-duration:70s"></div>
+<div class="cloud" style="top:22%;width:100px;height:32px;animation-duration:95s;animation-delay:-40s"></div>
+<div class="cloud" style="top:40%;width:170px;height:50px;animation-duration:120s;animation-delay:-80s"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<div class="app">
+  <header class="bar">
+    <button class="round" id="homeBtn" aria-label="Home">🏠</button>
+    <div class="title" id="title">Munchy's Letter Sounds</div>
+    <div class="starbox" id="starBox" aria-label="Stars"><span aria-hidden="true">⭐</span><span id="starN">0</span></div>
+    <button class="round" id="bookBtn" aria-label="Sticker book">📒</button>
+  </header>
+
+  <!-- HOME -->
+  <section class="screen" id="s-home">
+    <div class="hello">
+      <div id="homeMunchy"></div>
+      <div class="bubble-talk" id="helloTxt">Hi Kiyansh!</div>
+    </div>
+    <div class="modes">
+      <button class="big-btn" data-go="meet"><span class="ico">🔤</span>Letters</button>
+      <button class="big-btn" data-go="feed"><span class="ico">👾</span>Feed Munchy</button>
+      <button class="big-btn" data-go="bubble"><span class="ico">🫧</span>Bubble Pop</button>
+    </div>
+    <div class="home-small">
+      <button class="pill-btn yellow" data-go="book">📒 My stickers</button>
+      <button class="pill-btn" data-go="grown">⚙️ Grown-ups</button>
+    </div>
+  </section>
+
+  <!-- MEET -->
+  <section class="screen" id="s-meet" hidden>
+    <div id="meetGrid">
+      <p class="hint-txt">Tap a letter!</p>
+      <div class="lgrid" id="lgrid"></div>
+    </div>
+    <div id="meetCard" hidden></div>
+  </section>
+
+  <!-- FEED -->
+  <section class="screen" id="s-feed" hidden>
+    <div class="sign" id="fSign"></div>
+    <div class="opts" id="fOpts"></div>
+    <div class="munchy-zone"><div id="fMunchy"></div></div>
+    <div class="dots" id="fDots"></div>
+  </section>
+
+  <!-- BUBBLES -->
+  <section class="screen" id="s-bubble" hidden>
+    <div class="sign" id="bSign"></div>
+    <div class="bstage" id="bStage"></div>
+  </section>
+
+  <!-- STICKER BOOK -->
+  <section class="screen" id="s-book" hidden>
+    <div class="panel">
+      <h2>📒 My sticker book</h2>
+      <p id="bookTxt" style="margin:0;font-weight:700"></p>
+      <div class="book" id="book"></div>
+    </div>
+  </section>
+
+  <!-- GROWN-UPS -->
+  <section class="screen" id="s-grown" hidden>
+    <div class="panel">
+      <h2>⚙️ For grown-ups</h2>
+      <div class="g-sec">
+        <h3>Which letters is he learning?</h3>
+        <p>These letters are used in Feed Munchy and Bubble Pop. Letter cards always show all 26.</p>
+        <div class="chips" id="gPresets" style="margin-bottom:10px"></div>
+        <div class="g-letters" id="gLetters"></div>
+      </div>
+      <div class="g-sec">
+        <h3>Letter style</h3>
+        <div class="chips" id="gCase">
+          <button class="chip" data-v="lower">a b c</button>
+          <button class="chip" data-v="upper">A B C</button>
+          <button class="chip" data-v="both">Aa Bb</button>
+        </div>
+      </div>
+      <div class="g-sec">
+        <h3>Talking speed</h3>
+        <div class="chips" id="gRate">
+          <button class="chip" data-v="0.7">🐢 Slow</button>
+          <button class="chip" data-v="0.85">🙂 Normal</button>
+          <button class="chip" data-v="1">🐇 Quick</button>
+        </div>
+      </div>
+      <div class="g-sec">
+        <h3>Record the letter sounds 🎙️</h3>
+        <p>The computer voice says words clearly, but it can't say a pure letter sound like <b>/s/</b> or <b>/m/</b>. Tap 🎙️ and say the sound the way his teacher does (about 2 seconds). Your voice will then play in every game: "<i>ess</i> says <b>[your sound]</b>, like sun".</p>
+        <p id="gRecNote"></p>
+        <div class="recs" id="gRecs"></div>
+      </div>
+      <div class="g-sec">
+        <h3>Child's name</h3>
+        <input class="g-in" id="gName" maxlength="16" autocomplete="off">
+      </div>
+      <div class="g-sec">
+        <h3>Start over</h3>
+        <p>Clears stars and stickers. Recordings are kept.</p>
+        <button class="pill-btn" id="gReset">🧹 Reset stars and stickers</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="celebrate" hidden>
+  <div class="celebrate">
+    <div class="sticker" id="cSticker">🦄</div>
+    <h2>New sticker!</h2>
+    <p id="cTxt" style="font-weight:700;font-size:1.2rem;margin:0 0 14px"></p>
+    <button class="pill-btn yellow" id="cOk">Yay! ▶</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ---------- data ---------- */
+const IGLOO = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M5 54 A27 27 0 0 1 59 54 Z" fill="#fff" stroke="#4BA3E3" stroke-width="3"/><path d="M9 42 H55 M15 31 H49 M24 21 H40 M20 54 V42 M44 54 V42 M32 42 V31 M23 31 V21 M41 31 V21" stroke="#4BA3E3" stroke-width="2.5" fill="none"/><path d="M25 54 A7 8 0 0 1 39 54 Z" fill="#2B4A6B"/></svg>';
+const L = {
+  a: { n: 'ay',  w: [['apple','🍎'],['ant','🐜'],['alligator','🐊']] },
+  b: { n: 'bee', w: [['ball','⚽'],['bus','🚌'],['banana','🍌'],['bear','🐻']] },
+  c: { n: 'see', w: [['cat','🐱'],['car','🚗'],['cake','🎂'],['cow','🐄']] },
+  d: { n: 'dee', w: [['dog','🐶'],['duck','🦆'],['drum','🥁'],['donut','🍩']] },
+  e: { n: 'ee',  w: [['egg','🥚'],['elephant','🐘'],['elf','🧝']] },
+  f: { n: 'eff', w: [['fish','🐟'],['frog','🐸'],['fox','🦊'],['flower','🌸']] },
+  g: { n: 'jee', w: [['goat','🐐'],['gift','🎁'],['grapes','🍇'],['guitar','🎸']] },
+  h: { n: 'aitch', w: [['hat','🎩'],['horse','🐴'],['house','🏠'],['heart','❤️']] },
+  i: { n: 'eye', w: [['igloo',IGLOO],['inchworm','🐛']] },
+  j: { n: 'jay', w: [['juice','🧃'],['jeans','👖'],['jacket','🧥']] },
+  k: { n: 'kay', w: [['kite','🪁'],['key','🔑'],['kangaroo','🦘'],['koala','🐨']] },
+  l: { n: 'el',  w: [['lion','🦁'],['lemon','🍋'],['leaf','🍃'],['lollipop','🍭']] },
+  m: { n: 'em',  w: [['moon','🌙'],['monkey','🐒'],['mouse','🐭'],['milk','🥛']] },
+  n: { n: 'en',  w: [['nose','👃'],['nut','🥜'],['noodles','🍜']] },
+  o: { n: 'oh',  w: [['octopus','🐙'],['otter','🦦'],['ox','🐂']] },
+  p: { n: 'pee', w: [['pig','🐷'],['pizza','🍕'],['penguin','🐧'],['pumpkin','🎃']] },
+  q: { n: 'cue', w: [['queen','👸'],['question','❓']] },
+  r: { n: 'ar',  w: [['rabbit','🐰'],['rainbow','🌈'],['robot','🤖'],['rocket','🚀']] },
+  s: { n: 'ess', w: [['sun','☀️'],['snake','🐍'],['sock','🧦'],['star','⭐']] },
+  t: { n: 'tee', w: [['tiger','🐯'],['tree','🌳'],['turtle','🐢'],['tomato','🍅']] },
+  u: { n: 'you', w: [['umbrella','☂️'],['up','⬆️']] },
+  v: { n: 'vee', w: [['violin','🎻'],['volcano','🌋'],['van','🚐']] },
+  w: { n: 'double you', w: [['watermelon','🍉'],['whale','🐳'],['worm','🪱'],['wolf','🐺']] },
+  x: { n: 'ex',  w: [['box','📦'],['fox','🦊']], end: true },
+  y: { n: 'why', w: [['yo-yo','🪀'],['yarn','🧶']] },
+  z: { n: 'zee', w: [['zebra','🦓'],['zero','0️⃣']] }
+};
+const ABC = Object.keys(L);
+const SOUND = l => ('ckq'.includes(l) ? 'k' : l);           // c, k and q all start with /k/
+const PALETTE = ['#E8453C','#F28C28','#D4A017','#2EAA4F','#1E90D6','#7C5CFF','#D63AA8'];
+const colorOf = l => PALETTE[ABC.indexOf(l) % PALETTE.length];
+const STICKERS = ['🦄','🐲','🦖','🐙','🦋','🐳','🦁','🐼','🐸','🚀','🌈','🍩','🦕','🐬','🦜','🐞','🌟','🎈','🦒','🐯','🚒','🏎️','🦀','🐧','🍦','🎸','🐨','🦩','🛸','🏰'];
+const PRESETS = [['a–e','abcde'],['f–j','fghij'],['k–o','klmno'],['p–t','pqrst'],['u–z','uvwxyz'],['a–m','abcdefghijklm'],['All','abcdefghijklmnopqrstuvwxyz']];
+
+/* ---------- small helpers ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const restart = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('phx_' + k); return v === null ? d : JSON.parse(v); } catch (e){ return d; } },
+  set(k, v){ try { localStorage.setItem('phx_' + k, JSON.stringify(v)); } catch (e){} }
+};
+const S = {
+  name: store.get('name', 'Kiyansh'),
+  letters: store.get('letters', 'abcdef'),
+  lcase: store.get('case', 'lower'),
+  rate: store.get('rate', 0.85),
+  stars: store.get('stars', 0),
+  stickers: store.get('stickers', [])
+};
+const show = l => S.lcase === 'upper' ? l.toUpperCase() : S.lcase === 'both' ? l.toUpperCase() + l : l;
+const active = () => { const a = S.letters.split('').filter(l => L[l]); return a.length ? a : ['a', 'b', 'c']; };
+const picHTML = em => em.startsWith('<svg') ? em : `<span>${em}</span>`;
+
+/* ---------- voice ---------- */
+const canSpeak = 'speechSynthesis' in window;
+let voice = null;
+function pickVoice(){
+  if (!canSpeak) return;
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v => /en[-_]US/i.test(v.lang) && /Samantha|Google US|Aria|Jenny|Ava|Allison|Susan/i.test(v.name))
+       || vs.find(v => /en[-_]US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+}
+if (canSpeak){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function sayOne(text){
+  return new Promise(res => {
+    if (!canSpeak || !text) return res();
+    const u = new SpeechSynthesisUtterance(text);
+    if (voice) u.voice = voice;
+    u.lang = 'en-US'; u.rate = S.rate; u.pitch = 1.15;
+    let done = false; const fin = () => { if (!done){ done = true; res(); } };
+    u.onend = fin; u.onerror = fin;
+    setTimeout(fin, 1200 + text.length * 120 / S.rate);
+    speechSynthesis.speak(u);
+  });
+}
+/* Recorded sounds from the grown-up, kept in IndexedDB. */
+const recs = {};
+let recAudio = null;
+function playRec(l){
+  return new Promise(res => {
+    if (!recs[l]) return res();
+    recAudio = new Audio(recs[l]);
+    recAudio.onended = res; recAudio.onerror = res;
+    recAudio.play().catch(res);
+    setTimeout(res, 4000);
+  });
+}
+let talkId = 0;
+function hush(){ talkId++; try { if (canSpeak) speechSynthesis.cancel(); } catch (e){} if (recAudio){ recAudio.pause(); recAudio = null; } }
+/* talk('hello', {rec:'s'}, {wait:300}, 'sun') plays the parts in order; a newer talk() cuts it off. */
+async function talk(...parts){
+  hush(); const id = talkId;
+  await sleep(60);
+  for (const p of parts){
+    if (id !== talkId) return false;
+    if (typeof p === 'string') await sayOne(p);
+    else if (p && p.rec) await playRec(p.rec);
+    else if (p && p.wait) await sleep(p.wait);
+  }
+  return id === talkId;
+}
+/* "ess says [sound], like sun" with a recording, or "ess, like sun" without. */
+function soundParts(l, word){
+  const w = word || L[l].w[0][0], like = L[l].end ? `at the end of ${w}` : `like ${w}`;
+  return recs[l] ? [`${L[l].n} says`, { rec: l }, like] : [`${L[l].n}, ${like}`];
+}
+
+/* ---------- sound effects ---------- */
+let actx = null;
+function sfx(kind){
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const now = actx.currentTime;
+    const tone = (f, t, d, type = 'sine', v = .15, f2) => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, now + t);
+      if (f2) o.frequency.exponentialRampToValueAtTime(f2, now + t + d);
+      g.gain.setValueAtTime(.0001, now + t); g.gain.exponentialRampToValueAtTime(v, now + t + .02); g.gain.exponentialRampToValueAtTime(.0001, now + t + d);
+      o.connect(g); g.connect(actx.destination); o.start(now + t); o.stop(now + t + d + .05);
+    };
+    if (kind === 'pop') tone(700, 0, .12, 'sine', .2, 1400);
+    else if (kind === 'yay'){ [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .09, .25, 'triangle', .12)); }
+    else if (kind === 'chomp'){ tone(180, 0, .09, 'square', .08, 90); tone(180, .25, .09, 'square', .08, 90); }
+    else if (kind === 'boing') tone(300, 0, .3, 'sine', .12, 150);
+    else if (kind === 'fanfare'){ [523, 659, 784, 659, 784, 1047].forEach((f, i) => tone(f, i * .12, .3, 'triangle', .13)); }
+    else tone(500, 0, .05, 'sine', .06);
+  } catch (e){}
+}
+
+/* ---------- Munchy the monster ---------- */
+let mId = 0;
+function munchySVG(){
+  const id = 'm' + (++mId);
+  return `<svg class="munchy" viewBox="0 0 220 210" aria-label="Munchy the monster">
+    <defs><radialGradient id="${id}g" cx="40%" cy="35%"><stop offset="0" stop-color="#A08BFF"/><stop offset="1" stop-color="#6A48F0"/></radialGradient></defs>
+    <path d="M62 52 L52 14 L84 40 Z" fill="#FFD23F" stroke="#2B2550" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M158 52 L168 14 L136 40 Z" fill="#FFD23F" stroke="#2B2550" stroke-width="5" stroke-linejoin="round"/>
+    <g class="body" style="transform-box:fill-box;transform-origin:50% 100%">
+      <ellipse cx="110" cy="118" rx="92" ry="82" fill="url(#${id}g)" stroke="#2B2550" stroke-width="6"/>
+      <ellipse cx="110" cy="150" rx="52" ry="38" fill="#C7B8FF" opacity=".7"/>
+      <circle cx="40" cy="120" r="7" fill="#FF8FC0" opacity=".8"/><circle cx="180" cy="120" r="7" fill="#FF8FC0" opacity=".8"/>
+    </g>
+    <g><circle cx="80" cy="84" r="24" fill="#fff" stroke="#2B2550" stroke-width="5"/><circle class="pupil" cx="80" cy="86" r="11" fill="#2B2550"/><circle cx="76" cy="80" r="4" fill="#fff"/></g>
+    <g><circle cx="140" cy="84" r="24" fill="#fff" stroke="#2B2550" stroke-width="5"/><circle class="pupil" cx="140" cy="86" r="11" fill="#2B2550"/><circle cx="136" cy="80" r="4" fill="#fff"/></g>
+    <g class="mouth">
+      <path d="M62 122 Q110 178 158 122 Z" fill="#3A1F5C" stroke="#2B2550" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M78 123 l7 12 l7 -12 Z M128 123 l7 12 l7 -12 Z" fill="#fff"/>
+      <ellipse cx="110" cy="152" rx="16" ry="7" fill="#FF6F91"/>
+    </g>
+    <ellipse cx="72" cy="198" rx="24" ry="10" fill="#6A48F0" stroke="#2B2550" stroke-width="5"/>
+    <ellipse cx="148" cy="198" rx="24" ry="10" fill="#6A48F0" stroke="#2B2550" stroke-width="5"/>
+  </svg>`;
+}
+/* Munchy's eyes follow the finger. */
+document.addEventListener('pointermove', e => {
+  $$('.munchy').forEach(m => {
+    const r = m.getBoundingClientRect(); if (!r.width) return;
+    const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height * .4), d = Math.hypot(dx, dy) || 1;
+    $$('.pupil', m).forEach(p => { p.style.transform = `translate(${dx / d * 8}px,${dy / d * 8}px)`; });
+  });
+}, { passive: true });
+
+/* ---------- stars, stickers, confetti ---------- */
+function renderStars(){ $('#starN').textContent = S.stars; }
+function flyStar(fromEl){
+  const r = fromEl ? fromEl.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
+  const t = $('#starBox').getBoundingClientRect();
+  const s = document.createElement('div'); s.className = 'flystar'; s.textContent = '⭐';
+  s.style.left = (r.left + r.width / 2 - 20) + 'px'; s.style.top = (r.top + r.height / 2 - 20) + 'px';
+  document.body.appendChild(s);
+  requestAnimationFrame(() => requestAnimationFrame(() => { s.style.transform = `translate(${t.left - r.left - r.width / 2 + 20}px,${t.top - r.top - r.height / 2 + 4}px) scale(.6)`; s.style.opacity = '.3'; }));
+  setTimeout(() => s.remove(), 850);
+}
+/* Adds a star. Every 5th star wins a sticker; resolves after the celebration closes. */
+async function addStar(fromEl){
+  flyStar(fromEl);
+  await sleep(700);
+  S.stars++; store.set('stars', S.stars); renderStars(); restart($('#starBox'), 'bump');
+  if (S.stars % 5 !== 0) return;
+  const fresh = STICKERS.filter(x => !S.stickers.includes(x));
+  const st = fresh.length ? pick(fresh) : pick(STICKERS);
+  S.stickers.push(st); store.set('stickers', S.stickers);
+  await celebrate(st);
+}
+function celebrate(st){
+  return new Promise(res => {
+    $('#cSticker').textContent = st;
+    $('#cTxt').textContent = `Great job, ${S.name}! It goes in your sticker book.`;
+    $('#celebrate').hidden = false; sfx('fanfare'); confetti();
+    talk(`Wow! A new sticker! Great job, ${S.name}!`);
+    $('#cOk').onclick = () => { $('#celebrate').hidden = true; hush(); res(); };
+  });
+}
+const cv = $('#confetti'), cx = cv.getContext('2d');
+let bits = [], raf = null;
+function confetti(){
+  const dpr = devicePixelRatio || 1;
+  cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  for (let i = 0; i < 140; i++) bits.push({ x: innerWidth / 2, y: innerHeight * .4, vx: (Math.random() - .5) * 16, vy: -Math.random() * 14 - 4, s: 8 + Math.random() * 8, r: Math.random() * 6, c: pick(PALETTE), life: 0 });
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function tick(){
+  cx.clearRect(0, 0, innerWidth, innerHeight);
+  for (const p of bits){ p.vy += .35; p.x += p.vx; p.y += p.vy; p.r += .1; p.life++; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); cx.restore(); }
+  bits = bits.filter(p => p.y < innerHeight + 40 && p.life < 240);
+  raf = bits.length ? requestAnimationFrame(tick) : (cx.clearRect(0, 0, innerWidth, innerHeight), null);
+}
+
+/* ---------- screens ---------- */
+const TITLES = { home: "Munchy's Letter Sounds", meet: 'Letters', feed: 'Feed Munchy', bubble: 'Bubble Pop', book: 'My stickers', grown: 'Grown-ups' };
+let screen = 'home';
+function go(id){
+  hush(); screen = id;
+  $$('.screen').forEach(s => { s.hidden = s.id !== 's-' + id; });
+  $('#title').textContent = TITLES[id];
+  if (id !== 'bubble') stopBubbles();
+  if (id === 'home'){ $('#helloTxt').textContent = `Hi ${S.name}!`; }
+  if (id === 'meet') meetGrid();
+  if (id === 'feed') feedStart();
+  if (id === 'bubble') bubbleStart();
+  if (id === 'book') renderBook();
+  if (id === 'grown') renderGrown();
+  window.scrollTo(0, 0);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-go]');
+  if (b){ sfx('tap'); go(b.dataset.go); if (b.dataset.go === 'meet') talk("Let's meet the letters!"); }
+});
+$('#homeBtn').addEventListener('click', () => { sfx('tap'); go('home'); });
+$('#bookBtn').addEventListener('click', () => { sfx('tap'); go('book'); });
+$('#homeMunchy').innerHTML = munchySVG();
+$('#homeMunchy').addEventListener('click', () => { const m = $('#homeMunchy .munchy'); restart(m, 'happy'); sfx('boing'); talk(`Hi ${S.name}! I'm Munchy. Let's play with letter sounds!`); });
+
+/* ================= LETTERS ================= */
+let cardL = null, traceOn = false;
+function meetGrid(){
+  $('#meetGrid').hidden = false; $('#meetCard').hidden = true; cardL = null;
+  const act = active();
+  $('#lgrid').innerHTML = ABC.map(l => `<button class="ltile ${act.includes(l) ? '' : 'off'}" data-l="${l}" style="--c:${colorOf(l)}" aria-label="Letter ${l}">${show(l)}${act.includes(l) ? '<span class="dot">⭐</span>' : ''}</button>`).join('');
+}
+$('#lgrid').addEventListener('click', e => { const t = e.target.closest('[data-l]'); if (t){ sfx('tap'); openCard(t.dataset.l); } });
+function openCard(l){
+  cardL = l; traceOn = false;
+  $('#meetGrid').hidden = true;
+  const c = $('#meetCard'); c.hidden = false;
+  const i = ABC.indexOf(l), prev = ABC[(i + 25) % 26], next = ABC[(i + 1) % 26];
+  c.innerHTML = `<div class="lcard" style="--c:${colorOf(l)}">
+    <div class="trace-wrap" id="tWrap"><div class="bigletter" id="bigL">${show(l)}</div></div>
+    <div class="pics">${L[l].w.map(([w, em], k) => `<button class="pic" data-k="${k}" aria-label="${w}"><span class="em">${picHTML(em)}</span><span class="wd">${L[l].end ? w.slice(0, -1) + '<b>' + w.slice(-1) + '</b>' : '<b>' + w[0] + '</b>' + w.slice(1)}</span></button>`).join('')}</div>
+    <div class="card-nav">
+      <button class="pill-btn" id="cPrev" aria-label="Letter ${prev}">◀ ${show(prev)}</button>
+      <button class="pill-btn yellow" id="cHear">🔊 Hear it</button>
+      <button class="pill-btn pink" id="cTrace">✍️ Trace</button>
+      <button class="pill-btn" id="cNext" aria-label="Letter ${next}">${show(next)} ▶</button>
+    </div>
+    <div style="text-align:center"><button class="pill-btn" id="cAll">🔤 All letters</button></div>
+  </div>`;
+  const hear = () => { restart($('#bigL'), 'pop'); return talk(...soundParts(l), { wait: 250 }, L[l].w.map(x => x[0]).join(', ')); };
+  $('#cHear').onclick = hear;
+  $('#bigL').onclick = hear;
+  $('#cPrev').onclick = () => { sfx('tap'); openCard(prev); };
+  $('#cNext').onclick = () => { sfx('tap'); openCard(next); };
+  $('#cAll').onclick = () => { sfx('tap'); hush(); meetGrid(); };
+  $('#cTrace').onclick = toggleTrace;
+  $$('.pic', c).forEach(p => p.onclick = async () => {
+    const [w] = L[l].w[+p.dataset.k];
+    $$('.pic', c).forEach(x => x.classList.remove('talking')); p.classList.add('talking'); sfx('tap');
+    await talk(w, { wait: 150 }, L[l].end ? `${w} ends with ${L[l].n}` : `${w} starts with ${L[l].n}`);
+    p.classList.remove('talking');
+  });
+  hear();
+}
+
+/* tracing: draw over a faint letter with a finger */
+let tCanvas = null, tCtx = null, tLen = 0, tLast = null, tHue = 0;
+function toggleTrace(){
+  const wrap = $('#tWrap'), big = $('#bigL'); traceOn = !traceOn;
+  if (!traceOn){ if (tCanvas) tCanvas.remove(); tCanvas = null; big.classList.remove('ghost'); $('#cTrace').textContent = '✍️ Trace'; $('#cTrace').onclick = toggleTrace; $('#tDone') && $('#tDone').remove(); return; }
+  big.classList.add('ghost'); $('#cTrace').textContent = '🧽 Clear';
+  tCanvas = document.createElement('canvas'); wrap.appendChild(tCanvas);
+  const r = wrap.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+  tCanvas.width = r.width * dpr; tCanvas.height = r.height * dpr;
+  tCtx = tCanvas.getContext('2d'); tCtx.scale(dpr, dpr); tCtx.lineCap = 'round'; tCtx.lineJoin = 'round'; tCtx.lineWidth = Math.max(18, r.width / 22);
+  tLen = 0;
+  const done = document.createElement('button'); done.className = 'pill-btn yellow'; done.id = 'tDone'; done.textContent = '⭐ I did it!';
+  done.style.cssText = 'position:absolute;bottom:6px;right:6px;z-index:3';
+  wrap.appendChild(done);
+  done.onclick = async e => {
+    e.stopPropagation();
+    if (tLen < 250){ talk('Use your finger to trace the letter!'); return; }
+    sfx('yay'); talk(`Great tracing! That's ${L[cardL].n}!`);
+    const btn = done; btn.disabled = true;
+    await addStar(btn);
+    if (traceOn) toggleTrace();
+  };
+  $('#cTrace').onclick = () => { if (tCtx){ tCtx.clearRect(0, 0, tCanvas.width, tCanvas.height); tLen = 0; } };
+  const pos = e => { const b = tCanvas.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+  tCanvas.addEventListener('pointerdown', e => { tCanvas.setPointerCapture(e.pointerId); tLast = pos(e); });
+  tCanvas.addEventListener('pointermove', e => {
+    if (!tLast) return;
+    const p = pos(e); tHue = (tHue + 4) % 360;
+    tCtx.strokeStyle = `hsl(${tHue},85%,55%)`;
+    tCtx.beginPath(); tCtx.moveTo(tLast[0], tLast[1]); tCtx.lineTo(p[0], p[1]); tCtx.stroke();
+    tLen += Math.hypot(p[0] - tLast[0], p[1] - tLast[1]); tLast = p;
+  });
+  const up = () => { tLast = null; };
+  tCanvas.addEventListener('pointerup', up); tCanvas.addEventListener('pointercancel', up);
+  talk('Trace the letter with your finger!');
+}
+
+/* ================= FEED MUNCHY ================= */
+const F = { target: null, key: null, right: null, busy: false, streak: 0, lastL: null };
+$('#fMunchy').innerHTML = munchySVG();
+function feedStart(){ F.streak = 0; F.intro = true; renderDots(); feedRound(); }
+function renderDots(){ $('#fDots').innerHTML = Array.from({ length: 5 }, (_, i) => `<span class="${i < F.streak ? 'on' : ''}"></span>`).join(''); }
+function feedRound(){
+  let pool = active().filter(l => !L[l].end);
+  if (!pool.length) pool = ABC.filter(l => !L[l].end);
+  let l = pick(pool); if (pool.length > 1) while (l === F.lastL) l = pick(pool);
+  F.lastL = l; F.target = l; F.busy = false;
+  const words = L[l].w, key = words[0];
+  const others = words.length > 1 ? words.slice(1) : words;
+  const right = pick(others);
+  // wrong choices come from letters that start with a different sound
+  let dpool = active().filter(x => SOUND(x) !== SOUND(l) && !L[x].end);
+  if (dpool.length < 2) dpool = ABC.filter(x => SOUND(x) !== SOUND(l) && !L[x].end);
+  const dl = shuffle(dpool).slice(0, 2);
+  const opts = shuffle([{ w: right, ok: true }, ...dl.map(x => ({ w: pick(L[x].w), ok: false }))]);
+  F.key = key; F.right = right;
+  $('#fSign').style.setProperty('--c', colorOf(l));
+  $('#fSign').innerHTML = `<span class="bigl">${show(l)}</span><span class="em">${picHTML(key[1])}</span><button class="say" id="fSay" aria-label="Hear again">🔊</button>`;
+  $('#fSay').onclick = prompt;
+  $('#fOpts').innerHTML = opts.map((o, i) => `<div class="food" data-i="${i}" role="button" aria-label="${o.w[0]}">${picHTML(o.w[1])}</div>`).join('');
+  $$('.food').forEach((el, i) => makeDraggable(el, opts[i]));
+  F.opts = opts;
+  prompt();
+}
+function prompt(){
+  const l = F.target, names = F.opts.map(o => o.w[0]);
+  const hi = F.intro ? 'Munchy is hungry! ' : ''; F.intro = false;
+  return talk(`${hi}Munchy wants food that starts like ${F.key[0]}!`, ...(recs[l] ? [{ rec: l }] : []), { wait: 200 }, `${names[0]}, ${names[1]}, or ${names[2]}?`);
+}
+function makeDraggable(el, opt){
+  let sx = 0, sy = 0, moved = false, down = false;
+  el.addEventListener('pointerdown', e => {
+    if (F.busy) return;
+    down = true; moved = false; sx = e.clientX; sy = e.clientY;
+    el.setPointerCapture(e.pointerId); el.classList.remove('back');
+  });
+  el.addEventListener('pointermove', e => {
+    if (!down) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (!moved && Math.hypot(dx, dy) > 10){ moved = true; el.classList.add('dragging'); }
+    if (moved){
+      el.style.transform = `translate(${dx}px,${dy}px) scale(1.1)`;
+      $('#fMunchy .munchy').classList.toggle('open', overMunchy(e));
+    }
+  });
+  const end = e => {
+    if (!down) return; down = false;
+    el.classList.remove('dragging'); $('#fMunchy .munchy').classList.remove('open');
+    if (!moved || overMunchy(e)) feed(el, opt);
+    else { el.classList.add('back'); el.style.transform = ''; }
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', () => { down = false; el.classList.add('back'); el.style.transform = ''; $('#fMunchy .munchy').classList.remove('open'); });
+}
+function overMunchy(e){ const r = $('#fMunchy .munchy').getBoundingClientRect(); return e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom; }
+async function feed(el, opt){
+  if (F.busy) return;
+  const m = $('#fMunchy .munchy'), l = F.target;
+  if (opt.ok){
+    F.busy = true;
+    // fly the food into Munchy's mouth
+    const a = el.getBoundingClientRect(), b = m.getBoundingClientRect();
+    el.classList.add('back');
+    el.style.transform = `translate(${b.left + b.width / 2 - (a.left + a.width / 2)}px,${b.top + b.height * .62 - (a.top + a.height / 2)}px) scale(.5)`;
+    m.classList.add('open');
+    await sleep(320);
+    el.classList.add('gone'); m.classList.remove('open'); restart(m, 'chomp'); sfx('chomp');
+    await sleep(500); sfx('yay');
+    F.streak = Math.min(F.streak + 1, 5); renderDots();
+    const said = talk(`Yum yum! ${opt.w[0]} and ${F.key[0]} both start with ${L[l].n}!`, ...(recs[l] ? [{ rec: l }] : []));
+    await addStar(m);
+    await said;
+    if (F.streak >= 5){ restart(m, 'happy'); await talk(`Munchy is full! You fed Munchy 5 times, ${S.name}!`); F.streak = 0; renderDots(); }
+    if (screen === 'feed') feedRound();
+  } else {
+    sfx('boing'); restart(m, 'no'); restart(el, 'wiggle');
+    el.classList.add('back'); el.style.transform = '';
+    talk(`Yucky! ${opt.w[0]} does not start like ${F.key[0]}. Try again!`);
+  }
+}
+
+/* ================= BUBBLE POP ================= */
+const B = { target: null, bubs: [], raf: 0, last: 0, busy: false, lastT: null };
+function bubbleStart(){ stopBubbles(); B.bubs = []; B.intro = true; $('#bStage').innerHTML = ''; newTarget(); B.last = performance.now(); B.raf = requestAnimationFrame(bubbleTick); }
+function stopBubbles(){ cancelAnimationFrame(B.raf); B.raf = 0; }
+function bubbleLetters(){ const a = active(); return a.length >= 4 ? a : [...new Set([...a, ...shuffle(ABC.filter(x => !a.includes(x))).slice(0, 4 - a.length)])]; }
+function newTarget(){
+  let pool = active(); let l = pick(pool);
+  if (pool.length > 1) while (l === B.lastT) l = pick(pool);
+  B.lastT = l; B.target = l; B.busy = false;
+  const key = L[l].w[0];
+  $('#bSign').style.setProperty('--c', colorOf(l));
+  $('#bSign').innerHTML = `<span class="em">${picHTML(key[1])}</span><button class="say" id="bSay" aria-label="Hear again">🔊</button>`;
+  $('#bSay').onclick = bubblePrompt;
+  // make sure the target letter is floating somewhere
+  if (B.bubs.length && !B.bubs.some(b => b.l === l)){ const b = pick(B.bubs); setBubLetter(b, l); }
+  bubblePrompt();
+}
+function bubblePrompt(){
+  const l = B.target, w = L[l].w[0][0];
+  const hi = B.intro ? 'Bubble time! ' : ''; B.intro = false;
+  return talk(hi + (L[l].end ? `Pop the letter at the end of ${w}!` : `Pop the first letter of ${w}!`), ...(recs[l] ? [{ rec: l }] : []));
+}
+function setBubLetter(b, l){ b.l = l; b.el.textContent = show(l); b.el.style.setProperty('--c', colorOf(l)); b.el.setAttribute('aria-label', 'Bubble ' + l); }
+function spawn(i, n){
+  const st = $('#bStage'), W = st.clientWidth, H = st.clientHeight;
+  const s = Math.max(84, Math.min(130, W / 4.2));
+  const letters = bubbleLetters();
+  let l = pick(letters);
+  if (!B.bubs.some(b => b.l === B.target) && Math.random() < .6) l = B.target;
+  const el = document.createElement('button'); el.className = 'bub'; el.style.setProperty('--s', s + 'px');
+  st.appendChild(el);
+  const lane = (i % n + .5) / n;
+  const b = { el, s, x: lane * W - s / 2, y: H * (.3 + Math.random() * .65), vy: 32 + Math.random() * 24, ph: Math.random() * 6.3, amp: 12 + Math.random() * 14, l };
+  setBubLetter(b, l);
+  el.addEventListener('pointerdown', e => { e.preventDefault(); popBub(b); });
+  return b;
+}
+function bubbleTick(t){
+  const dt = Math.min(.05, (t - B.last) / 1000); B.last = t;
+  const st = $('#bStage'), H = st.clientHeight, W = st.clientWidth, n = W < 500 ? 4 : 5;
+  while (B.bubs.length < n) B.bubs.push(spawn(B.bubs.length, n));
+  for (const b of B.bubs){
+    b.y -= b.vy * dt; b.ph += dt * 1.4;
+    if (b.y < -b.s){ b.y = H + 10; b.vy = 28 + Math.random() * 22; const ls = bubbleLetters(); setBubLetter(b, !B.bubs.some(x => x !== b && x.l === B.target) ? B.target : pick(ls)); }
+    const x = Math.max(0, Math.min(W - b.s, b.x + Math.sin(b.ph) * b.amp));
+    b.el.style.transform = `translate(${x}px,${b.y}px)`;
+  }
+  B.raf = requestAnimationFrame(bubbleTick);
+}
+async function popBub(b){
+  if (B.busy) return;
+  const l = B.target;
+  if (b.l === l){
+    B.busy = true; sfx('pop'); burst(b);
+    const r = b.el.getBoundingClientRect();
+    b.y = $('#bStage').clientHeight + 40 + Math.random() * 80; setBubLetter(b, pick(bubbleLetters()));
+    const said = talk(`Pop! ${L[l].n}!`, ...(recs[l] ? [{ rec: l }] : []), L[l].w[0][0]);
+    const fake = { getBoundingClientRect: () => r };
+    await addStar(fake); await said;
+    if (screen === 'bubble') newTarget();
+  } else {
+    sfx('boing'); restart(b.el, 'nope');
+    talk(`That's ${L[b.l].n}, like ${L[b.l].w[0][0]}. Find the one for ${L[l].w[0][0]}!`);
+  }
+}
+function burst(b){
+  const st = $('#bStage'), sr = st.getBoundingClientRect(), r = b.el.getBoundingClientRect();
+  const cx0 = r.left - sr.left + r.width / 2, cy0 = r.top - sr.top + r.height / 2;
+  for (let i = 0; i < 12; i++){
+    const d = document.createElement('div'); d.className = 'burst'; d.style.background = pick(PALETTE);
+    d.style.left = cx0 + 'px'; d.style.top = cy0 + 'px'; st.appendChild(d);
+    const a = i / 12 * Math.PI * 2, dist = 50 + Math.random() * 40;
+    d.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: `translate(${Math.cos(a) * dist - 6}px,${Math.sin(a) * dist - 6}px) scale(.3)`, opacity: 0 }], { duration: 600, easing: 'ease-out' });
+    setTimeout(() => d.remove(), 620);
+  }
+}
+
+/* ================= STICKER BOOK ================= */
+function renderBook(){
+  const counts = {}; S.stickers.forEach(x => { counts[x] = (counts[x] || 0) + 1; });
+  const left = 5 - (S.stars % 5);
+  $('#bookTxt').textContent = `You have ${Object.keys(counts).length} of ${STICKERS.length} stickers. ${left} more ⭐ for the next one!`;
+  $('#book').innerHTML = STICKERS.map(x => counts[x]
+    ? `<button class="slot got" data-s="${x}">${x}${counts[x] > 1 ? `<span class="n">×${counts[x]}</span>` : ''}</button>`
+    : '<div class="slot"></div>').join('');
+}
+$('#book').addEventListener('click', e => { const s = e.target.closest('[data-s]'); if (s){ restart(s, 'pop'); sfx('pop'); } });
+
+/* ================= GROWN-UPS ================= */
+function renderGrown(){
+  $('#gPresets').innerHTML = PRESETS.map(([t, v]) => `<button class="chip" data-v="${v}" aria-pressed="${S.letters === v}">${t}</button>`).join('');
+  $('#gLetters').innerHTML = ABC.map(l => `<button data-l="${l}" aria-pressed="${S.letters.includes(l)}">${l}</button>`).join('');
+  $$('#gCase .chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === S.lcase)));
+  $$('#gRate .chip').forEach(c => c.setAttribute('aria-pressed', String(+c.dataset.v === S.rate)));
+  $('#gName').value = S.name;
+  const canRec = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+  $('#gRecNote').innerHTML = canRec ? `<b>${Object.keys(recs).length}</b> of 26 sounds recorded.` : '⚠️ This browser can\'t record. Try Safari or Chrome, opened from the https:// link.';
+  $('#gRecs').innerHTML = ABC.map(l => `<div class="rec"><span class="rl" style="color:${colorOf(l)}">${l}</span>
+    <button data-rec="${l}" class="${recState && recState.l === l ? 'live' : ''}" ${canRec ? '' : 'disabled'} aria-label="Record ${l}">${recState && recState.l === l ? '⏹' : '🎙️'}</button>
+    <button data-play="${l}" ${recs[l] ? '' : 'disabled'} aria-label="Play ${l}">▶</button>
+    <button data-del="${l}" ${recs[l] ? '' : 'disabled'} aria-label="Delete ${l}">🗑</button></div>`).join('');
+}
+function setLetters(v){ S.letters = ABC.filter(l => v.includes(l)).join(''); store.set('letters', S.letters); renderGrown(); }
+$('#gPresets').addEventListener('click', e => { const c = e.target.closest('[data-v]'); if (c) setLetters(c.dataset.v); });
+$('#gLetters').addEventListener('click', e => {
+  const b = e.target.closest('[data-l]'); if (!b) return;
+  const l = b.dataset.l, has = S.letters.includes(l);
+  if (has && S.letters.length <= 1) return;
+  setLetters(has ? S.letters.replace(l, '') : S.letters + l);
+});
+$('#gCase').addEventListener('click', e => { const c = e.target.closest('[data-v]'); if (c){ S.lcase = c.dataset.v; store.set('case', S.lcase); renderGrown(); } });
+$('#gRate').addEventListener('click', e => { const c = e.target.closest('[data-v]'); if (c){ S.rate = +c.dataset.v; store.set('rate', S.rate); renderGrown(); talk('This is how fast I talk.'); } });
+$('#gName').addEventListener('input', e => { S.name = e.target.value.trim().slice(0, 16) || 'friend'; store.set('name', S.name); });
+$('#gReset').addEventListener('click', () => {
+  if (!confirm('Clear all stars and stickers?')) return;
+  S.stars = 0; S.stickers = []; store.set('stars', 0); store.set('stickers', []); renderStars();
+});
+
+/* recordings in IndexedDB */
+let db = null, recState = null;
+function openDB(){
+  return new Promise(res => {
+    try {
+      const r = indexedDB.open('phonics_sounds', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('rec');
+      r.onsuccess = () => { db = r.result; res(db); };
+      r.onerror = () => res(null);
+    } catch (e){ res(null); }
+  });
+}
+function dbDo(mode, fn){
+  return new Promise(res => {
+    if (!db) return res(null);
+    try { const tx = db.transaction('rec', mode), q = fn(tx.objectStore('rec')); tx.oncomplete = () => res(q && q.result); tx.onerror = () => res(null); } catch (e){ res(null); }
+  });
+}
+function setRec(l, blob){ if (recs[l]) URL.revokeObjectURL(recs[l]); if (blob) recs[l] = URL.createObjectURL(blob); else delete recs[l]; }
+async function loadRecs(){
+  await openDB(); if (!db) return;
+  const keys = await dbDo('readonly', s => s.getAllKeys()) || [];
+  for (const k of keys){ const blob = await dbDo('readonly', s => s.get(k)); if (blob) setRec(k, blob); }
+}
+async function record(l){
+  if (recState){ const same = recState.l === l; recState.mr.stop(); if (same) return; await sleep(200); }
+  hush();
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch (e){ $('#gRecNote').innerHTML = '⚠️ Microphone permission was blocked. Allow it in the browser settings and try again.'; return; }
+  const mr = new MediaRecorder(stream), chunks = [];
+  mr.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+  mr.onstop = async () => {
+    stream.getTracks().forEach(t => t.stop());
+    clearTimeout(recState && recState.timer);
+    const blob = new Blob(chunks, { type: mr.mimeType || 'audio/webm' });
+    recState = null;
+    if (blob.size){ await dbDo('readwrite', s => s.put(blob, l)); setRec(l, blob); }
+    if (screen === 'grown'){ renderGrown(); if (recs[l]) playRec(l); }
+  };
+  mr.start();
+  recState = { mr, l, timer: setTimeout(() => { if (mr.state === 'recording') mr.stop(); }, 2500) };
+  renderGrown();
+}
+$('#gRecs').addEventListener('click', async e => {
+  const r = e.target.closest('[data-rec]'), p = e.target.closest('[data-play]'), d = e.target.closest('[data-del]');
+  if (r) record(r.dataset.rec);
+  if (p){ hush(); playRec(p.dataset.play); }
+  if (d){ const l = d.dataset.del; await dbDo('readwrite', s => s.delete(l)); setRec(l, null); renderGrown(); }
+});
+
+/* ---------- start ---------- */
+renderStars();
+loadRecs();
+go('home');
+</script>
+</body>
+</html>
