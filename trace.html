@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="description" content="Trace with Buddy: a phone-friendly tracing game for 5-year-olds. Follow the ladybug to trace lines, shapes, letters and numbers in the right stroke order.">
+<meta name="theme-color" content="#FFE9A8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Trace with Buddy</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9C%8F%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@700&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2B2550; --bg1:#FFE9A8; --bg2:#FFD1E3; --paper:#FFFDF6; --purple:#7C5CFF; --yellow:#FFD23F; --pink:#FF6FA8; --green:#2ECC71;
+  --fd:'Baloo 2','Comic Sans MS',system-ui,sans-serif; --letter:'Andika','Century Gothic',system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;overscroll-behavior:none}
+body{font-family:var(--fd);color:var(--ink);background:linear-gradient(160deg,var(--bg1),var(--bg2));-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-action:manipulation}
+[hidden]{display:none!important}
+
+/* every screen fills the phone exactly, nothing scrolls while tracing */
+.screen{height:100vh;height:100dvh;display:flex;flex-direction:column;padding:max(8px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom));max-width:720px;margin:0 auto}
+.bar{display:flex;align-items:center;gap:8px;flex:none}
+.rbtn{width:52px;height:52px;flex:none;border-radius:16px;background:#fff;border:3.5px solid var(--ink);box-shadow:0 4px 0 var(--ink);font-size:1.6rem;display:grid;place-items:center}
+.rbtn:active,.tile:active,.bigbtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.bar .mid{flex:1;min-width:0;text-align:center;font-weight:800;font-size:1.3rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stars{display:flex;align-items:center;gap:4px;background:#fff;border:3.5px solid var(--ink);border-radius:999px;padding:4px 12px;font-weight:800;font-size:1.25rem;box-shadow:0 4px 0 var(--ink);flex:none}
+.stars.bump{animation:bump .5s}
+@keyframes bump{40%{transform:scale(1.3)}}
+
+/* home */
+.home-hero{text-align:center;margin:10px 0 6px}
+.home-hero .big{font-size:4.2rem;line-height:1;display:inline-block;animation:wobble 2.4s ease-in-out infinite}
+.home-hero h1{margin:4px 0 0;font-size:clamp(1.6rem,8vw,2.4rem);line-height:1.1}
+@keyframes wobble{50%{transform:rotate(-8deg) translateY(-4px)}}
+.sets{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;flex:1;align-content:start}
+.tile{background:#fff;border:4px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);padding:12px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:800;font-size:1.25rem;min-height:120px}
+.tile .ico{font-family:var(--letter);font-size:2.8rem;line-height:1.1}
+.tile .sub{font-size:.85rem;font-weight:700;opacity:.7}
+.sets .tile:nth-child(1){background:#DFF7E8} .sets .tile:nth-child(2){background:#E6E0FF} .sets .tile:nth-child(3){background:#FFE3EE} .sets .tile:nth-child(4){background:#DDF1FF}
+
+/* picker */
+.grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-content:start;padding:12px 2px 8px;-webkit-overflow-scrolling:touch}
+.grid .tile{min-height:0;aspect-ratio:1;padding:0;position:relative;border-radius:20px}
+.grid .tile .ico{font-size:clamp(1.9rem,9vw,2.6rem)}
+.grid .tile .shape{width:60%;height:60%}
+.grid .tile .ok{position:absolute;top:2px;right:4px;font-size:1rem}
+
+/* trace */
+.word{display:flex;align-items:center;justify-content:center;gap:6px}
+.word .em{font-size:1.7rem;line-height:1}
+.word .em svg{width:1.6rem;height:1.6rem;display:block}
+.board{flex:1;min-height:0;position:relative;margin:8px 0;background:var(--paper);border:4px solid var(--ink);border-radius:26px;box-shadow:0 6px 0 var(--ink);overflow:hidden}
+.board svg{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.tip{position:absolute;left:0;right:0;top:8px;text-align:center;font-weight:800;font-size:1.05rem;pointer-events:none;opacity:.85}
+.ctrl{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:none}
+.bigbtn{height:60px;border-radius:18px;background:#fff;border:3.5px solid var(--ink);box-shadow:0 4px 0 var(--ink);font-size:1.6rem;font-weight:800;display:grid;place-items:center}
+.bigbtn.yellow{background:var(--yellow)}
+.bigbtn:disabled{opacity:.35}
+.done-pop{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.done-pop .msg{background:#fff;border:4px solid var(--ink);border-radius:24px;padding:8px 18px;font-weight:800;font-size:1.6rem;animation:pop .45s;box-shadow:0 6px 0 var(--ink);margin-top:55%}
+.next-glow{animation:glow 1s ease-in-out infinite}
+@keyframes glow{50%{transform:scale(1.08);background:#FFE066}}
+@keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+.head{transition:transform .06s linear}
+.pulse{animation:pulse 1.1s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{50%{transform:scale(1.25)}}
+.wiggle{animation:wig .4s;transform-box:fill-box;transform-origin:center}
+@keyframes wig{25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+
+/* sticker overlay */
+.overlay{position:fixed;inset:0;background:rgba(43,37,80,.6);display:grid;place-items:center;z-index:50;padding:16px}
+.celebrate{background:#fff;border:5px solid var(--ink);border-radius:30px;padding:20px;text-align:center;animation:pop .5s;width:100%;max-width:340px}
+.celebrate .sticker{font-size:6.5rem;line-height:1.1;animation:spin 1.1s ease-out}
+.celebrate h2{margin:4px 0 12px;font-size:1.8rem}
+@keyframes spin{0%{transform:scale(0) rotate(-200deg)}100%{transform:scale(1) rotate(0)}}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+
+@media (min-width:560px){ .grid{grid-template-columns:repeat(6,1fr)} .sets{grid-template-columns:repeat(4,1fr)} }
+@media (orientation:landscape) and (max-height:500px){
+  .screen{flex-direction:row;flex-wrap:wrap;max-width:none}
+  #s-trace .bar{width:100%}
+  #s-trace .board{flex:1;height:auto;margin:6px 8px 0 0}
+  #s-trace .ctrl{grid-template-columns:1fr 1fr;align-content:center;width:140px;margin-top:6px}
+  .home-hero{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<!-- HOME -->
+<section class="screen" id="s-home">
+  <div class="bar"><div class="mid"></div><div class="stars" id="stars1"><span aria-hidden="true">⭐</span><span class="sn">0</span></div></div>
+  <div class="home-hero"><span class="big" aria-hidden="true">🐞</span><h1>Trace with Buddy</h1></div>
+  <div class="sets" id="sets"></div>
+</section>
+
+<!-- PICKER -->
+<section class="screen" id="s-pick" hidden>
+  <div class="bar">
+    <button class="rbtn" data-act="home" aria-label="Home">🏠</button>
+    <div class="mid" id="pickTitle"></div>
+    <div class="stars"><span aria-hidden="true">⭐</span><span class="sn">0</span></div>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<!-- TRACE -->
+<section class="screen" id="s-trace" hidden>
+  <div class="bar">
+    <button class="rbtn" data-act="pick" aria-label="Back to the list">◀</button>
+    <div class="mid word" id="tWord"></div>
+    <div class="stars"><span aria-hidden="true">⭐</span><span class="sn">0</span></div>
+  </div>
+  <div class="board" id="board">
+    <svg id="svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-label="Tracing board"></svg>
+    <div class="tip" id="tip"></div>
+  </div>
+  <div class="ctrl">
+    <button class="bigbtn" id="bPrev" aria-label="Previous">⬅️</button>
+    <button class="bigbtn" id="bWatch" aria-label="Watch how">👀</button>
+    <button class="bigbtn" id="bAgain" aria-label="Start again">🔄</button>
+    <button class="bigbtn" id="bNext" aria-label="Next">➡️</button>
+  </div>
+</section>
+
+<div class="overlay" id="celebrate" hidden>
+  <div class="celebrate">
+    <div class="sticker" id="cSticker">🦄</div>
+    <h2>New sticker!</h2>
+    <button class="bigbtn yellow" id="cOk" style="width:100%">Yay! ▶</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ---------- what can be traced ----------
+   Each item is a list of strokes (SVG paths) in drawing order.
+   Lowercase: x-height 50→100, tall letters start at 10, tails go to 128.
+   Capitals and numbers: 10 → 100. */
+const C_A = 'M71.6,62.5 A25,25 0 1 0 71.6,87.5';           // the "c" curve used by a, c, d, g, q
+const RIGHT_O = 'M25,75 A25,25 0 1 1 75,75 A25,25 0 1 1 25,75'; // ball for b and p
+const IGLOO = '<svg viewBox="0 0 64 64"><path d="M5 54 A27 27 0 0 1 59 54 Z" fill="#fff" stroke="#4BA3E3" stroke-width="3"/><path d="M9 42 H55 M15 31 H49 M24 21 H40" stroke="#4BA3E3" stroke-width="2.5" fill="none"/><path d="M25 54 A7 8 0 0 1 39 54 Z" fill="#2B4A6B"/></svg>';
+const LOWER = {
+  a: [C_A, 'M75,50 L75,100'],
+  b: ['M25,10 L25,100', RIGHT_O],
+  c: [C_A],
+  d: [C_A, 'M75,10 L75,100'],
+  e: ['M25,75 L75,75 A25,25 0 1 0 71.6,87.5'],
+  f: ['M68,18 Q50,4 41,22 L40,100', 'M22,52 L62,52'],
+  g: [C_A, 'M75,50 L75,112 Q75,128 52,128 Q34,128 28,118'],
+  h: ['M25,10 L25,100', 'M25,74 Q25,50 50,50 Q75,50 75,74 L75,100'],
+  i: ['M50,50 L50,100', 'M50,32 L50,32.4'],
+  j: ['M58,50 L58,112 Q58,128 40,128 Q27,128 22,118', 'M58,32 L58,32.4'],
+  k: ['M27,10 L27,100', 'M72,50 L28,78 L72,100'],
+  l: ['M50,10 L50,100'],
+  m: ['M20,50 L20,100', 'M20,70 Q20,50 35,50 Q50,50 50,70 L50,100', 'M50,70 Q50,50 65,50 Q80,50 80,70 L80,100'],
+  n: ['M25,50 L25,100', 'M25,74 Q25,50 50,50 Q75,50 75,74 L75,100'],
+  o: ['M50,50 A25,25 0 1 0 50,100 A25,25 0 1 0 50,50'],
+  p: ['M25,50 L25,128', RIGHT_O],
+  q: [C_A, 'M75,50 L75,128'],
+  r: ['M30,50 L30,100', 'M30,72 Q32,50 54,50 Q67,50 73,57'],
+  s: ['M70,57 Q62,50 50,50 Q28,50 30,63 Q32,74 50,75 Q70,77 70,88 Q70,100 50,100 Q34,100 28,92'],
+  t: ['M50,22 L50,100', 'M30,50 L70,50'],
+  u: ['M25,50 L25,78 Q25,100 50,100 Q75,100 75,78', 'M75,50 L75,100'],
+  v: ['M25,50 L50,100 L75,50'],
+  w: ['M16,50 L33,100 L50,62 L67,100 L84,50'],
+  x: ['M27,50 L73,100', 'M73,50 L27,100'],
+  y: ['M25,50 L52,100', 'M75,50 L40,128'],
+  z: ['M27,50 L73,50 L27,100 L73,100']
+};
+const O_BIG = 'M50,10 A30,45 0 1 0 50,100 A30,45 0 1 0 50,10';
+const UPPER = {
+  A: ['M50,10 L20,100', 'M50,10 L80,100', 'M33,68 L67,68'],
+  B: ['M25,10 L25,100', 'M25,10 L55,10 Q75,10 75,32 Q75,55 55,55 L25,55', 'M25,55 L58,55 Q80,55 80,77 Q80,100 58,100 L25,100'],
+  C: ['M76.5,26 A32,45 0 1 0 76.5,84'],
+  D: ['M25,10 L25,100', 'M25,10 L45,10 Q80,10 80,55 Q80,100 45,100 L25,100'],
+  E: ['M28,10 L28,100', 'M28,10 L74,10', 'M28,55 L66,55', 'M28,100 L74,100'],
+  F: ['M28,10 L28,100', 'M28,10 L74,10', 'M28,55 L66,55'],
+  G: ['M76.5,26 A32,45 0 1 0 83.5,63', 'M60,63 L84,63'],
+  H: ['M25,10 L25,100', 'M75,10 L75,100', 'M25,55 L75,55'],
+  I: ['M50,10 L50,100', 'M30,10 L70,10', 'M30,100 L70,100'],
+  J: ['M65,10 L65,78 Q65,100 45,100 Q29,100 25,85'],
+  K: ['M25,10 L25,100', 'M75,10 L25,62', 'M42,46 L78,100'],
+  L: ['M28,10 L28,100 L75,100'],
+  M: ['M18,10 L18,100', 'M18,10 L50,72 L82,10 L82,100'],
+  N: ['M22,10 L22,100', 'M22,10 L78,100 L78,10'],
+  O: [O_BIG],
+  P: ['M25,10 L25,100', 'M25,10 L55,10 Q78,10 78,33 Q78,56 55,56 L25,56'],
+  Q: [O_BIG, 'M58,78 L82,104'],
+  R: ['M25,10 L25,100', 'M25,10 L55,10 Q78,10 78,33 Q78,56 55,56 L25,56', 'M50,56 L78,100'],
+  S: ['M74,22 Q64,10 50,10 Q26,10 26,32 Q26,50 50,55 Q76,60 76,80 Q76,100 50,100 Q30,100 24,86'],
+  T: ['M20,10 L80,10', 'M50,10 L50,100'],
+  U: ['M25,10 L25,72 Q25,100 50,100 Q75,100 75,72 L75,10'],
+  V: ['M20,10 L50,100 L80,10'],
+  W: ['M12,10 L31,100 L50,40 L69,100 L88,10'],
+  X: ['M24,10 L76,100', 'M76,10 L24,100'],
+  Y: ['M22,10 L50,55', 'M78,10 L50,55 L50,100'],
+  Z: ['M24,10 L76,10 L24,100 L76,100']
+};
+const NUMS = {
+  0: ['M50,10 A28,45 0 1 0 50,100 A28,45 0 1 0 50,10'],
+  1: ['M36,25 L52,10 L52,100'],
+  2: ['M26,30 Q28,10 50,10 Q74,10 74,32 Q74,50 26,100 L76,100'],
+  3: ['M28,22 Q36,10 50,10 Q72,10 72,31 Q72,53 48,54 Q76,55 76,77 Q76,100 50,100 Q32,100 25,88'],
+  4: ['M55,10 L24,68 L80,68', 'M64,10 L64,100'],
+  5: ['M70,10 L32,10 L29,48 Q40,42 52,42 Q76,42 76,70 Q76,100 50,100 Q32,100 25,90'],
+  6: ['M70,16 Q60,10 50,10 Q24,10 24,60 Q24,100 50,100 Q76,100 76,76 Q76,52 50,52 Q28,52 25,72'],
+  7: ['M24,10 L76,10 L40,100'],
+  8: ['M70,26 Q70,10 50,10 Q30,10 30,28 Q30,46 50,55 Q76,64 76,80 Q76,100 50,100 Q24,100 24,80 Q24,64 50,55 Q70,46 70,26'],
+  9: ['M74,32 Q74,10 50,10 Q26,10 26,32 Q26,54 50,54 Q74,54 74,32 L74,100']
+};
+const SHAPES = {
+  down:    { name: 'line down',   strokes: ['M50,12 L50,100'] },
+  across:  { name: 'line across', strokes: ['M10,56 L90,56'] },
+  slide:   { name: 'slide',       strokes: ['M18,14 L82,100'] },
+  rainbow: { name: 'rainbow',     strokes: ['M12,92 Q50,-8 88,92'] },
+  wave:    { name: 'wave',        strokes: ['M8,56 Q19,28 30,56 Q41,84 52,56 Q63,28 74,56 Q85,84 92,60'] },
+  zigzag:  { name: 'zigzag',      strokes: ['M8,32 L27,84 L46,32 L65,84 L84,32'] },
+  circle:  { name: 'circle',      strokes: ['M50,14 A40,40 0 1 0 50,94 A40,40 0 1 0 50,14'] },
+  square:  { name: 'square',      strokes: ['M20,18 L80,18 L80,94 L20,94 L20,18'] },
+  cross:   { name: 'plus',        strokes: ['M50,14 L50,98', 'M10,56 L90,56'] },
+  snail:   { name: 'snail',       strokes: ['M50,56 Q50,48 58,48 Q68,48 68,58 Q68,72 52,72 Q34,72 34,56 Q34,34 58,34 Q84,34 84,58 Q84,88 52,88 Q18,88 16,56'] }
+};
+/* Picture words for each letter (same as Munchy's Letter Sounds). */
+const WORD = { a:['apple','🍎'], b:['ball','⚽'], c:['cat','🐱'], d:['dog','🐶'], e:['egg','🥚'], f:['fish','🐟'], g:['goat','🐐'], h:['hat','🎩'], i:['igloo',IGLOO], j:['juice','🧃'], k:['kite','🪁'], l:['lion','🦁'], m:['moon','🌙'], n:['nose','👃'], o:['octopus','🐙'], p:['pig','🐷'], q:['queen','👸'], r:['rabbit','🐰'], s:['sun','☀️'], t:['tiger','🐯'], u:['umbrella','☂️'], v:['violin','🎻'], w:['whale','🐳'], x:['box','📦'], y:['yo-yo','🪀'], z:['zebra','🦓'] };
+const NAME = { a:'ay', b:'bee', c:'see', d:'dee', e:'ee', f:'eff', g:'jee', h:'aitch', i:'eye', j:'jay', k:'kay', l:'el', m:'em', n:'en', o:'oh', p:'pee', q:'cue', r:'ar', s:'ess', t:'tee', u:'you', v:'vee', w:'double you', x:'ex', y:'why', z:'zee' };
+const NUMWORD = ['zero','one','two','three','four','five','six','seven','eight','nine'];
+const NUMPIC = ['🍩','☝️','👀','🐻','🍀','🖐️','🎲','🌈','🐙','🎈'];
+const BUDDIES = [['🐞','ladybug'],['🐝','bee'],['🚗','car'],['🐢','turtle'],['🦋','butterfly'],['🐌','snail'],['🚂','train'],['🐠','fish']];
+const STICKERS = ['🦄','🐲','🦖','🐙','🦋','🐳','🦁','🐼','🐸','🚀','🌈','🍩','🦕','🐬','🦜','🐞','🌟','🎈','🦒','🐯','🚒','🏎️','🦀','🐧','🍦','🎸','🐨','🦩','🛸','🏰'];
+const COLORS = ['#E8453C','#F28C28','#E0B000','#2EAA4F','#1E90D6','#7C5CFF','#D63AA8'];
+
+const SETS = {
+  shapes: { title: 'Lines & shapes', ico: '〰️', sub: 'warm up', vb: '0 0 100 112', lines: [],
+            items: Object.keys(SHAPES).map(k => ({ id: k, label: SHAPES[k].name, strokes: SHAPES[k].strokes })) },
+  lower:  { title: 'a b c', ico: 'abc', sub: 'small letters', vb: '-6 0 112 136', lines: [10, 50, 100],
+            items: Object.keys(LOWER).map(k => ({ id: k, label: k, strokes: LOWER[k] })) },
+  upper:  { title: 'A B C', ico: 'ABC', sub: 'big letters', vb: '-6 0 112 112', lines: [10, 55, 100],
+            items: Object.keys(UPPER).map(k => ({ id: k, label: k, strokes: UPPER[k] })) },
+  nums:   { title: '1 2 3', ico: '123', sub: 'numbers', vb: '-6 0 112 112', lines: [10, 55, 100],
+            items: Object.keys(NUMS).map(k => ({ id: k, label: k, strokes: NUMS[k] })) }
+};
+
+/* ---------- helpers ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const restart = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+const NS = 'http://www.w3.org/2000/svg';
+/* Same keys as Munchy's Letter Sounds, so stars and stickers are shared on the same site. */
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('phx_' + k); return v === null ? d : JSON.parse(v); } catch (e){ return d; } },
+  set(k, v){ try { localStorage.setItem('phx_' + k, JSON.stringify(v)); } catch (e){} }
+};
+const S = { name: store.get('name', 'Kiyansh'), rate: store.get('rate', 0.85), stars: store.get('stars', 0), stickers: store.get('stickers', []), done: store.get('traced', {}) };
+
+/* ---------- voice (and grown-up recordings from Munchy's game, if any) ---------- */
+const canSpeak = 'speechSynthesis' in window;
+let voice = null;
+function pickVoice(){
+  if (!canSpeak) return;
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v => /en[-_]US/i.test(v.lang) && /Samantha|Google US|Aria|Jenny|Ava|Allison/i.test(v.name)) || vs.find(v => /en[-_]US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+}
+if (canSpeak){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function sayOne(text){
+  return new Promise(res => {
+    if (!canSpeak || !text) return res();
+    const u = new SpeechSynthesisUtterance(text); if (voice) u.voice = voice;
+    u.lang = 'en-US'; u.rate = S.rate; u.pitch = 1.15;
+    let done = false; const fin = () => { if (!done){ done = true; res(); } };
+    u.onend = fin; u.onerror = fin; setTimeout(fin, 1200 + text.length * 120 / S.rate);
+    speechSynthesis.speak(u);
+  });
+}
+const recs = {}; let recAudio = null, talkId = 0;
+function playRec(l){ return new Promise(res => { if (!recs[l]) return res(); recAudio = new Audio(recs[l]); recAudio.onended = res; recAudio.onerror = res; recAudio.play().catch(res); setTimeout(res, 4000); }); }
+function hush(){ talkId++; try { if (canSpeak) speechSynthesis.cancel(); } catch (e){} if (recAudio){ recAudio.pause(); recAudio = null; } }
+async function talk(...parts){
+  hush(); const id = talkId; await sleep(60);
+  for (const p of parts){ if (id !== talkId) return; if (typeof p === 'string') await sayOne(p); else if (p && p.rec) await playRec(p.rec); }
+}
+try {
+  const r = indexedDB.open('phonics_sounds', 1);
+  r.onupgradeneeded = () => r.result.createObjectStore('rec');
+  r.onsuccess = () => {
+    try {
+      const st = r.result.transaction('rec', 'readonly').objectStore('rec'), q = st.openCursor();
+      q.onsuccess = () => { const c = q.result; if (c){ recs[c.key] = URL.createObjectURL(c.value); c.continue(); } };
+    } catch (e){}
+  };
+} catch (e){}
+
+/* ---------- little sounds ---------- */
+let actx = null, lastTick = 0;
+function sfx(kind){
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const now = actx.currentTime;
+    const tone = (f, t, d, type = 'sine', v = .12) => { const o = actx.createOscillator(), g = actx.createGain(); o.type = type; o.frequency.value = f; g.gain.setValueAtTime(.0001, now + t); g.gain.exponentialRampToValueAtTime(v, now + t + .02); g.gain.exponentialRampToValueAtTime(.0001, now + t + d); o.connect(g); g.connect(actx.destination); o.start(now + t); o.stop(now + t + d + .05); };
+    if (kind === 'tick') tone(900 + Math.random() * 300, 0, .05, 'sine', .03);
+    else if (kind === 'stroke') { tone(660, 0, .12); tone(880, .08, .15); }
+    else if (kind === 'yay') [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .1, .28, 'triangle'));
+    else if (kind === 'boop') tone(260, 0, .18, 'sine', .08);
+    else tone(500, 0, .05, 'sine', .05);
+  } catch (e){}
+}
+
+/* ---------- stars, stickers, confetti ---------- */
+function renderStars(){ $$('.sn').forEach(e => { e.textContent = S.stars; }); }
+async function addStar(){
+  S.stars++; store.set('stars', S.stars); renderStars(); $$('.stars').forEach(e => restart(e, 'bump'));
+  if (S.stars % 5 !== 0) return;
+  const fresh = STICKERS.filter(x => !S.stickers.includes(x)), st = fresh.length ? pick(fresh) : pick(STICKERS);
+  S.stickers.push(st); store.set('stickers', S.stickers);
+  await new Promise(res => {
+    $('#cSticker').textContent = st; $('#celebrate').hidden = false; confetti();
+    talk(`Wow! A new sticker for ${S.name}!`);
+    $('#cOk').onclick = () => { $('#celebrate').hidden = true; hush(); res(); };
+  });
+}
+const cv = $('#confetti'), cx = cv.getContext('2d'); let bits = [], raf = null;
+function confetti(){
+  const dpr = devicePixelRatio || 1; cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  for (let i = 0; i < 110; i++) bits.push({ x: innerWidth / 2, y: innerHeight * .45, vx: (Math.random() - .5) * 13, vy: -Math.random() * 12 - 4, s: 7 + Math.random() * 7, r: Math.random() * 6, c: pick(COLORS), life: 0 });
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function tick(){
+  cx.clearRect(0, 0, innerWidth, innerHeight);
+  for (const p of bits){ p.vy += .35; p.x += p.vx; p.y += p.vy; p.r += .1; p.life++; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); cx.restore(); }
+  bits = bits.filter(p => p.y < innerHeight + 40 && p.life < 220);
+  raf = bits.length ? requestAnimationFrame(tick) : (cx.clearRect(0, 0, innerWidth, innerHeight), null);
+}
+
+/* ---------- screens ---------- */
+let setId = 'shapes', idx = 0;
+function go(id){
+  hush(); stopDemo();
+  $$('.screen').forEach(s => { s.hidden = s.id !== 's-' + id; });
+  if (id === 'pick') renderPick();
+}
+document.addEventListener('click', e => { const a = e.target.closest('[data-act]'); if (a){ sfx(); go(a.dataset.act); } });
+$('#sets').innerHTML = Object.entries(SETS).map(([k, s]) => `<button class="tile" data-set="${k}"><span class="ico">${s.ico}</span>${s.title}<span class="sub">${s.sub}</span></button>`).join('');
+$('#sets').addEventListener('click', e => {
+  const t = e.target.closest('[data-set]'); if (!t) return;
+  sfx(); setId = t.dataset.set; go('pick'); talk(SETS[setId].title === 'Lines & shapes' ? 'Lines and shapes!' : 'Pick one to trace!');
+});
+function shapeIcon(item){
+  return `<svg class="shape" viewBox="0 0 100 112">${item.strokes.map(d => `<path d="${d}" fill="none" stroke="#2B2550" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}</svg>`;
+}
+function renderPick(){
+  const set = SETS[setId];
+  $('#pickTitle').textContent = set.title;
+  $('#grid').innerHTML = set.items.map((it, i) => `<button class="tile" data-i="${i}" aria-label="${it.label}" style="color:${COLORS[i % COLORS.length]}">
+    ${setId === 'shapes' ? shapeIcon(it) : `<span class="ico">${it.label}</span>`}${S.done[setId + ':' + it.id] ? '<span class="ok">⭐</span>' : ''}</button>`).join('');
+}
+$('#grid').addEventListener('click', e => { const t = e.target.closest('[data-i]'); if (t){ sfx(); openItem(+t.dataset.i); } });
+
+/* ================= TRACING ================= */
+const svg = $('#svg');
+const T = { strokes: [], si: 0, prog: 0, dragging: false, pid: null, done: false, buddy: BUDDIES[0], color: COLORS[0], misses: 0 };
+function el(tag, attrs, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+
+/* Sample a path into points 1 unit apart, so we can follow the finger along it. */
+function sample(d){
+  const p = el('path', { d }, svg), len = p.getTotalLength(), pts = [];
+  const n = Math.max(1, Math.ceil(len));
+  for (let i = 0; i <= n; i++){ const q = p.getPointAtLength(len * i / n); pts.push([q.x, q.y]); }
+  p.remove();
+  return { d, len, pts, dot: len < 2 };
+}
+
+function wordHTML(){
+  const it = SETS[setId].items[idx];
+  if (setId === 'shapes') return `<span>${it.label}</span>`;
+  if (setId === 'nums') return `<span style="font-family:var(--letter)">${it.label}</span><span class="em">${NUMPIC[+it.id]}</span>`;
+  const w = WORD[it.id.toLowerCase()];
+  return `<span style="font-family:var(--letter)">${it.label}</span><span class="em">${w[1]}</span><span>${w[0]}</span>`;
+}
+function itemSpeech(){
+  const it = SETS[setId].items[idx], l = it.id.toLowerCase();
+  if (setId === 'shapes') return [`Let's trace a ${it.label}!`];
+  if (setId === 'nums') return [`Let's trace ${NUMWORD[+it.id]}!`];
+  const parts = [`${setId === 'upper' ? 'Big' : 'Little'} ${NAME[l]}.`];
+  if (recs[l]) parts.push(`${NAME[l]} says`, { rec: l });
+  parts.push(`like ${WORD[l][0]}!`);
+  return parts;
+}
+
+function openItem(i){
+  const set = SETS[setId];
+  idx = (i + set.items.length) % set.items.length;
+  go('trace');
+  T.buddy = pick(BUDDIES); T.color = COLORS[idx % COLORS.length];
+  $('#tWord').innerHTML = wordHTML();
+  build(set.items[idx]);
+  // show how first, then hand over
+  demo(true).then(ok => { if (ok) talk(...itemSpeech(), `Follow the ${T.buddy[1]} with your finger!`); });
+}
+
+function build(item){
+  stopDemo();
+  svg.innerHTML = '';
+  const set = SETS[setId];
+  svg.setAttribute('viewBox', set.vb);
+  T.strokes = item.strokes.map(sample);
+  // zoom in so the item fills the board (big is easier for small fingers)
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  T.strokes.forEach(st => st.pts.forEach(([x, y]) => { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }));
+  const w = Math.max(x1 - x0 + 30, 84), h = Math.max(y1 - y0 + 30, 84);
+  const vb = [(x0 + x1) / 2 - w / 2, (y0 + y1) / 2 - h / 2, w, h];
+  svg.setAttribute('viewBox', vb.join(' '));
+  // handwriting lines
+  set.lines.forEach((y, k) => el('line', { x1: vb[0] + 2, x2: vb[0] + vb[2] - 2, y1: y, y2: y, stroke: k === 1 ? '#9BB7E8' : '#C5D5F2', 'stroke-width': k === 1 ? 1.2 : 1.6, 'stroke-dasharray': k === 1 ? '4 4' : '' }, svg));
+  T.si = 0; T.prog = 0; T.done = false; T.dragging = false; T.misses = 0;
+  T.layer = el('g', {}, svg);
+  T.strokes.forEach((s, k) => {
+    s.g = el('g', {}, T.layer);
+    if (s.dot){
+      s.track = el('circle', { cx: s.pts[0][0], cy: s.pts[0][1], r: 7, fill: '#ECE7FF', stroke: '#B9AEF0', 'stroke-width': 1.5, 'stroke-dasharray': '2 2' }, s.g);
+      s.ink = el('circle', { cx: s.pts[0][0], cy: s.pts[0][1], r: 0, fill: T.color }, s.g);
+    } else {
+      s.track = el('path', { d: s.d, fill: 'none', stroke: '#ECE7FF', 'stroke-width': 15, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, s.g);
+      el('path', { d: s.d, fill: 'none', stroke: '#B9AEF0', 'stroke-width': 1.6, 'stroke-dasharray': '3 4', 'stroke-linecap': 'round' }, s.g);
+      s.ink = el('path', { d: s.d, fill: 'none', stroke: T.color, 'stroke-width': 11, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-dasharray': `0 ${s.len + 20}` }, s.g);
+    }
+  });
+  // stroke numbers at each start
+  T.badges = T.strokes.map((s, k) => {
+    const g = el('g', {}, svg), [x, y] = s.pts[0];
+    const ox = -14, oy = -11;
+    el('circle', { cx: x + ox, cy: y + oy, r: 5.2, fill: '#fff', stroke: '#2B2550', 'stroke-width': 1.2 }, g);
+    const t = el('text', { x: x + ox, y: y + oy + 2.6, 'text-anchor': 'middle', 'font-size': 7, 'font-weight': 800, fill: '#2B2550', 'font-family': 'Baloo 2, sans-serif' }, g);
+    t.textContent = k + 1;
+    if (T.strokes.length === 1) g.setAttribute('opacity', 0);
+    return g;
+  });
+  T.arrows = el('g', { opacity: .9 }, svg);
+  T.goal = el('text', { 'text-anchor': 'middle', 'font-size': 10 }, svg); T.goal.textContent = '⭐';
+  T.headG = el('g', { class: 'head' }, svg);
+  T.headInner = el('g', { class: 'pulse' }, T.headG);
+  el('circle', { r: 10, fill: '#fff', stroke: '#2B2550', 'stroke-width': 1.6 }, T.headInner);
+  const ht = el('text', { y: 4.4, 'text-anchor': 'middle', 'font-size': 12.5 }, T.headInner); ht.textContent = T.buddy[0];
+  $('#tip').textContent = '';
+  $('#bNext').classList.remove('next-glow');
+  place();
+}
+
+/* Draw the current state: ink so far, buddy position, arrows ahead, goal star. */
+function place(){
+  T.strokes.forEach((s, k) => {
+    const full = k < T.si || T.done, cur = k === T.si && !T.done;
+    if (s.dot) s.ink.setAttribute('r', full ? 6.5 : 0);
+    else { s.ink.setAttribute('stroke-dasharray', full ? `${s.len + 20} 0` : `${cur ? T.prog : 0} ${s.len + 20}`); s.ink.setAttribute('visibility', full || (cur && T.prog > 0.5) ? 'visible' : 'hidden'); }
+    T.badges[k].setAttribute('opacity', T.strokes.length > 1 && k === T.si && !T.done ? 1 : 0);
+  });
+  T.arrows.innerHTML = '';
+  if (T.done){ T.headG.setAttribute('opacity', 0); T.goal.setAttribute('opacity', 0); return; }
+  const s = T.strokes[T.si], i = Math.min(s.pts.length - 1, Math.round(T.prog / s.len * (s.pts.length - 1))) || 0;
+  const [x, y] = s.pts[s.dot ? 0 : i];
+  T.headG.setAttribute('opacity', 1);
+  T.headG.setAttribute('transform', `translate(${x},${y})`);
+  const end = s.pts[s.pts.length - 1];
+  T.goal.setAttribute('x', end[0]); T.goal.setAttribute('y', end[1] + 3.5); T.goal.setAttribute('opacity', s.dot ? 0 : 1);
+  // little arrows showing which way to go
+  if (!s.dot) for (const ahead of [14, 26, 38]){
+    const j = i + ahead; if (j >= s.pts.length - 6) break;
+    const a = s.pts[j], b = s.pts[Math.min(j + 2, s.pts.length - 1)], ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
+    el('path', { d: 'M-3,-3.2 L2.2,0 L-3,3.2', fill: 'none', stroke: T.color, 'stroke-width': 1.8, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: 1 - ahead / 50, transform: `translate(${a[0]},${a[1]}) rotate(${ang})` }, T.arrows);
+  }
+}
+
+/* finger → board coordinates */
+function toSvg(e){ const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
+/* How close the finger must be, in board units: at least 36 screen pixels. */
+function tol(){ const m = svg.getScreenCTM(); return Math.max(9, 36 / (m ? m.a : 3)); }
+
+svg.addEventListener('pointerdown', e => {
+  if (T.done) return;
+  if (demoing){ stopDemo(); place(); }
+  if (T.pid !== null) return;                       // ignore a second finger or palm
+  const p = toSvg(e), s = T.strokes[T.si], i = Math.round(T.prog / s.len * (s.pts.length - 1)) || 0, h = s.pts[s.dot ? 0 : i];
+  const dist = Math.hypot(p.x - h[0], p.y - h[1]);
+  if (dist <= tol() * 1.6){
+    T.pid = e.pointerId; T.dragging = true; try { svg.setPointerCapture(e.pointerId); } catch (err){}
+    if (s.dot){ finishStroke(); return; }
+    move(p);
+  } else {
+    // touched somewhere else: point at the buddy
+    sfx('boop'); restart(T.headInner, 'wiggle');
+    T.misses++;
+    if (T.misses % 3 === 1) talk(`Start at the ${T.buddy[1]}!`);
+  }
+});
+svg.addEventListener('pointermove', e => { if (T.dragging && e.pointerId === T.pid) move(toSvg(e)); });
+const lift = e => { if (e.pointerId !== T.pid) return; T.pid = null; T.dragging = false; };
+svg.addEventListener('pointerup', lift);
+svg.addEventListener('pointercancel', lift);
+
+function move(p){
+  const s = T.strokes[T.si]; if (!s || s.dot) return;
+  const n = s.pts.length - 1, i0 = Math.round(T.prog / s.len * n), win = Math.min(n, i0 + 30), tl = tol();
+  let best = -1, bestD = Infinity;
+  for (let i = i0; i <= win; i++){ const d = Math.hypot(p.x - s.pts[i][0], p.y - s.pts[i][1]); if (d < bestD){ bestD = d; best = i; } }
+  if (bestD > tl * 2.2){                             // wandered off: buddy waits
+    T.dragging = false; T.pid = null; restart(T.headInner, 'wiggle'); sfx('boop');
+    $('#tip').textContent = `Go back to the ${T.buddy[1]} ${T.buddy[0]}`;
+    return;
+  }
+  if (bestD <= tl && best > i0){
+    T.prog = best / n * s.len; $('#tip').textContent = '';
+    const now = performance.now(); if (now - lastTick > 90){ sfx('tick'); lastTick = now; }
+    place();
+    if (best >= n - 2) finishStroke();
+  }
+}
+async function finishStroke(){
+  T.dragging = false; T.pid = null;
+  T.si++; T.prog = 0; sfx('stroke');
+  if (T.si >= T.strokes.length){ T.done = true; place(); return finishItem(); }
+  place();
+  if (T.strokes[T.si].dot) talk('Now tap the dot!');
+}
+async function finishItem(){
+  const set = SETS[setId], it = set.items[idx];
+  // rainbow colour every stroke
+  T.strokes.forEach((s, k) => { const c = COLORS[(idx + k * 2) % COLORS.length]; s.ink.setAttribute(s.dot ? 'fill' : 'stroke', c); });
+  restart(T.layer, 'pulse');
+  sfx('yay'); confetti();
+  S.done[setId + ':' + it.id] = true; store.set('traced', S.done);
+  const praise = pick(['Great tracing', 'Wow, super job', 'You did it', 'Beautiful']);
+  const what = setId === 'shapes' ? `a ${it.label}` : setId === 'nums' ? NUMWORD[+it.id] : `${setId === 'upper' ? 'big' : 'little'} ${NAME[it.id.toLowerCase()]}`;
+  $('#tip').textContent = '⭐ ' + praise + '! ⭐';
+  $('#bNext').classList.add('next-glow');
+  const said = talk(`${praise}, ${S.name}! You traced ${what}!`);
+  await addStar();
+  await said;
+}
+
+/* ---------- watch how: the buddy draws it once ---------- */
+let demoing = false, demoToken = 0;
+function stopDemo(){
+  if (demoing && T.keep){ T.si = T.keep.si; T.prog = T.keep.prog; T.done = T.keep.done; T.strokes.forEach(s => s.ink && s.ink.setAttribute('opacity', 1)); }
+  demoing = false; demoToken++;
+}
+async function demo(first){
+  stopDemo(); const tok = demoToken; demoing = true;
+  const keep = T.keep = { si: T.si, prog: T.prog, done: T.done };
+  T.si = 0; T.prog = 0; T.done = false;
+  T.strokes.forEach(s => { s.ink.setAttribute('opacity', .35); });
+  if (!first) talk('Watch me!');
+  await sleep(first ? 350 : 250);
+  for (let k = 0; k < T.strokes.length; k++){
+    if (tok !== demoToken) return false;
+    T.si = k; const s = T.strokes[k], dur = s.dot ? 300 : Math.max(700, s.len * 9), t0 = performance.now();
+    while (true){
+      if (tok !== demoToken) break;
+      const f = Math.min(1, (performance.now() - t0) / dur);
+      T.prog = f * s.len; place();
+      if (f >= 1) break;
+      await new Promise(r => requestAnimationFrame(r));
+    }
+    if (tok !== demoToken) break;
+    await sleep(220);
+  }
+  if (tok !== demoToken) return false;              // the child touched the board: stopDemo() already put things back
+  // put everything back to where the child was
+  T.strokes.forEach(s => { s.ink.setAttribute('opacity', 1); });
+  T.si = keep.si; T.prog = keep.prog; T.done = keep.done;
+  demoing = false; place();
+  return true;
+}
+
+$('#bWatch').addEventListener('click', () => { sfx(); if (T.done) build(SETS[setId].items[idx]); demo(false); });
+$('#bAgain').addEventListener('click', () => { sfx(); build(SETS[setId].items[idx]); talk(...itemSpeech()); });
+$('#bPrev').addEventListener('click', () => { sfx(); openItem(idx - 1); });
+$('#bNext').addEventListener('click', () => { sfx(); openItem(idx + 1); });
+// stop the page from moving while a finger is on the board (older iOS)
+$('#board').addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
+renderStars();
+go('home');
+</script>
+</body>
+</html>
