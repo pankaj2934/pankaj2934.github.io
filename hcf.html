@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="HCF Tricks: a calm, step-by-step page for learning the Highest Common Factor of big numbers.">
+<meta name="theme-color" content="#F6F4EE">
+<title>HCF Tricks</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%AA%9C%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F4EE; --ink:#26304A; --muted:#5E6780; --card:#FFFFFF;
+  --good:#2E7D5B; --good-bg:#E4F3EA; --bad:#B4553A; --bad-bg:#FBEDE6; --hint-bg:#FFF4D6; --gold:#E8B53A; --soft:#EEF3FB;
+  --c2:#4A7BD0; --c3:#8467C9; --c5:#D98A3D; --c7:#B05BB8; --c11:#5F7290; --c13:#3E9A8C; --cx:#7A6A55;
+  --kb:#DCE8FB; --kr:#FCE6CF;
+  --r:18px; --fd:'Fredoka','Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:600;color:var(--ink);line-height:1.5;background:var(--bg);min-height:100vh;font-size:17px}
+h1,h2,h3{font-family:var(--fd);font-weight:600;margin:0 0 .4em;line-height:1.15}
+h2{font-size:1.45rem} h3{font-size:1.15rem}
+p{margin:.45em 0} b{font-weight:800}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.wrap{max-width:900px;margin:0 auto;padding:14px 16px 40px}
+.muted{color:var(--muted)} .small{font-size:.92rem}
+.row{display:flex;align-items:center} .between{justify-content:space-between} .center{justify-content:center} .gap{gap:10px} .wrapf{flex-wrap:wrap}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:52px;height:52px;flex:none;border-radius:14px;background:var(--gold);border:2.5px solid var(--ink);display:grid;place-items:center;font-size:28px}
+h1{font-size:clamp(1.5rem,5.5vw,2rem);margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:.95rem}
+.hud{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:2.5px solid var(--ink);border-radius:999px;padding:5px 12px;font-family:var(--fd);font-weight:600;font-size:1rem}
+button.pill{cursor:pointer}
+
+/* tabs */
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 18px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 8px;background:#fff;border:2.5px solid var(--ink);border-radius:14px;box-shadow:0 3px 0 var(--ink);font-family:var(--fd);font-weight:600;font-size:1rem;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tab span{font-size:1.4rem;line-height:1}
+.tab[aria-selected="true"]{background:var(--ink);color:#fff}
+
+/* cards & buttons */
+.card{background:var(--card);border:2.5px solid var(--ink);border-radius:var(--r);box-shadow:0 4px 0 var(--ink);padding:18px;margin-bottom:20px}
+.btn{font-family:var(--fd);font-weight:600;font-size:1.1rem;border:2.5px solid var(--ink);border-radius:12px;background:#fff;padding:10px 16px;box-shadow:0 3px 0 var(--ink);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-height:48px}
+.tab:active,.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.primary{background:var(--gold)}
+.btn.dark{background:var(--ink);color:#fff}
+.btn:focus-visible,.tab:focus-visible,.chip:focus-visible,input:focus-visible,.pill:focus-visible{outline:3px solid var(--c2);outline-offset:3px}
+.levels{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-family:var(--fd);font-weight:600;font-size:.95rem;border:2.5px solid var(--ink);background:#fff;border-radius:999px;padding:6px 13px;cursor:pointer;min-height:40px}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff}
+.badge{display:inline-block;font-family:var(--fd);font-weight:700;color:#fff;background:var(--c,var(--cx));border:2px solid var(--ink);border-radius:10px;padding:1px 8px;min-width:46px;text-align:center}
+
+/* learn */
+.section-title{margin:6px 4px 12px;font-size:1.5rem}
+.factors{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:center;margin:12px 0}
+.factors .lab{font-family:var(--fd);font-weight:700;font-size:1.3rem}
+.flist{display:flex;gap:6px;flex-wrap:wrap}
+.f{min-width:40px;text-align:center;font-family:var(--fd);font-weight:600;font-size:1.15rem;padding:3px 8px;border-radius:10px;background:#F1F1F4;border:2px solid transparent}
+.f.c{background:var(--good-bg);border-color:var(--good)}
+.f.top{background:var(--gold);border-color:var(--ink)}
+.answer-line{font-family:var(--fd);font-weight:600;font-size:1.3rem;margin:8px 0}
+.numbig{width:100%;max-width:260px;font-family:var(--fd);font-weight:700;font-size:2rem;text-align:center;border:2.5px solid var(--ink);border-radius:12px;padding:8px 12px;background:#FFFDF7;color:var(--ink)}
+.nd-sum{margin:12px 0 10px;padding:10px 12px;background:var(--hint-bg);border:2px dashed var(--ink);border-radius:12px}
+.clues{display:grid;gap:6px}
+.clue{display:grid;grid-template-columns:auto 22px 1fr;gap:10px;align-items:center;padding:7px 10px;border-radius:12px;background:var(--good-bg)}
+.clue.no{background:#F2F3F7;color:var(--muted)}
+.clue .mark{font-weight:900;font-size:1.1rem;text-align:center}
+.clue.yes .mark{color:var(--good)} .clue.no .mark{color:var(--bad)}
+.rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-bottom:22px}
+.rule{background:#fff;border:2.5px solid var(--ink);border-top:10px solid var(--c);border-radius:var(--r);box-shadow:0 4px 0 var(--ink);padding:16px}
+.rule-h{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.rule .num{width:52px;height:52px;flex:none;border-radius:50%;background:var(--c);color:#fff;border:2.5px solid var(--ink);display:grid;place-items:center;font-family:var(--fd);font-weight:700;font-size:1.2rem}
+.rule h3{margin:0}
+.ex{font-family:var(--fd);font-weight:500;padding:4px 10px;border-radius:10px;margin:6px 0;font-size:1.02rem}
+.ex.ok{background:var(--good-bg)} .ex.ok::before{content:'\2713  ';color:var(--good);font-weight:700}
+.ex.no{background:var(--bad-bg)} .ex.no::before{content:'\2717  ';color:var(--bad);font-weight:700}
+.tip-s{font-size:.9rem;color:var(--muted);margin-top:8px}
+.plan ol{padding-left:0;list-style:none;counter-reset:s;margin:10px 0 14px}
+.plan li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;margin:10px 0}
+.plan li::before{content:counter(s);width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-family:var(--fd);font-weight:700}
+.note{background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:12px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;align-items:start}
+.when{width:100%;border-collapse:collapse;margin-top:6px}
+.when td{padding:10px;border-top:2px solid #E3E1DA;vertical-align:top}
+.when td:first-child{width:46%}
+
+/* ladder */
+.ladder{border-collapse:collapse;font-family:var(--fd);font-weight:600;font-size:clamp(1.6rem,7vw,2.3rem);font-variant-numeric:tabular-nums;margin:0 auto}
+.ladder td{padding:6px 14px;text-align:center}
+.ladder td.side{text-align:right;padding-left:0;min-width:64px}
+.ladder tr:not(:last-child) td.side{border-right:3px solid var(--ink)}
+.ladder tr:not(:last-child) td.n{border-bottom:3px solid var(--ink)}
+.ladder.sm{font-size:1.4rem}
+.ladder.sm td{padding:3px 10px}
+.sd{display:inline-grid;place-items:center;min-width:1.6em;height:1.6em;padding:0 .2em;border-radius:999px;background:var(--c,var(--cx));color:#fff;border:2px solid var(--ink);font-size:.8em}
+.sd.ask{background:#fff;color:var(--muted);border-style:dashed}
+.sd.glow{outline:4px solid var(--gold);outline-offset:2px}
+.ladder .ans{font-size:1.4rem}
+.stage{display:grid;place-items:center;padding:12px 0 6px;min-height:160px;overflow-x:auto}
+
+/* remainder */
+.etable{display:grid;gap:10px;margin:8px 0}
+.erow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--fd);font-weight:600;font-size:clamp(1.25rem,5vw,1.7rem);font-variant-numeric:tabular-nums;padding:8px 12px;border-radius:14px;background:#F6F6FA}
+.erow.cur{background:#fff;border:2.5px solid var(--ink)}
+.erow .op{color:var(--muted);font-weight:500;font-size:.8em}
+.erow .en{padding:0 6px;border-radius:8px}
+.en.kb{background:var(--kb);outline:2px solid var(--c2)}
+.en.kr{background:var(--kr);outline:2px solid var(--c5)}
+.zero{font-size:.75em;color:var(--good);background:var(--good-bg);border-radius:999px;padding:2px 10px}
+.ans{width:110px;font-family:var(--fd);font-weight:700;font-size:1.4rem;text-align:center;border:2.5px solid var(--ink);border-radius:12px;padding:6px;background:#FFFDF7;color:var(--ink)}
+.ans.sm{width:84px}
+.ans.right{border-color:var(--good);background:var(--good-bg)} .ans.wrong{border-color:var(--bad);background:var(--bad-bg)}
+
+/* shared activity bits */
+.sched{list-style:none;padding:0;margin:12px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sched li{border:2px solid #CFCBBF;border-radius:12px;padding:6px 8px;font-size:.88rem;color:var(--muted);display:flex;gap:6px;align-items:flex-start;background:#fff}
+.sched li .sn{flex:none;width:22px;height:22px;border-radius:50%;background:#E4E1D8;display:grid;place-items:center;font-family:var(--fd);font-weight:700;font-size:.8rem;color:var(--ink)}
+.sched li.now{border-color:var(--ink);background:var(--hint-bg);color:var(--ink)}
+.sched li.now .sn{background:var(--ink);color:#fff}
+.sched li.done{border-color:var(--good);background:var(--good-bg);color:var(--good)}
+.sched li.done .sn{background:var(--good);color:#fff}
+.tokens{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+.tok{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--ink);display:grid;place-items:center;background:#fff;color:transparent;font-size:1rem}
+.tok.on{background:var(--gold);color:var(--ink)}
+.msg{display:flex;gap:10px;align-items:flex-start;min-height:56px;padding:12px 14px;border-radius:14px;background:#F4F5F9;margin:6px 0 14px}
+.msg .mtxt{flex:1}
+.msg .mtxt>div{margin-top:4px}
+.msg.good{background:var(--good-bg)} .msg.bad{background:var(--bad-bg)} .msg.hint{background:var(--hint-bg)}
+.say{flex:none;border:2px solid var(--ink);background:#fff;border-radius:10px;width:42px;height:42px;cursor:pointer;font-size:1.1rem}
+.clue-line{font-size:.97rem} .clue-line.ok{color:var(--good)} .clue-line.no{color:var(--bad)}
+.label{font-family:var(--fd);font-weight:600;margin:0 0 8px}
+.divgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:14px}
+.divbtn{background:var(--c);color:#fff;padding:8px 0;font-size:1.2rem;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+.divbtn.tried{background:#E9E7E1;color:var(--muted);text-shadow:none;text-decoration:line-through}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions .btn{flex:1 1 auto}
+.dim{opacity:.35;pointer-events:none}
+.box{border:2.5px dashed var(--ink);border-radius:16px;padding:14px;margin-bottom:14px;background:#FFFDF5;display:grid;gap:10px}
+.eq{display:flex;align-items:center;gap:10px;font-family:var(--fd);font-weight:600;font-size:1.4rem;flex-wrap:wrap}
+.custom{display:flex;gap:8px;align-items:center;margin:-4px 0 14px}
+.mine{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:14px 0 0}
+.mine input{width:120px}
+.win{text-align:center;padding:16px;border:2.5px solid var(--ink);border-radius:18px;background:linear-gradient(180deg,#FFF5D1,#FFFFFF);margin-bottom:14px}
+.win-h{font-family:var(--fd);font-weight:700;font-size:1.6rem}
+.win-eq{font-size:1.8rem;margin:8px 0;font-family:var(--fd);font-weight:600}
+
+/* show me */
+.steps{display:grid;gap:12px;margin-top:16px}
+.step{border:2.5px solid var(--ink);border-radius:16px;padding:12px 14px;background:#F6F6FA}
+.step.good{background:var(--good-bg)} .step.smart{background:var(--hint-bg)} .step.start{background:var(--soft)}
+.step.done{background:linear-gradient(180deg,#FFF5D1,#fff);text-align:center}
+.step-h{font-family:var(--fd);font-weight:600;font-size:1.15rem;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.step.done .step-h{justify-content:center;font-size:1.35rem}
+.calc{font-family:var(--fd);font-weight:500;font-size:1.15rem;margin:4px 0}
+.show-in{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.show-in .ans{width:130px}
+
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+footer{text-align:center;color:var(--muted);font-size:.9rem;margin-top:10px}
+@keyframes pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s ease-out}
+body.calm *{animation:none!important;transition:none!important}
+@media (max-width:520px){
+  .card{padding:14px} .tab{font-size:.85rem}
+  .divgrid{grid-template-columns:repeat(4,1fr)}
+  .sched{grid-template-columns:1fr}
+  .ladder td{padding:5px 8px}
+  .ladder td.side{min-width:44px}
+  .ladder .ans{width:84px;font-size:1.2rem}
+  .actions .btn{font-size:1rem;padding:10px 10px}
+}
+.stage,.card,.panel{min-width:0;max-width:100%}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body class="calm">
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">🪜</div>
+    <div>
+      <h1>HCF Tricks</h1>
+      <div class="sub">Find the Highest Common Factor of big numbers</div>
+    </div>
+  </div>
+  <div class="hud">
+    <div class="pill" id="starPill" title="Stars earned"><span aria-hidden="true">⭐</span><b id="starCount">0</b></div>
+    <button class="pill" id="soundBtn"></button>
+    <button class="pill" id="fxBtn"></button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button class="tab" role="tab" data-tab="learn" aria-selected="true"><span aria-hidden="true">📘</span>Learn</button>
+  <button class="tab" role="tab" data-tab="ladder" aria-selected="false"><span aria-hidden="true">🪜</span>Ladder</button>
+  <button class="tab" role="tab" data-tab="rem" aria-selected="false"><span aria-hidden="true">➗</span>Remainder</button>
+  <button class="tab" role="tab" data-tab="show" aria-selected="false"><span aria-hidden="true">👀</span>Show me</button>
+</nav>
+
+<main>
+<!-- ================= LEARN ================= -->
+<section id="tab-learn" class="panel" role="tabpanel">
+  <div class="card">
+    <h2>What is the HCF?</h2>
+    <p>HCF means <b>Highest Common Factor</b>.</p>
+    <p>It is the <b>biggest number</b> that divides <b>both</b> numbers with <b>remainder 0</b>.</p>
+    <p class="muted">Example: 12 and 18. These are all the numbers that divide them.</p>
+    <div class="factors">
+      <span class="lab">12</span>
+      <div class="flist"><span class="f c">1</span><span class="f c">2</span><span class="f c">3</span><span class="f">4</span><span class="f top">6</span><span class="f">12</span></div>
+      <span class="lab">18</span>
+      <div class="flist"><span class="f c">1</span><span class="f c">2</span><span class="f c">3</span><span class="f top">6</span><span class="f">9</span><span class="f">18</span></div>
+    </div>
+    <p><span class="f c">green</span> = divides both numbers. <span class="f top">6</span> is the biggest one.</p>
+    <p class="answer-line">HCF of 12 and 18 = 6</p>
+    <p class="note">For big numbers like <b>408</b> and <b>391</b>, writing every factor takes too long. The tricks on this page are much faster.</p>
+  </div>
+
+  <h2 class="section-title">Tool 1: Divisibility checks</h2>
+  <p class="muted" style="margin:-6px 4px 12px">These checks tell you if a number divides by 2, 3, 5, 7, 11 or 13 without doing the full division.</p>
+  <div class="rules">
+    <article class="rule" style="--c:var(--c2)">
+      <div class="rule-h"><div class="num">÷2</div><h3>Last digit is even</h3></div>
+      <p>Last digit is <b>0, 2, 4, 6 or 8</b>. Then it divides by 2.</p>
+      <div class="ex ok">126 → ends in 6</div>
+      <div class="ex no">63 → ends in 3</div>
+    </article>
+    <article class="rule" style="--c:var(--c3)">
+      <div class="rule-h"><div class="num">÷3</div><h3>Add the digits</h3></div>
+      <p><b>Add all the digits.</b> If the total is in the 3 times table, the number divides by 3.</p>
+      <div class="ex ok">126 → 1+2+6 = 9</div>
+      <div class="ex no">134 → 1+3+4 = 8</div>
+    </article>
+    <article class="rule" style="--c:var(--c5)">
+      <div class="rule-h"><div class="num">÷5</div><h3>Ends in 0 or 5</h3></div>
+      <p>Last digit is <b>0 or 5</b>. Then it divides by 5.</p>
+      <div class="ex ok">245 → ends in 5</div>
+      <div class="ex no">134 → ends in 4</div>
+    </article>
+    <article class="rule" style="--c:var(--c7)">
+      <div class="rule-h"><div class="num">÷7</div><h3>Chop and double</h3></div>
+      <p><b>Remove the last digit. Double it.</b> Subtract it from the number that is left. If the answer is in the 7 times table (or 0), it divides by 7.</p>
+      <div class="ex ok">343 → 34 − 6 = 28</div>
+      <div class="ex no">134 → 13 − 8 = 5</div>
+    </article>
+    <article class="rule" style="--c:var(--c11)">
+      <div class="rule-h"><div class="num">÷11</div><h3>Minus, plus, minus</h3></div>
+      <p>First digit − second digit + third digit … If the answer is 0 or in the 11 times table, it divides by 11.</p>
+      <div class="ex ok">286 → 2 − 8 + 6 = 0</div>
+      <div class="ex no">134 → 1 − 3 + 4 = 2</div>
+    </article>
+    <article class="rule" style="--c:var(--c13)">
+      <div class="rule-h"><div class="num">÷13</div><h3>Just divide</h3></div>
+      <p>For 13 and bigger, there is no quick check. <b>Do the division.</b> Remainder 0 means yes.</p>
+      <div class="ex ok">169 ÷ 13 = 13 r 0</div>
+      <div class="ex no">134 ÷ 13 = 10 r 4</div>
+    </article>
+  </div>
+
+  <div class="card">
+    <h2>Check any number</h2>
+    <p class="muted">Type a number. The page shows which checks it passes.</p>
+    <input id="ndInput" class="numbig" inputmode="numeric" autocomplete="off" value="126" aria-label="Number to check">
+    <div id="ndOut"></div>
+  </div>
+
+  <h2 class="section-title">Tool 2: Two tricks for the HCF</h2>
+  <div class="two">
+    <div class="card plan">
+      <h2>🪜 Trick A: The Ladder</h2>
+      <p class="muted">Good when the numbers are even, or end in 0 or 5.</p>
+      <div class="stage" style="min-height:0">
+        <table class="ladder sm" aria-label="Ladder for 84 and 126">
+          <tr><td class="side"><span class="sd" style="--c:var(--c2)">2</span></td><td class="n">84</td><td class="n">126</td></tr>
+          <tr><td class="side"><span class="sd" style="--c:var(--c3)">3</span></td><td class="n">42</td><td class="n">63</td></tr>
+          <tr><td class="side"><span class="sd" style="--c:var(--c7)">7</span></td><td class="n">14</td><td class="n">21</td></tr>
+          <tr><td class="side"></td><td class="n">2</td><td class="n">3</td></tr>
+        </table>
+      </div>
+      <ol>
+        <li><span>Find a number that divides <b>both</b>. Check in order: 2, 3, 5, 7, 11, 13.</span></li>
+        <li><span>Write it on the left. Divide both numbers. Write the answers below.</span></li>
+        <li><span>Do it again with the new numbers. Stop when no number divides both.</span></li>
+        <li><span><b>Multiply the left side numbers.</b> That is the HCF.</span></li>
+      </ol>
+      <p class="answer-line">2 × 3 × 7 = 42. HCF = 42</p>
+      <button class="btn primary" data-goto="ladder">Practise the Ladder ▶</button>
+    </div>
+    <div class="card plan">
+      <h2>➗ Trick B: The Remainder trick</h2>
+      <p class="muted">Good for big numbers and odd numbers.</p>
+      <div class="etable">
+        <div class="erow"><span class="en">1,071</span><span class="op">÷</span><span class="en">462</span><span class="op">=</span><b>2</b><span class="op">remainder</span><b>147</b></div>
+        <div class="erow"><span class="en">462</span><span class="op">÷</span><span class="en">147</span><span class="op">=</span><b>3</b><span class="op">remainder</span><b>21</b></div>
+        <div class="erow"><span class="en">147</span><span class="op">÷</span><span class="en">21</span><span class="op">=</span><b>7</b><span class="op">remainder</span><b>0</b></div>
+      </div>
+      <ol>
+        <li><span>Divide the <b>big</b> number by the <b>small</b> number.</span></li>
+        <li><span>Remainder is not 0? Make a new pair: the <b>small number</b> and the <b>remainder</b>. Divide again.</span></li>
+        <li><span>Remainder is 0? <b>Stop.</b> The number you divided by is the HCF.</span></li>
+      </ol>
+      <p class="answer-line">HCF of 1,071 and 462 = 21</p>
+      <button class="btn primary" data-goto="rem">Practise the Remainder trick ▶</button>
+    </div>
+  </div>
+
+  <div class="card plan">
+    <h2>⚡ Quick checks (do these first)</h2>
+    <ol>
+      <li><span><b>Does the small number divide the big number?</b> Then the small number is the HCF.<br><span class="muted">36 and 144: 144 ÷ 36 = 4 r 0. HCF = 36.</span></span></li>
+      <li><span><b>Subtract the numbers.</b> The HCF always divides the difference too.<br><span class="muted">408 and 391: 408 − 391 = 17. Check 391 ÷ 17 = 23 r 0. HCF = 17.</span></span></li>
+      <li><span><b>Difference is 1?</b> Then the HCF is 1.<br><span class="muted">250 and 251: difference 1. HCF = 1.</span></span></li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>Which trick do I use?</h2>
+    <table class="when">
+      <tr><td>Both numbers are even, or end in 0 or 5</td><td>🪜 <b>Ladder</b></td></tr>
+      <tr><td>Numbers are big or odd</td><td>➗ <b>Remainder trick</b></td></tr>
+      <tr><td>Numbers are close together</td><td>⚡ <b>Subtract</b> first</td></tr>
+    </table>
+    <p class="note">Both tricks always give the same answer. You can use either one.</p>
+  </div>
+</section>
+
+<!-- ================= LADDER ================= -->
+<section id="tab-ladder" class="panel" role="tabpanel" hidden>
+  <div class="card">
+    <div class="row between wrapf gap">
+      <h2 style="margin:0">🪜 Ladder practice</h2>
+      <div class="levels" id="lLevels">
+        <button class="chip" data-level="1">Level 1</button>
+        <button class="chip" data-level="2">Level 2</button>
+        <button class="chip" data-level="3">Level 3</button>
+        <button class="chip" data-level="mine">✏️ My numbers</button>
+      </div>
+    </div>
+    <div class="tokens" id="lTokens"></div>
+    <ol class="sched" id="lSched"></ol>
+    <div class="mine" id="lMine" hidden>
+      <input class="ans" id="lM1" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="First number" placeholder="84">
+      <span class="eq">and</span>
+      <input class="ans" id="lM2" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="Second number" placeholder="126">
+      <button class="btn dark" id="lMGo">Start ▶</button>
+    </div>
+    <div class="stage" id="lStage"></div>
+    <div class="msg" id="lMsg" aria-live="polite"><div class="mtxt"></div><button class="say" aria-label="Read aloud">🔈</button></div>
+    <div class="box" id="lMult" hidden></div>
+    <div class="win" id="lWin" hidden></div>
+    <div id="lControls">
+      <p class="label">Divide both numbers by…</p>
+      <div class="divgrid" id="lGrid"></div>
+      <div class="custom" id="lCustom" hidden>
+        <span class="eq">÷</span>
+        <input class="ans" id="lCustomD" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="Divide by">
+        <button class="btn dark" id="lCustomGo">Go</button>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="lStop">✋ No number divides both</button>
+        <button class="btn" id="lHint">💡 Hint</button>
+        <button class="btn" id="lNew">🔄 New numbers</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REMAINDER ================= -->
+<section id="tab-rem" class="panel" role="tabpanel" hidden>
+  <div class="card">
+    <div class="row between wrapf gap">
+      <h2 style="margin:0">➗ Remainder practice</h2>
+      <div class="levels" id="rLevels">
+        <button class="chip" data-level="1">Level 1</button>
+        <button class="chip" data-level="2">Level 2</button>
+        <button class="chip" data-level="3">Level 3</button>
+        <button class="chip" data-level="mine">✏️ My numbers</button>
+      </div>
+    </div>
+    <div class="tokens" id="rTokens"></div>
+    <ol class="sched" id="rSched"></ol>
+    <div class="mine" id="rMine" hidden>
+      <input class="ans" id="rM1" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="First number" placeholder="1071">
+      <span class="eq">and</span>
+      <input class="ans" id="rM2" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="Second number" placeholder="462">
+      <button class="btn dark" id="rMGo">Start ▶</button>
+    </div>
+    <p class="answer-line" id="rTitle" style="text-align:center"></p>
+    <div class="etable" id="rTable"></div>
+    <div class="msg" id="rMsg" aria-live="polite"><div class="mtxt"></div><button class="say" aria-label="Read aloud">🔈</button></div>
+    <div class="win" id="rWin" hidden></div>
+    <div class="actions" id="rControls">
+      <button class="btn primary" id="rCheck">Check ✓</button>
+      <button class="btn" id="rHint">💡 Hint</button>
+      <button class="btn" id="rNew">🔄 New numbers</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SHOW ME ================= -->
+<section id="tab-show" class="panel" role="tabpanel" hidden>
+  <div class="card">
+    <h2>👀 Show me how</h2>
+    <p class="muted">Type two numbers and pick a trick. The page solves it one step at a time.</p>
+    <div class="show-in">
+      <input class="ans" id="sA" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="First number" value="84">
+      <span class="eq">and</span>
+      <input class="ans" id="sB" inputmode="numeric" maxlength="5" autocomplete="off" aria-label="Second number" value="126">
+    </div>
+    <div class="row center gap wrapf" style="margin-top:12px">
+      <div class="levels" id="sMethod">
+        <button class="chip" data-level="ladder">🪜 Ladder</button>
+        <button class="chip" data-level="rem">➗ Remainder</button>
+      </div>
+      <button class="btn primary" id="sGo">Solve ▶</button>
+    </div>
+    <div class="steps" id="sSteps" aria-live="polite"></div>
+    <div class="row gap center" id="sNav" style="margin-top:14px" hidden>
+      <button class="btn dark" id="sNext">Next step ▶</button>
+      <button class="btn" id="sAll">Show all</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>For parents and teachers: use <b>✏️ My numbers</b> to set your own problems. Sound and effects start <b>off</b>; use the buttons at the top to turn them on.</footer>
+</div>
+
+<script>
+/* ---------- Pure math helpers (no page access) ---------- */
+'use strict';
+const MINUS = '−';
+const PRIMES = [2, 3, 5, 7, 11, 13];
+function gcd(a, b){ a = Math.abs(a); b = Math.abs(b); while (b){ const t = a % b; a = b; b = t; } return a; }
+function randInt(lo, hi){ return lo + Math.floor(Math.random() * (hi - lo + 1)); }
+function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+function digitsOf(n){ return String(Math.abs(n)).split('').map(Number); }
+function primeFactors(n){ const f = []; let d = 2; while (n > 1 && d * d <= n){ while (n % d === 0){ f.push(d); n = n / d; } d++; } if (n > 1) f.push(n); return f; }
+function fmt(n){ return Number(n).toLocaleString('en-US'); }
+
+/* Explain whether n divides by d, using the quick check for that number. */
+function clue(n, d){
+  const ds = digitsOf(n), sum = ds.reduce((s, x) => s + x, 0), last = n % 10, N = fmt(n);
+  const sumTxt = ds.length > 1 ? ds.join(' + ') + ' = ' + sum : String(sum);
+  let ok, text;
+  switch (d){
+    case 2: ok = last % 2 === 0; text = `${N} ends in ${last} → ${ok ? 'even' : 'odd'}`; break;
+    case 3: ok = sum % 3 === 0; text = `${N}: ${sumTxt} → ${sum} ${ok ? 'is' : 'is not'} in the 3 times table`; break;
+    case 5: ok = last === 0 || last === 5; text = `${N} ends in ${last} → ${ok ? 'yes, 0 or 5' : 'not 0 or 5'}`; break;
+    case 7: {
+      ok = n % 7 === 0; let x = n; const chain = [];
+      while (Math.abs(x) > 70){
+        const r = Math.trunc(x / 10), dd = Math.abs(x % 10), nx = r - 2 * dd;
+        chain.push(`${r} ${MINUS} ${2 * dd} = ${nx < 0 ? MINUS + (-nx) : nx}`);
+        x = nx;
+      }
+      const ax = Math.abs(x);
+      text = chain.length
+        ? `${N}: chop and double → ${chain.join(', then ')} → ${ax} ${ax % 7 === 0 ? 'is' : 'is not'} in the 7 times table`
+        : `${N} ${ok ? 'is' : 'is not'} in the 7 times table`;
+      break;
+    }
+    case 11: {
+      ok = n % 11 === 0;
+      if (n < 100){
+        text = n < 11 ? `${N} is smaller than 11` : `${N}: ${ok ? 'both digits are the same' : 'the digits are different'}`;
+      } else {
+        let alt = 0;
+        const parts = ds.map((x, i) => { alt += (i % 2 ? -x : x); return i === 0 ? String(x) : (i % 2 ? ` ${MINUS} ${x}` : ` + ${x}`); }).join('');
+        const aa = Math.abs(alt);
+        text = `${N}: ${parts} = ${alt < 0 ? MINUS + aa : alt} → ${ok ? (aa === 0 ? '0 means yes' : `${aa} is in the 11 times table`) : 'not 0 and not in the 11 times table'}`;
+      }
+      break;
+    }
+    default: {
+      const q = Math.floor(n / d), r = n % d; ok = r === 0;
+      text = `${N} ÷ ${d} = ${fmt(q)} remainder ${r}`;
+    }
+  }
+  return { ok, text };
+}
+
+/* Break n into easy chunks for dividing by d (e.g. 126 ÷ 2 → 120 + 6). */
+function chunks(n, d){
+  const out = []; let rest = n;
+  while (rest > 0){
+    let best = rest;
+    for (let p = 1; d * p <= rest; p *= 10){ best = d * p * Math.floor(rest / (d * p)); }
+    out.push(best); rest -= best;
+  }
+  return out;
+}
+
+/* Every division in the remainder trick, biggest number first. */
+function euclid(a, b){
+  if (a < b) [a, b] = [b, a];
+  const rows = [];
+  while (b){ rows.push({ a, b, q: Math.floor(a / b), r: a % b }); [a, b] = [b, a % b]; }
+  return rows;
+}
+
+/* Ladder problems: the HCF is built only from primes the checks cover. */
+const LADDER = {
+  1: { gs: [2, 3, 4, 5, 6, 8, 9, 10, 12, 14, 15], cof: [1, 12], min: 10, max: 100, coprime: 0 },
+  2: { gs: [6, 8, 10, 12, 14, 15, 18, 20, 21, 22, 24, 28, 30, 36, 42, 45], cof: [2, 16], min: 40, max: 400, coprime: .1 },
+  3: { gs: [12, 18, 24, 26, 28, 30, 33, 36, 39, 42, 44, 52, 60, 63, 66, 70, 72, 78, 84, 90, 105, 126], cof: [2, 30], min: 150, max: 2500, coprime: .1 }
+};
+function genLadder(level, avoid){
+  const L = LADDER[level] || LADDER[1];
+  for (let t = 0; t < 3000; t++){
+    const g = Math.random() < L.coprime ? 1 : pick(L.gs);
+    const x = randInt(L.cof[0], L.cof[1]), y = randInt(L.cof[0], L.cof[1]);
+    if (x === y || gcd(x, y) !== 1) continue;
+    const A = g * x, B = g * y;
+    if (Math.min(A, B) < L.min || Math.max(A, B) > L.max) continue;
+    if (avoid && avoid[0] === A && avoid[1] === B) continue;
+    return [A, B];
+  }
+  return [84, 126];
+}
+
+/* Remainder problems: a few steps, and each answer to a division is 12 or less. */
+const REM = {
+  1: { g: [2, 15], min: 20, max: 150, steps: [2, 3] },
+  2: { g: [3, 40], min: 80, max: 700, steps: [2, 4] },
+  3: { g: [7, 150], min: 300, max: 4000, steps: [2, 5] }
+};
+function genRemainder(level, avoid){
+  const R = REM[level] || REM[1];
+  for (let t = 0; t < 5000; t++){
+    const g = randInt(R.g[0], R.g[1]);
+    const lo = Math.ceil(R.min / g), hi = Math.floor(R.max / g);
+    if (hi < 2 || lo > hi) continue;
+    const x = randInt(Math.max(lo, 1), hi), y = randInt(1, hi);
+    if (x === y || gcd(x, y) !== 1) continue;
+    const A = Math.max(g * x, g * y), B = Math.min(g * x, g * y);
+    if (A < R.min || A > R.max) continue;
+    const rows = euclid(A, B);
+    if (rows.length < R.steps[0] || rows.length > R.steps[1] || rows.some(r => r.q > 12)) continue;
+    if (avoid && avoid[0] === A && avoid[1] === B) continue;
+    return [A, B];
+  }
+  return [1071, 462];
+}
+
+/* The ladder as a list of steps: 2, 3, 5, then break the smaller number into prime pieces. */
+function ladderSteps(a0, b0){
+  let a = a0, b = b0;
+  const steps = [{ kind: 'start', a, b }], rungs = [];
+  const tryPrime = p => {
+    while (true){
+      const ra = clue(a, p), rb = clue(b, p);
+      if (ra.ok && rb.ok){
+        steps.push({ kind: 'div', p, a, b, ra, rb, na: a / p, nb: b / p });
+        rungs.push({ d: p, a, b }); a /= p; b /= p;
+        if (Math.min(a, b) === 1) return;
+      } else { steps.push({ kind: 'fail', p, a, b, ra, rb }); return; }
+    }
+  };
+  for (const p of [2, 3, 5]){ if (Math.min(a, b) === 1) break; tryPrime(p); }
+  if (Math.min(a, b) > 1){
+    const m = Math.min(a, b), M = Math.max(a, b), f = primeFactors(m);
+    const cands = [...new Set(f)].filter(q => q > 5);
+    steps.push({ kind: 'smart', m, M, f, cands });
+    for (const q of cands){ if (Math.min(a, b) === 1) break; tryPrime(q); }
+  }
+  steps.push({ kind: 'done', a0, b0, a, b, rungs: rungs.slice() });
+  return steps;
+}
+</script>
+
+<script>
+/* ---------- Page logic ---------- */
+(function(){
+'use strict';
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('hcf_' + k); return v === null ? d : JSON.parse(v); } catch (e){ return d; } },
+  set(k, v){ try { localStorage.setItem('hcf_' + k, JSON.stringify(v)); } catch (e){} }
+};
+const COLORS = { 2: 'var(--c2)', 3: 'var(--c3)', 5: 'var(--c5)', 7: 'var(--c7)', 11: 'var(--c11)', 13: 'var(--c13)' };
+const colorOf = d => COLORS[d] || 'var(--cx)';
+const line = r => `<div class="clue-line ${r.ok ? 'ok' : 'no'}">${r.ok ? '✓' : '✗'} ${r.text}</div>`;
+const restart = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+const digitsOnly = el => el.addEventListener('input', () => { const v = el.value.replace(/\D/g, ''); if (v !== el.value) el.value = v; });
+const num = el => { const v = parseInt(el.value, 10); return Number.isNaN(v) ? null : v; };
+const mark = (el, ok) => { el.classList.toggle('right', ok); el.classList.toggle('wrong', !ok); };
+const onEnter = (el, fn) => el.addEventListener('keydown', e => { if (e.key === 'Enter') fn(); });
+const setPressed = (box, level) => $$('.chip', box).forEach(c => c.setAttribute('aria-pressed', String(c.dataset.level === String(level))));
+const focus = el => { if (el) el.focus({ preventScroll: true }); };
+
+/* ----- settings: sound and effects both start off ----- */
+let soundOn = store.get('sound', false), fxOn = store.get('fx', false), actx = null;
+function sfx(kind){
+  if (!soundOn) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const now = actx.currentTime;
+    const play = (f, t, d, v = 0.07) => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, now + t);
+      g.gain.exponentialRampToValueAtTime(v, now + t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + t + d);
+      o.connect(g); g.connect(actx.destination);
+      o.start(now + t); o.stop(now + t + d + 0.05);
+    };
+    if (kind === 'good'){ play(523, 0, .18); play(659, .12, .22); }
+    else if (kind === 'bad'){ play(330, 0, .25, .04); }
+    else if (kind === 'win'){ [523, 659, 784].forEach((f, i) => play(f, i * .14, .35)); }
+    else { play(440, 0, .06, .03); }
+  } catch (e){}
+}
+function renderSettings(){
+  const s = $('#soundBtn'); s.textContent = soundOn ? '🔊 Sound on' : '🔇 Sound off'; s.setAttribute('aria-pressed', String(soundOn));
+  const f = $('#fxBtn'); f.textContent = fxOn ? '✨ Effects on' : '◻️ Effects off'; f.setAttribute('aria-pressed', String(fxOn));
+  document.body.classList.toggle('calm', !fxOn);
+}
+$('#soundBtn').addEventListener('click', () => { soundOn = !soundOn; store.set('sound', soundOn); renderSettings(); sfx('tap'); });
+$('#fxBtn').addEventListener('click', () => { fxOn = !fxOn; store.set('fx', fxOn); renderSettings(); });
+
+/* ----- read aloud ----- */
+const canSpeak = 'speechSynthesis' in window;
+function speak(html){
+  if (!canSpeak) return;
+  const tmp = document.createElement('div'); tmp.innerHTML = html;
+  const text = tmp.textContent
+    .replace(/÷/g, ' divided by ').replace(/×/g, ' times ').replace(/[−-](?=\s)/g, ' minus ')
+    .replace(/✓/g, 'yes. ').replace(/✗/g, 'no. ').replace(/→/g, ', ').replace(/\br\s(\d)/g, 'remainder $1');
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text); u.rate = 0.9;
+  window.speechSynthesis.speak(u);
+}
+$$('.say').forEach(b => {
+  if (!canSpeak){ b.hidden = true; return; }
+  b.addEventListener('click', () => speak(b.parentElement.querySelector('.mtxt').innerHTML));
+});
+function setMsg(box, kind, html){ box.className = 'msg ' + (kind || ''); $('.mtxt', box).innerHTML = html; }
+
+/* ----- confetti (only when effects are on) ----- */
+const cv = $('#confetti'), cx = cv.getContext('2d');
+let bits = [], raf = null;
+function confetti(count = 80){
+  if (!fxOn || document.body.classList.contains('calm')) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const cols = ['#4A7BD0', '#8467C9', '#D98A3D', '#3E9A8C', '#E8B53A'];
+  for (let i = 0; i < count; i++){
+    bits.push({ x: innerWidth / 2 + (Math.random() - .5) * 140, y: innerHeight * .35, vx: (Math.random() - .5) * 10, vy: -Math.random() * 10 - 3,
+      s: 6 + Math.random() * 6, r: Math.random() * 6, vr: (Math.random() - .5) * .2, c: pick(cols), life: 0 });
+  }
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function tick(){
+  cx.clearRect(0, 0, innerWidth, innerHeight);
+  for (const p of bits){
+    p.vy += .3; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life++;
+    cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); cx.restore();
+  }
+  bits = bits.filter(p => p.y < innerHeight + 40 && p.life < 220);
+  if (bits.length) raf = requestAnimationFrame(tick); else { raf = null; cx.clearRect(0, 0, innerWidth, innerHeight); }
+}
+
+/* ----- stars, tokens and step list ----- */
+let stars = store.get('stars', 0);
+const SET = 5;
+function renderStars(){ $('#starCount').textContent = stars; }
+function addStar(){ stars++; store.set('stars', stars); renderStars(); }
+function renderTokens(el, count, active){
+  const shown = Math.min(count, SET);
+  const label = count >= SET ? `All ${SET} problems done.` : `Problem ${Math.min(count + (active ? 1 : 0), SET) || 1} of ${SET}`;
+  el.innerHTML = Array.from({ length: SET }, (_, k) => `<span class="tok ${k < shown ? 'on' : ''}">★</span>`).join('') + `<span class="muted small">${label}</span>`;
+}
+function renderSched(el, labels, idx){
+  el.innerHTML = labels.map((t, i) => `<li class="${i < idx ? 'done' : i === idx ? 'now' : ''}"><span class="sn">${i < idx ? '✓' : i + 1}</span><span>${t}</span></li>`).join('');
+}
+function setDone(count){
+  return count >= SET
+    ? `<p><b>You finished ${SET} problems.</b> This is a good time for a break.</p>`
+    : '';
+}
+
+/* ----- tabs ----- */
+function showTab(id){
+  if (!['learn', 'ladder', 'rem', 'show'].includes(id)) id = 'learn';
+  $$('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
+  $$('.panel').forEach(p => { p.hidden = p.id !== 'tab-' + id; });
+  store.set('tab', id);
+  if (id === 'ladder' && !L.started) newLadder();
+  if (id === 'rem' && !R.started) newRem();
+}
+$$('.tab').forEach(t => t.addEventListener('click', () => { showTab(t.dataset.tab); sfx('tap'); }));
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-goto]');
+  if (g){ showTab(g.dataset.goto); window.scrollTo({ top: 0 }); }
+});
+
+/* ----- LEARN: number checker ----- */
+function renderND(){
+  const raw = $('#ndInput').value.replace(/\D/g, '').slice(0, 7), out = $('#ndOut');
+  if (!raw){ out.innerHTML = '<p class="muted">Type a number above.</p>'; return; }
+  const n = parseInt(raw, 10);
+  if (n < 2){ out.innerHTML = '<p class="muted">Type a number bigger than 1.</p>'; return; }
+  const rows = PRIMES.map(d => { const c = clue(n, d); return `<div class="clue ${c.ok ? 'yes' : 'no'}"><span class="badge" style="--c:${colorOf(d)}">÷${d}</span><span class="mark">${c.ok ? '✓' : '✗'}</span><span>${c.text}</span></div>`; }).join('');
+  const pf = primeFactors(n);
+  const sum = pf.length === 1
+    ? `<b>${fmt(n)} is a prime number.</b> Only 1 and ${fmt(n)} divide it.`
+    : `<b>Prime pieces:</b> ${fmt(n)} = ${pf.join(' × ')}`;
+  out.innerHTML = `<div class="nd-sum">${sum}</div><div class="clues">${rows}</div>`;
+}
+$('#ndInput').addEventListener('input', e => { const v = e.target.value.replace(/\D/g, '').slice(0, 7); if (v !== e.target.value) e.target.value = v; renderND(); });
+renderND();
+
+/* ----- shared ladder drawing ----- */
+function ladderTable(rungs, a, b, o = {}){
+  let h = `<table class="ladder${o.small ? ' sm' : ''}"><tbody>`;
+  for (const r of rungs){
+    h += `<tr><td class="side"><span class="sd${o.glow ? ' glow' : ''}" style="--c:${colorOf(r.d)}">${r.d}</span></td><td class="n">${fmt(r.a)}</td><td class="n">${fmt(r.b)}</td></tr>`;
+  }
+  const side = o.pend ? `<span class="sd" style="--c:${colorOf(o.pend)}">${o.pend}</span>` : o.ask ? '<span class="sd ask">?</span>' : '';
+  h += `<tr><td class="side">${side}</td><td class="n">${fmt(a)}</td><td class="n">${fmt(b)}</td></tr>`;
+  if (o.inputs){
+    h += `<tr><td class="side"></td>
+      <td class="n"><input class="ans" id="lA" inputmode="numeric" autocomplete="off" aria-label="${a} divided by ${o.pend}"></td>
+      <td class="n"><input class="ans" id="lB" inputmode="numeric" autocomplete="off" aria-label="${b} divided by ${o.pend}"></td></tr>`;
+  }
+  return h + '</tbody></table>';
+}
+
+/* ================= LADDER PRACTICE ================= */
+const HINT1 = {
+  2: 'Look at the <b>last digit</b> of both numbers. Are both even (0, 2, 4, 6, 8)?',
+  3: '<b>Add the digits</b> of each number. Are both totals in the 3 times table?',
+  5: 'Look at the <b>last digit</b> of both numbers. Do both end in 0 or 5?',
+  7: 'Try the <b>7 times table</b>, or the chop and double check, on both numbers.',
+  11: 'Try the <b>minus, plus, minus</b> check for 11 on both numbers.',
+  13: 'Divide both numbers by <b>13</b>. Is the remainder 0 both times?'
+};
+const L_STEPS = ['Find a number that divides both', 'Divide both numbers', 'Multiply the left side numbers'];
+const L = { level: store.get('ladLevel', 1), a: 0, b: 0, oa: 0, ob: 0, rungs: [], phase: 'idle', pend: 0, tries: 0, hintLv: 0, failed: new Set(), count: 0, started: false };
+if (!['1', '2', '3', 'mine'].includes(String(L.level))) L.level = 1;
+const lMsg = $('#lMsg');
+
+$('#lGrid').innerHTML = PRIMES.map(d => `<button class="btn divbtn" data-d="${d}" style="--c:${colorOf(d)}" aria-label="Divide both by ${d}">÷${d}</button>`).join('')
+  + '<button class="btn divbtn" data-d="?" style="--c:var(--ink)" aria-label="Divide by another number">÷ ?</button>';
+
+function renderLadder(){
+  const ph = L.phase;
+  $('#lMine').hidden = L.level !== 'mine';
+  $('#lStage').innerHTML = L.a ? ladderTable(L.rungs, L.a, L.b, { ask: ph === 'pick', pend: ph === 'divide' ? L.pend : 0, inputs: ph === 'divide', glow: ph === 'multiply' }) : '';
+  $('#lControls').hidden = !(ph === 'pick' || ph === 'divide');
+  $('#lControls').classList.toggle('dim', ph === 'divide');
+  $$('#lGrid .divbtn').forEach(b => b.classList.toggle('tried', L.failed.has(+b.dataset.d)));
+  renderSched($('#lSched'), L_STEPS, { idle: 0, pick: 0, divide: 1, multiply: 2, won: 3 }[ph]);
+  renderTokens($('#lTokens'), L.count, ph !== 'won' && ph !== 'idle');
+  if (ph === 'divide'){
+    digitsOnly($('#lA')); digitsOnly($('#lB'));
+    onEnter($('#lA'), () => focus($('#lB'))); onEnter($('#lB'), checkLadderDivide);
+  }
+}
+
+function newLadder(custom){
+  L.started = true;
+  if (L.count >= SET) L.count = 0;
+  $('#lWin').hidden = true; $('#lMult').hidden = true;
+  if (!custom && L.level === 'mine'){
+    Object.assign(L, { a: 0, b: 0, rungs: [], phase: 'idle', failed: new Set() });
+    renderLadder();
+    setMsg(lMsg, '', 'Type two numbers above and press <b>Start</b>.');
+    focus($('#lM1')); return;
+  }
+  const [A, B] = custom || genLadder(L.level, L.oa ? [L.oa, L.ob] : null);
+  Object.assign(L, { a: A, b: B, oa: A, ob: B, rungs: [], phase: 'pick', pend: 0, tries: 0, hintLv: 0, failed: new Set() });
+  renderLadder();
+  if (fxOn) restart($('#lStage'), 'pop');
+  setMsg(lMsg, '', `Find the HCF of <b>${fmt(A)}</b> and <b>${fmt(B)}</b>.<div>Check the numbers in order: 2, 3, 5, 7, 11, 13. Press the first one that divides <b>both</b>.</div>`);
+}
+
+function tryLadder(d){
+  if (L.phase !== 'pick' || !(d >= 2)) return;
+  const ra = clue(L.a, d), rb = clue(L.b, d);
+  if (ra.ok && rb.ok){
+    sfx('good');
+    Object.assign(L, { pend: d, tries: 0, phase: 'divide' });
+    renderLadder();
+    setMsg(lMsg, 'good', `<b>Yes. ${d} divides both numbers.</b>${line(ra)}${line(rb)}<div>Now divide both numbers by ${d}. Write the answers in the boxes.</div>`);
+    focus($('#lA'));
+  } else {
+    sfx('bad'); L.failed.add(d);
+    renderLadder();
+    setMsg(lMsg, 'bad', `<b>${d} does not divide both numbers.</b>${line(ra)}${line(rb)}<div>Try the next number in the list.</div>`);
+  }
+}
+
+function applyLadder(){
+  const d = L.pend;
+  L.rungs.push({ d, a: L.a, b: L.b });
+  const fa = L.a, fb = L.b;
+  Object.assign(L, { a: fa / d, b: fb / d, pend: 0, phase: 'pick', hintLv: 0, failed: new Set() });
+  renderLadder();
+  setMsg(lMsg, 'good', `<b>Correct.</b> ${fmt(fa)} ÷ ${d} = <b>${fmt(L.a)}</b> and ${fmt(fb)} ÷ ${d} = <b>${fmt(L.b)}</b>.<div>Now check the new numbers. Start again with ${d}, because it can work more than once.</div>`);
+}
+function checkLadderDivide(){
+  if (L.phase !== 'divide') return;
+  const d = L.pend, wa = L.a / d, wb = L.b / d, A = $('#lA'), B = $('#lB'), va = num(A), vb = num(B);
+  if (va === null || vb === null){ setMsg(lMsg, 'hint', 'Write an answer in <b>both</b> boxes, then press Enter.'); focus(va === null ? A : B); return; }
+  mark(A, va === wa); mark(B, vb === wb);
+  if (va === wa && vb === wb){ sfx('good'); applyLadder(); return; }
+  sfx('bad'); L.tries++;
+  if (L.tries >= 2){
+    A.value = wa; B.value = wb; mark(A, true); mark(B, true);
+    setMsg(lMsg, 'hint', `The answers are <b>${fmt(wa)}</b> and <b>${fmt(wb)}</b>. <button class="btn dark" id="lOk" style="margin-left:6px">Next ▶</button>`);
+    $('#lOk').addEventListener('click', applyLadder); focus($('#lOk'));
+    return;
+  }
+  const n = va !== wa ? L.a : L.b, ch = chunks(n, d);
+  setMsg(lMsg, 'hint', ch.length > 1
+    ? `Not this one. Try splitting ${fmt(n)} into parts: ${ch.map(c => `${fmt(c)} ÷ ${d} = ${fmt(c / d)}`).join(', ')}. Then add the answers.`
+    : `Not this one. ${d} × <b>?</b> = ${fmt(n)}. Count in ${d}s.`);
+  focus(va !== wa ? A : B);
+}
+
+function stopLadder(){
+  if (L.phase !== 'pick') return;
+  if (gcd(L.a, L.b) !== 1){
+    sfx('bad');
+    setMsg(lMsg, 'bad', `<b>Not yet.</b> A number still divides both ${fmt(L.a)} and ${fmt(L.b)}. Press <b>💡 Hint</b> for help.`);
+    return;
+  }
+  sfx('good');
+  if (!L.rungs.length){
+    finishLadder(1, `No number (except 1) divides both ${fmt(L.oa)} and ${fmt(L.ob)}.`);
+    return;
+  }
+  L.phase = 'multiply'; L.tries = 0;
+  renderLadder();
+  const ds = L.rungs.map(r => r.d);
+  const box = $('#lMult'); box.hidden = false;
+  box.innerHTML = `<div class="eq"><span>${ds.join(' × ')} =</span><input class="ans" id="mAns" inputmode="numeric" autocomplete="off" aria-label="${ds.join(' times ')}"><button class="btn primary" id="mCheck">Check ✓</button></div>`;
+  digitsOnly($('#mAns')); onEnter($('#mAns'), checkMultiply);
+  $('#mCheck').addEventListener('click', checkMultiply);
+  setMsg(lMsg, 'good', ds.length === 1
+    ? `<b>Correct.</b> No number divides both ${fmt(L.a)} and ${fmt(L.b)}.<div>Last step: there is only one number on the left side. Write it in the box.</div>`
+    : `<b>Correct.</b> No number divides both ${fmt(L.a)} and ${fmt(L.b)}.<div>Last step: multiply the numbers on the left side of the ladder.</div>`);
+  focus($('#mAns'));
+}
+function checkMultiply(){
+  if (L.phase !== 'multiply') return;
+  const ds = L.rungs.map(r => r.d), P = ds.reduce((x, y) => x * y, 1), el = $('#mAns'), v = num(el);
+  if (v === null){ focus(el); return; }
+  mark(el, v === P);
+  if (v === P){ $('#lMult').hidden = true; finishLadder(P); return; }
+  sfx('bad'); L.tries++;
+  let run = ds[0];
+  const parts = ds.slice(1).map(d => { const s = `${fmt(run)} × ${d} = ${fmt(run * d)}`; run *= d; return s; });
+  if (L.tries >= 2){
+    setMsg(lMsg, 'hint', `Multiply one at a time: ${parts.join(', then ')}. The answer is <b>${fmt(P)}</b>. Write it in the box.`);
+  } else {
+    setMsg(lMsg, 'hint', `Not this one. Multiply one at a time. Start with ${parts[0].replace(/ = .*/, ' = ?')}`);
+  }
+  focus(el);
+}
+function finishLadder(H, why){
+  L.phase = 'won'; L.count++;
+  addStar(); sfx('win'); confetti();
+  renderLadder();
+  const chk = H > 1 ? `<p class="muted">Check: ${fmt(L.oa)} ÷ ${fmt(H)} = ${fmt(L.oa / H)} and ${fmt(L.ob)} ÷ ${fmt(H)} = ${fmt(L.ob / H)}. Both remainders are 0.</p>` : '';
+  const w = $('#lWin');
+  w.innerHTML = `<div class="win-h">✓ Correct</div>
+    <div class="win-eq">HCF of ${fmt(L.oa)} and ${fmt(L.ob)} = ${fmt(H)}</div>
+    ${why ? `<p>${why}</p>` : ''}${chk}${setDone(L.count)}
+    <button class="btn primary" id="lNext">${L.count >= SET ? `Start ${SET} more ▶` : 'Next problem ▶'}</button>`;
+  w.hidden = false;
+  setMsg(lMsg, 'good', `<b>Done.</b> The HCF of ${fmt(L.oa)} and ${fmt(L.ob)} is <b>${fmt(H)}</b>.`);
+  $('#lNext').addEventListener('click', () => newLadder());
+  focus($('#lNext'));
+}
+
+function hintLadder(){
+  if (!L.a || L.phase === 'won' || L.phase === 'idle') return;
+  if (L.phase === 'divide'){ setMsg(lMsg, 'hint', `Divide each number by ${L.pend}. ${fmt(L.a)} ÷ ${L.pend} = ? and ${fmt(L.b)} ÷ ${L.pend} = ?`); return; }
+  if (L.phase === 'multiply'){ checkMultiply(); return; }
+  sfx('tap');
+  const g = gcd(L.a, L.b), m = Math.min(L.a, L.b), M = Math.max(L.a, L.b);
+  L.hintLv = Math.min(L.hintLv + 1, 2);
+  if (g === 1){
+    if (m === 1) setMsg(lMsg, 'hint', 'One number is 1. Nothing bigger than 1 divides 1. Press <b>✋ No number divides both</b>.');
+    else if (L.hintLv === 1) setMsg(lMsg, 'hint', `Check 2, 3, 5, 7, 11 and 13 on both numbers. Does any of them divide <b>both</b>?`);
+    else {
+      const pf = primeFactors(m);
+      setMsg(lMsg, 'hint', `${pf.length === 1 ? `${fmt(m)} is a prime number` : `${fmt(m)} = ${pf.join(' × ')}`}. None of these divide ${fmt(M)}. Press <b>✋ No number divides both</b>.`);
+    }
+    return;
+  }
+  const p = primeFactors(g)[0];
+  if (L.hintLv === 1) setMsg(lMsg, 'hint', HINT1[p] || `Break the smaller number into prime pieces: ${fmt(m)} = ${primeFactors(m).join(' × ')}. Test those pieces on ${fmt(M)}.`);
+  else setMsg(lMsg, 'hint', `Try <b>÷${p}</b>.${PRIMES.includes(p) ? '' : ' Use the <b>÷ ?</b> button and type ' + p + '.'}${line(clue(L.a, p))}${line(clue(L.b, p))}`);
+}
+
+$('#lGrid').addEventListener('click', e => {
+  const b = e.target.closest('[data-d]'); if (!b) return;
+  if (b.dataset.d === '?'){ const r = $('#lCustom'); r.hidden = !r.hidden; if (!r.hidden) focus($('#lCustomD')); return; }
+  tryLadder(+b.dataset.d);
+});
+digitsOnly($('#lCustomD'));
+$('#lCustomGo').addEventListener('click', () => { const d = num($('#lCustomD')); if (d >= 2) tryLadder(d); else setMsg(lMsg, 'bad', 'Type a number bigger than 1.'); });
+onEnter($('#lCustomD'), () => $('#lCustomGo').click());
+$('#lStop').addEventListener('click', stopLadder);
+$('#lHint').addEventListener('click', hintLadder);
+$('#lNew').addEventListener('click', () => { sfx('tap'); newLadder(); });
+$('#lLevels').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  L.level = c.dataset.level === 'mine' ? 'mine' : +c.dataset.level; store.set('ladLevel', L.level); setPressed($('#lLevels'), L.level);
+  L.oa = 0; newLadder();
+});
+setPressed($('#lLevels'), L.level);
+digitsOnly($('#lM1')); digitsOnly($('#lM2'));
+$('#lMGo').addEventListener('click', () => {
+  const A = num($('#lM1')), B = num($('#lM2'));
+  if (!(A >= 2 && B >= 2)){ setMsg(lMsg, 'bad', 'Type two whole numbers. Each one must be bigger than 1.'); return; }
+  newLadder([A, B]);
+});
+onEnter($('#lM2'), () => $('#lMGo').click());
+
+/* ================= REMAINDER PRACTICE ================= */
+const R_STEPS = ['Divide: big number ÷ small number', 'Remainder not 0? Make a new pair and divide again', 'Remainder 0? The HCF is the number you divided by'];
+const R = { level: store.get('remLevel', 1), a0: 0, b0: 0, rows: [], cur: null, phase: 'idle', tries: 0, count: 0, started: false };
+if (!['1', '2', '3', 'mine'].includes(String(R.level))) R.level = 1;
+const rMsg = $('#rMsg');
+
+function remRow(r, hl){
+  return `<div class="erow"><span class="en ${hl ? 'kb' : ''}">${fmt(r.a)}</span><span class="op">÷</span><span class="en">${fmt(r.b)}</span><span class="op">=</span><b class="en">${fmt(r.q)}</b><span class="op">remainder</span><b class="en">${fmt(r.r)}</b>${r.r === 0 ? '<span class="zero">0 → stop</span>' : ''}</div>`;
+}
+function renderRem(){
+  const ph = R.phase;
+  $('#rMine').hidden = R.level !== 'mine';
+  $('#rTitle').textContent = R.a0 ? `HCF of ${fmt(R.a0)} and ${fmt(R.b0)}` : '';
+  const n = R.rows.length;
+  let h = R.rows.map((r, i) => {
+    if (i === n - 1 && ph === 'divide'){
+      // last finished row: colour the two numbers that move down
+      return `<div class="erow"><span class="en">${fmt(r.a)}</span><span class="op">÷</span><span class="en kb">${fmt(r.b)}</span><span class="op">=</span><b class="en">${fmt(r.q)}</b><span class="op">remainder</span><b class="en kr">${fmt(r.r)}</b></div>`;
+    }
+    return remRow(r);
+  }).join('');
+  if (ph === 'divide'){
+    const c = R.cur, moved = n > 0;
+    h += `<div class="erow cur"><span class="en ${moved ? 'kb' : ''}">${fmt(c.a)}</span><span class="op">÷</span><span class="en ${moved ? 'kr' : ''}">${fmt(c.b)}</span><span class="op">=</span>
+      <input class="ans sm" id="rQ" inputmode="numeric" autocomplete="off" aria-label="${c.a} divided by ${c.b}, answer">
+      <span class="op">remainder</span>
+      <input class="ans sm" id="rR" inputmode="numeric" autocomplete="off" aria-label="remainder"></div>`;
+  } else if (ph === 'answer' || ph === 'won'){
+    h += `<div class="erow cur"><span>HCF =</span>${ph === 'answer'
+      ? '<input class="ans" id="rH" inputmode="numeric" autocomplete="off" aria-label="HCF">'
+      : `<b class="en kb">${fmt(R.rows[n - 1].b)}</b>`}</div>`;
+  }
+  $('#rTable').innerHTML = h;
+  $('#rControls').hidden = !(ph === 'divide' || ph === 'answer');
+  renderSched($('#rSched'), R_STEPS, { idle: 0, divide: n ? 1 : 0, answer: 2, won: 3 }[ph]);
+  renderTokens($('#rTokens'), R.count, ph !== 'won' && ph !== 'idle');
+  if (ph === 'divide'){
+    digitsOnly($('#rQ')); digitsOnly($('#rR'));
+    onEnter($('#rQ'), () => focus($('#rR'))); onEnter($('#rR'), checkRem);
+    focus($('#rQ'));
+  }
+  if (ph === 'answer'){ digitsOnly($('#rH')); onEnter($('#rH'), checkRem); focus($('#rH')); }
+}
+
+function newRem(custom){
+  R.started = true;
+  if (R.count >= SET) R.count = 0;
+  $('#rWin').hidden = true;
+  if (!custom && R.level === 'mine'){
+    Object.assign(R, { a0: 0, b0: 0, rows: [], cur: null, phase: 'idle' });
+    renderRem();
+    setMsg(rMsg, '', 'Type two numbers above and press <b>Start</b>.');
+    focus($('#rM1')); return;
+  }
+  let [A, B] = custom || genRemainder(R.level, R.a0 ? [R.a0, R.b0] : null);
+  if (A < B) [A, B] = [B, A];
+  Object.assign(R, { a0: A, b0: B, rows: [], cur: { a: A, b: B }, phase: 'divide', tries: 0 });
+  renderRem();
+  setMsg(rMsg, '', `Divide the big number by the small number: <b>${fmt(A)} ÷ ${fmt(B)}</b>.<div>Write the answer and the remainder.</div>`);
+}
+
+function checkRem(){
+  if (R.phase === 'answer'){ checkRemAnswer(); return; }
+  if (R.phase !== 'divide') return;
+  const { a, b } = R.cur, q = Math.floor(a / b), r = a % b;
+  const Q = $('#rQ'), Rr = $('#rR'), vq = num(Q), vr = num(Rr);
+  if (vq === null || vr === null){ setMsg(rMsg, 'hint', 'Write a number in <b>both</b> boxes. If nothing is left over, the remainder is 0.'); focus(vq === null ? Q : Rr); return; }
+  mark(Q, vq === q); mark(Rr, vr === r);
+  if (vq === q && vr === r){ sfx('good'); applyRem(); return; }
+  sfx('bad'); R.tries++;
+  if (R.tries >= 3){
+    Q.value = q; Rr.value = r; mark(Q, true); mark(Rr, true);
+    setMsg(rMsg, 'hint', `${fmt(b)} × ${q} = ${fmt(b * q)}. ${fmt(a)} ${MINUS} ${fmt(b * q)} = ${fmt(r)}. So the answer is <b>${q} remainder ${fmt(r)}</b>. <button class="btn dark" id="rOk" style="margin-left:6px">Next ▶</button>`);
+    $('#rOk').addEventListener('click', applyRem); focus($('#rOk'));
+    return;
+  }
+  let tip;
+  if (vq !== q){
+    const prod = b * vq;
+    if (prod > a) tip = `${fmt(b)} × ${vq} = ${fmt(prod)}. That is bigger than ${fmt(a)}. Try a smaller number.`;
+    else tip = `${fmt(b)} × ${vq} = ${fmt(prod)}. ${fmt(a)} ${MINUS} ${fmt(prod)} = ${fmt(a - prod)}. That is not smaller than ${fmt(b)}, so ${fmt(b)} fits in more times. Try a bigger number.`;
+  } else if (vr >= b){
+    tip = `The remainder must be <b>smaller than ${fmt(b)}</b>.`;
+  } else {
+    tip = `The first answer, ${q}, is correct. Now find the remainder: ${fmt(b)} × ${q} = ${fmt(b * q)}. Then ${fmt(a)} ${MINUS} ${fmt(b * q)} = ?`;
+  }
+  setMsg(rMsg, 'hint', tip);
+  focus(vq !== q ? Q : Rr);
+}
+function applyRem(){
+  const { a, b } = R.cur, q = Math.floor(a / b), r = a % b;
+  R.rows.push({ a, b, q, r }); R.tries = 0;
+  if (r === 0){
+    R.phase = 'answer'; renderRem();
+    setMsg(rMsg, 'good', `<b>Correct.</b> ${fmt(a)} ÷ ${fmt(b)} = ${q} remainder <b>0</b>.<div>The remainder is 0, so we stop. Which number is the HCF? Write it in the box.</div>`);
+  } else {
+    R.cur = { a: b, b: r }; R.phase = 'divide'; renderRem();
+    setMsg(rMsg, 'good', `<b>Correct.</b> The remainder is ${fmt(r)}. It is not 0, so we keep going.<div>New pair: <span class="en kb">${fmt(b)}</span> (the number you divided by) and <span class="en kr">${fmt(r)}</span> (the remainder). Now work out ${fmt(b)} ÷ ${fmt(r)}.</div>`);
+  }
+}
+function checkRemAnswer(){
+  const H = R.rows[R.rows.length - 1].b, el = $('#rH'), v = num(el);
+  if (v === null){ focus(el); return; }
+  mark(el, v === H);
+  if (v === H){ finishRem(H); return; }
+  sfx('bad'); R.tries++;
+  const last = R.rows[R.rows.length - 1];
+  setMsg(rMsg, 'hint', R.tries >= 2
+    ? `Look at the last line: ${fmt(last.a)} ÷ <b>${fmt(last.b)}</b> = ${last.q} remainder 0. The HCF is <b>${fmt(H)}</b>. Write it in the box.`
+    : `Look at the last line. The remainder is 0. The HCF is the number you <b>divided by</b> on that line.`);
+  focus(el);
+}
+function finishRem(H){
+  R.phase = 'won'; R.count++;
+  addStar(); sfx('win'); confetti();
+  renderRem();
+  const chk = H > 1 ? `<p class="muted">Check: ${fmt(R.a0)} ÷ ${fmt(H)} = ${fmt(R.a0 / H)} and ${fmt(R.b0)} ÷ ${fmt(H)} = ${fmt(R.b0 / H)}. Both remainders are 0.</p>` : '<p class="muted">The HCF is 1. No number bigger than 1 divides both.</p>';
+  const w = $('#rWin');
+  w.innerHTML = `<div class="win-h">✓ Correct</div>
+    <div class="win-eq">HCF of ${fmt(R.a0)} and ${fmt(R.b0)} = ${fmt(H)}</div>
+    ${chk}${setDone(R.count)}
+    <button class="btn primary" id="rNext">${R.count >= SET ? `Start ${SET} more ▶` : 'Next problem ▶'}</button>`;
+  w.hidden = false;
+  setMsg(rMsg, 'good', `<b>Done.</b> The HCF of ${fmt(R.a0)} and ${fmt(R.b0)} is <b>${fmt(H)}</b>.`);
+  $('#rNext').addEventListener('click', () => newRem());
+  focus($('#rNext'));
+}
+function hintRem(){
+  sfx('tap');
+  if (R.phase === 'answer'){ setMsg(rMsg, 'hint', 'The remainder on the last line is 0. The HCF is the number you <b>divided by</b> on that line.'); return; }
+  if (R.phase !== 'divide') return;
+  const { a, b } = R.cur;
+  const near = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].filter(k => b * k <= a).slice(-2);
+  setMsg(rMsg, 'hint', `How many times does ${fmt(b)} fit into ${fmt(a)}? Try the ${fmt(b)} times table: ${near.map(k => `${fmt(b)} × ${k} = ${fmt(b * k)}`).join(', ')}. Pick the biggest one that is not more than ${fmt(a)}.`);
+}
+
+$('#rCheck').addEventListener('click', checkRem);
+$('#rHint').addEventListener('click', hintRem);
+$('#rNew').addEventListener('click', () => { sfx('tap'); newRem(); });
+$('#rLevels').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  R.level = c.dataset.level === 'mine' ? 'mine' : +c.dataset.level; store.set('remLevel', R.level); setPressed($('#rLevels'), R.level);
+  R.a0 = 0; newRem();
+});
+setPressed($('#rLevels'), R.level);
+digitsOnly($('#rM1')); digitsOnly($('#rM2'));
+$('#rMGo').addEventListener('click', () => {
+  const A = num($('#rM1')), B = num($('#rM2'));
+  if (!(A >= 1 && B >= 1)){ setMsg(rMsg, 'bad', 'Type two whole numbers. Each one must be bigger than 0.'); return; }
+  newRem([A, B]);
+});
+onEnter($('#rM2'), () => $('#rMGo').click());
+
+/* ================= SHOW ME ================= */
+const show = { steps: [], i: 0, method: store.get('showMethod', 'ladder') };
+if (!['ladder', 'rem'].includes(show.method)) show.method = 'ladder';
+const badge = p => `<span class="badge" style="--c:${colorOf(p)}">÷${p}</span>`;
+function remSteps(A, B){
+  const rows = euclid(A, B), steps = [{ kind: 'rstart', a: Math.max(A, B), b: Math.min(A, B) }];
+  rows.forEach((r, i) => steps.push({ kind: 'row', r, rows: rows.slice(0, i + 1) }));
+  steps.push({ kind: 'rdone', A, B, H: rows[rows.length - 1].b });
+  return steps;
+}
+function renderStep(st, prev, next){
+  switch (st.kind){
+    case 'start':
+      return `<div class="step start"><div class="step-h">🪜 Ladder: ${fmt(st.a)} and ${fmt(st.b)}</div><p>Check 2, 3 and 5 first, always on <b>both</b> numbers.</p></div>`;
+    case 'div':
+      return `<div class="step good"><div class="step-h">${badge(st.p)} check</div>${line(st.ra)}${line(st.rb)}
+        <p>Both pass. Write ${st.p} on the left and divide both numbers:</p>
+        <div class="calc">${fmt(st.a)} ÷ ${st.p} = <b>${fmt(st.na)}</b> &nbsp;·&nbsp; ${fmt(st.b)} ÷ ${st.p} = <b>${fmt(st.nb)}</b></div></div>`;
+    case 'fail': {
+      const again = prev && prev.kind === 'div' && prev.p === st.p;
+      return `<div class="step"><div class="step-h">${badge(st.p)} check</div>${line(st.ra)}${line(st.rb)}<p>${again ? `${st.p} does not work any more.` : `${st.p} does not divide both.`} ${next && next.kind === 'done' ? 'That was the last check.' : 'Go to the next number.'}</p></div>`;
+    }
+    case 'smart': {
+      const fTxt = st.f.length === 1 ? `<b>${fmt(st.m)}</b> is a <b>prime</b> number. It cannot be broken into smaller pieces.` : `<b>${fmt(st.m)} = ${st.f.join(' × ')}</b>`;
+      const test = !st.cands.length
+        ? 'Its pieces are only 2, 3 or 5. We already checked those. Nothing new to test.'
+        : `We already checked 2, 3 and 5. So we only need to test <b>${st.cands.join(' and ')}</b> on ${fmt(st.M)}.`;
+      return `<div class="step smart"><div class="step-h">🧩 Prime pieces</div><p>Break the smaller number into prime pieces. Only these pieces can divide both numbers.</p><p>${fTxt}</p><p>${test}</p></div>`;
+    }
+    case 'done': {
+      const ds = st.rungs.map(r => r.d), H = ds.reduce((x, y) => x * y, 1);
+      const table = `<div class="stage" style="min-height:0">${ladderTable(st.rungs, st.a, st.b, { small: true, glow: true })}</div>`;
+      const calc = ds.length ? `Multiply the left side numbers: ${ds.join(' × ')} = <b>${fmt(H)}</b>` : 'No number divides both. The HCF is 1.';
+      return `<div class="step done"><div class="step-h">✓ Finished</div>${table}<p class="calc">${calc}</p><div class="win-eq">HCF = ${fmt(H)}</div><button class="btn primary" data-goto="ladder">🪜 Now I will try one</button></div>`;
+    }
+    case 'rstart':
+      return `<div class="step start"><div class="step-h">➗ Remainder trick: ${fmt(st.a)} and ${fmt(st.b)}</div><p>Divide the big number by the small number.</p></div>`;
+    case 'row': {
+      const r = st.r;
+      const more = r.r === 0
+        ? `The remainder is <b>0</b>. Stop. The HCF is the number we divided by: <b>${fmt(r.b)}</b>.`
+        : `The remainder is ${fmt(r.r)}, not 0. New pair: ${fmt(r.b)} and ${fmt(r.r)}.`;
+      return `<div class="step ${r.r === 0 ? 'good' : ''}"><div class="step-h">Line ${st.rows.length}</div>
+        <div class="etable">${remRow(r)}</div>
+        <p class="calc">${fmt(r.b)} × ${fmt(r.q)} = ${fmt(r.b * r.q)}, and ${fmt(r.a)} ${MINUS} ${fmt(r.b * r.q)} = ${fmt(r.r)}</p><p>${more}</p></div>`;
+    }
+    case 'rdone':
+      return `<div class="step done"><div class="step-h">✓ Finished</div><div class="win-eq">HCF of ${fmt(st.A)} and ${fmt(st.B)} = ${fmt(st.H)}</div><button class="btn primary" data-goto="rem">➗ Now I will try one</button></div>`;
+  }
+  return '';
+}
+function startShow(){
+  const A = num($('#sA')), B = num($('#sB'));
+  if (!(A >= 1 && B >= 1)){ $('#sSteps').innerHTML = '<div class="step">Type two whole numbers. Each one must be bigger than 0.</div>'; $('#sNav').hidden = true; return; }
+  show.steps = show.method === 'ladder' ? ladderSteps(A, B) : remSteps(A, B);
+  show.i = 0; $('#sSteps').innerHTML = ''; $('#sNav').hidden = false;
+  nextStep(false);
+}
+function nextStep(quiet){
+  if (show.i >= show.steps.length) return;
+  const st = show.steps[show.i], prev = show.steps[show.i - 1];
+  show.i++;
+  $('#sSteps').insertAdjacentHTML('beforeend', renderStep(st, prev, show.steps[show.i]));
+  if (show.i >= show.steps.length){ $('#sNav').hidden = true; sfx('win'); }
+  else if (!quiet) sfx('tap');
+  if (!quiet){ const el = $('#sSteps').lastElementChild; if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' }); }
+}
+$('#sGo').addEventListener('click', startShow);
+$('#sNext').addEventListener('click', () => nextStep(false));
+$('#sAll').addEventListener('click', () => { while (show.i < show.steps.length) nextStep(true); });
+$('#sMethod').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  show.method = c.dataset.level; store.set('showMethod', show.method); setPressed($('#sMethod'), show.method);
+  if (show.method === 'rem' && $('#sA').value === '84' && $('#sB').value === '126'){ $('#sA').value = 1071; $('#sB').value = 462; }
+  else if (show.method === 'ladder' && $('#sA').value === '1071' && $('#sB').value === '462'){ $('#sA').value = 84; $('#sB').value = 126; }
+  startShow();
+});
+setPressed($('#sMethod'), show.method);
+digitsOnly($('#sA')); digitsOnly($('#sB'));
+onEnter($('#sB'), startShow);
+
+/* ----- start ----- */
+renderStars(); renderSettings();
+showTab(store.get('tab', 'learn'));
+})();
+</script>
+</body>
+</html>
