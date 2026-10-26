@@ -7,7 +7,7 @@
 No sign-up. No ads. Nothing to install. Open a link and play.
 
 [![Play now](https://img.shields.io/badge/▶_Play_now-pankaj2934.github.io-F5B301?style=for-the-badge)](https://pankaj2934.github.io/)
-![Pages](https://img.shields.io/badge/games-16-2F80ED?style=for-the-badge)
+![Pages](https://img.shields.io/badge/games-17-2F80ED?style=for-the-badge)
 ![Works on](https://img.shields.io/badge/works_on-phone_·_tablet_·_laptop-1F9D63?style=for-the-badge)
 
 </div>
@@ -18,6 +18,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 
 | | Game | What you learn |
 |:-:|---|---|
+| 🧩 | **[GCF Quest](https://pankaj2934.github.io/gcf.html)** | Made for Aadvik's Kumon D200b page. Tap every factor of two numbers, spot the common factors, pop the **Greatest Common Factor** balloon, then reduce the fraction in one step. Plus a 10-question Quick Fire round. |
 | ✏️ | **[Trace with Buddy](https://pankaj2934.github.io/trace.html)** | Made for phones. Follow the ladybug with your finger to trace lines, shapes, a–z, A–Z and 0–9 in the right stroke order. |
 | 👾 | **[Munchy's Letter Sounds](https://pankaj2934.github.io/phonics.html)** | Phonics for ages 4–6. Meet the letters, trace them, feed Munchy the monster things that start with the same sound, and pop letter bubbles. Earn stickers! |
 | 🪜 | **[HCF Tricks](https://pankaj2934.github.io/hcf.html)** | Find the Highest Common Factor of big numbers with the **Ladder** and **Remainder** tricks. Calm design, step-by-step, made for learners who like clear routines. |
@@ -57,6 +58,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 |:-:|---|---|
 | 🍕 | [Fraction Shading Quest](https://pankaj2934.github.io/fraction.html) | Read a fraction from a picture, then shade one yourself. |
 | 🕵️ | [Fraction Detective](https://pankaj2934.github.io/fractionnew.html) | Simplify fractions using divisibility clues. |
+| 🧩 | [GCF Quest](https://pankaj2934.github.io/gcf.html) | List factors (factor pairs light up together), find common factors on a Venn diagram, pick the GCF and use it to reduce a fraction in one step. |
 | 🪜 | [HCF Tricks](https://pankaj2934.github.io/hcf.html) | Use the Ladder and Remainder tricks to find the HCF. |
 
 ### 🔤 Letters and words
@@ -73,7 +75,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 ## 🧭 Learning path
 
 ```
-👾 Letter sounds  →  ✏️ Tracing  →  🍎 Count & Compare  →  ✖️ Times tables  →  ➗ Word problems  →  🍕 Fractions  →  🕵️ Simplifying  →  🪜 HCF
+👾 Letter sounds  →  ✏️ Tracing  →  🍎 Count & Compare  →  ✖️ Times tables  →  ➗ Word problems  →  🍕 Fractions  →  🕵️ Simplifying  →  🧩 GCF  →  🪜 HCF
 ```
 
 ---
@@ -84,6 +86,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 - 🔒 **Private.** Nothing is uploaded. Scores stay in your own browser.
 - ✏️ **Set your own problems.** Many games let you type in your own numbers: look for **"Mine"** or **"My numbers"**.
 - 🔇 **Sensory friendly.** In HCF Tricks, sound and animations start **off**. Turn them on with the buttons at the top.
+- 🧩 **Kumon friendly.** GCF Quest starts with 12 and 18, the same numbers as Kumon D200b. Type in **"My numbers"** to practise any pair up to 100.
 - ⭐ **Shared stickers.** Stars from Trace with Buddy and Munchy's Letter Sounds add up to the same sticker book.
 - 🎙️ **Your voice, your accent.** In Munchy's Letter Sounds, open **⚙️ Grown-ups** to pick which letters to practise and to record each letter sound yourself.
 
