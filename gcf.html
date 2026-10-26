@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="GCF Quest: find factors, spot common factors, pick the Greatest Common Factor and reduce fractions in one step.">
+<meta name="theme-color" content="#FFF7E8">
+<title>GCF Quest</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A9%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF7E8; --ink:#2A2F4A; --muted:#646A85; --card:#FFFFFF;
+  --a:#3D7BE0; --a-bg:#E2EDFC; --b:#E0703D; --b-bg:#FDE9DD;
+  --both:#2E9D63; --both-bg:#DFF4E8; --bad:#D04B4B; --bad-bg:#FCE4E4;
+  --gold:#F4B930; --gold-bg:#FFF1C9;
+  --r:18px; --fd:'Fredoka','Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:700;color:var(--ink);background:var(--bg);min-height:100vh;font-size:17px;line-height:1.45}
+h1,h2,h3{font-family:var(--fd);font-weight:600;margin:0 0 .35em;line-height:1.15}
+p{margin:.4em 0}
+button{font:inherit;color:inherit;cursor:pointer}
+[hidden]{display:none!important}
+.wrap{max-width:860px;margin:0 auto;padding:14px 16px 48px}
+.muted{color:var(--muted)}
+.ca{color:var(--a)} .cb{color:var(--b)} .cboth{color:var(--both)}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:50px;height:50px;border-radius:14px;background:var(--gold);border:2.5px solid var(--ink);display:grid;place-items:center;font-size:27px;flex:none}
+h1{font-size:clamp(1.5rem,5.5vw,2rem);margin:0}
+.sub{color:var(--muted);font-size:.92rem}
+.hud{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:2.5px solid var(--ink);border-radius:999px;padding:4px 12px;font-family:var(--fd);font-weight:600}
+.pill.btn{cursor:pointer}
+
+.card{background:var(--card);border:2.5px solid var(--ink);border-radius:var(--r);padding:18px;box-shadow:0 5px 0 var(--ink);margin-bottom:16px}
+
+/* buttons */
+.big{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:2.5px solid var(--ink);border-radius:14px;padding:11px 18px;background:var(--gold);font-family:var(--fd);font-weight:600;font-size:1.1rem;box-shadow:0 4px 0 var(--ink);transition:transform .08s}
+.big:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.big.alt{background:#fff}
+.big.blue{background:var(--a-bg)}
+.big.green{background:var(--both-bg)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* menu */
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.mode{text-align:left;background:#fff;border:2.5px solid var(--ink);border-radius:var(--r);padding:16px;box-shadow:0 5px 0 var(--ink)}
+.mode:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.mode .em{font-size:2.1rem}
+.mode h3{margin:.2em 0}
+.levels{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.lv{border:2.5px solid var(--ink);border-radius:999px;padding:6px 14px;background:#fff;font-family:var(--fd);font-weight:600}
+.lv.on{background:var(--ink);color:#fff}
+.mine{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.mine input{width:80px}
+input.num{font-family:var(--fd);font-size:1.4rem;font-weight:600;text-align:center;border:2.5px solid var(--ink);border-radius:12px;padding:6px;width:74px;background:#fff;color:var(--ink)}
+input.num:focus{outline:3px solid var(--gold);outline-offset:1px}
+
+/* steps bar */
+.steps{display:flex;gap:6px;margin-bottom:14px}
+.steps span{flex:1;height:10px;border-radius:99px;background:#fff;border:2px solid var(--ink)}
+.steps span.done{background:var(--both)}
+.steps span.now{background:var(--gold)}
+
+.q{font-family:var(--fd);font-weight:600;font-size:clamp(1.3rem,4.8vw,1.7rem);margin:0 0 6px}
+.say{background:var(--gold-bg);border:2px dashed #C99A1E;border-radius:14px;padding:10px 12px;margin:10px 0;min-height:48px}
+.say.good{background:var(--both-bg);border-color:var(--both)}
+.say.bad{background:var(--bad-bg);border-color:var(--bad)}
+
+/* number tiles */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px;margin:12px 0}
+.tile{aspect-ratio:1;border:2.5px solid var(--ink);border-radius:12px;background:#fff;font-family:var(--fd);font-weight:600;font-size:1.3rem;display:grid;place-items:center;position:relative;transition:background .15s,transform .15s}
+.tile:active{transform:scale(.94)}
+.tile.yes{background:var(--both-bg);border-color:var(--both);color:var(--both)}
+.tile.pair{animation:pop .45s}
+.tile.no{animation:shake .4s;background:var(--bad-bg);border-color:var(--bad)}
+.tile.hint{outline:4px dashed var(--gold);outline-offset:2px}
+.tile:disabled{cursor:default}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
+
+/* factor list (like the worksheet boxes) */
+.flist{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--fd);font-weight:600;font-size:1.25rem;margin:6px 0}
+.box{min-width:44px;height:44px;padding:0 6px;border:2.5px solid var(--ink);border-radius:8px;display:inline-grid;place-items:center;background:#fff}
+.box.empty{border-style:dashed;color:transparent}
+.box.ca{background:var(--a-bg)} .box.cb{background:var(--b-bg)} .box.cboth{background:var(--both-bg);border-color:var(--both)}
+.flist .lbl{font-size:1.05rem;margin-right:4px}
+
+.pairs{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.pairs span{background:var(--gold-bg);border:2px solid #C99A1E;border-radius:999px;padding:2px 10px;font-family:var(--fd);font-weight:600}
+
+/* common factor rows */
+.crow{margin:10px 0;padding:10px;border-radius:14px}
+.crow.a{background:var(--a-bg)} .crow.b{background:var(--b-bg)}
+.crow .flist .box{cursor:pointer}
+.crow .box.no{animation:shake .4s;background:var(--bad-bg);border-color:var(--bad)}
+
+/* balloons for GCF pick */
+.balloons{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:18px 0}
+.bal{width:76px;height:92px;border-radius:50% 50% 48% 48%;border:2.5px solid var(--ink);font-family:var(--fd);font-weight:700;font-size:1.7rem;display:grid;place-items:center;position:relative;animation:float 3s ease-in-out infinite}
+.bal::after{content:'';position:absolute;bottom:-26px;left:50%;width:2px;height:24px;background:var(--ink)}
+.bal:nth-child(2n){animation-delay:-1.2s} .bal:nth-child(3n){animation-delay:-2s}
+.bal.no{animation:shake .4s}
+.bal.win{background:var(--gold)!important;transform:scale(1.2);animation:none}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* fraction */
+.frac{display:inline-flex;flex-direction:column;align-items:center;font-family:var(--fd);font-weight:600;font-size:2rem;line-height:1.1;vertical-align:middle}
+.frac .bar{width:100%;min-width:48px;height:3px;background:var(--ink);border-radius:2px;margin:4px 0}
+.fracline{display:flex;align-items:center;gap:14px;justify-content:center;flex-wrap:wrap;margin:16px 0;font-family:var(--fd);font-size:2rem;font-weight:600}
+.div{font-size:1rem;color:var(--both);font-family:var(--fd);font-weight:600;text-align:center}
+
+.compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
+.compare div{border:2px solid var(--ink);border-radius:14px;padding:10px;background:#fff}
+
+/* venn */
+.venn{display:block;margin:6px auto;max-width:420px;width:100%}
+
+/* quick fire */
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:14px 0}
+.opt{border:2.5px solid var(--ink);border-radius:16px;background:#fff;padding:16px 8px;font-family:var(--fd);font-weight:600;font-size:1.6rem;box-shadow:0 4px 0 var(--ink)}
+.opt.yes{background:var(--both-bg);border-color:var(--both)}
+.opt.no{background:var(--bad-bg);border-color:var(--bad);animation:shake .4s}
+.opt .frac{font-size:1.5rem}
+
+.stars{font-size:2.4rem;letter-spacing:4px;text-align:center}
+.center{text-align:center}
+
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+.foot{text-align:center;color:var(--muted);font-size:.9rem;margin-top:16px}
+.foot a{color:var(--ink)}
+@media (max-width:420px){
+  .card{padding:14px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:6px}
+  .tile{font-size:1.15rem}
+  .box{min-width:38px;height:40px}
+  .bal{width:64px;height:80px;font-size:1.45rem}
+}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">🧩</div>
+      <div>
+        <h1>GCF Quest</h1>
+        <div class="sub">Factors → Common factors → GCF → Reduce!</div>
+      </div>
+    </div>
+    <div class="hud">
+      <span class="pill" title="Stars earned">⭐ <span id="starTotal">0</span></span>
+      <button class="pill btn" id="soundBtn" aria-pressed="false">🔇 Sound</button>
+      <button class="pill btn" id="homeBtn" hidden>🏠 Menu</button>
+    </div>
+  </header>
+
+  <!-- MENU -->
+  <section id="menu">
+    <div class="card">
+      <h2>Hi Aadvik! 👋</h2>
+      <p>The <b>Greatest Common Factor (GCF)</b> is the biggest number that divides <b>both</b> numbers with no remainder.</p>
+      <p class="muted">Use it to reduce a fraction in <b>one step</b>, like 12/18 = 2/3.</p>
+    </div>
+    <div class="modes">
+      <div class="mode">
+        <div class="em">🗺️</div>
+        <h3>Factor Quest</h3>
+        <p class="muted">The worksheet, step by step: factors of each number, common factors, the GCF, then reduce the fraction.</p>
+        <div class="levels" id="levels">
+          <button class="lv on" data-lv="1">🌱 Up to 20</button>
+          <button class="lv" data-lv="2">🌿 Up to 36</button>
+          <button class="lv" data-lv="3">🌳 Up to 60</button>
+        </div>
+        <div class="row" style="margin-top:12px"><button class="big" id="startQuest">▶ Start quest</button></div>
+        <div class="mine">
+          <span class="muted">My numbers:</span>
+          <input class="num" id="mineA" type="number" inputmode="numeric" min="2" max="100" placeholder="12" aria-label="First number">
+          <span>&amp;</span>
+          <input class="num" id="mineB" type="number" inputmode="numeric" min="2" max="100" placeholder="18" aria-label="Second number">
+          <button class="big alt" id="startMine">Go</button>
+        </div>
+        <p class="muted" id="mineMsg" style="font-size:.9rem"></p>
+      </div>
+      <div class="mode">
+        <div class="em">⚡</div>
+        <h3>Quick Fire</h3>
+        <p class="muted">10 fast questions. Find the GCF, or reduce a fraction in one step. Can you get all 10?</p>
+        <div class="row" style="margin-top:12px"><button class="big blue" id="startQuick">⚡ Play Quick Fire</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUEST -->
+  <section id="quest" hidden>
+    <div class="steps" id="stepsBar"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="card" id="questCard"></div>
+  </section>
+
+  <!-- QUICK FIRE -->
+  <section id="quick" hidden>
+    <div class="card" id="quickCard"></div>
+  </section>
+
+  <p class="foot">Based on Kumon D200b · <a href="./">More games</a></p>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- storage ---------- */
+function load(k, d){ try{ var v = localStorage.getItem('gcf_' + k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } }
+function save(k, v){ try{ localStorage.setItem('gcf_' + k, JSON.stringify(v)); }catch(e){} }
+
+var stars = load('stars', 0);
+var level = load('level', 1);
+var soundOn = load('sound', false);
+
+/* ---------- math ---------- */
+function factors(n){ var f = []; for (var i = 1; i <= n; i++) if (n % i === 0) f.push(i); return f; }
+function gcd(a, b){ while (b) { var t = b; b = a % b; a = t; } return a; }
+function rand(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
+function shuffle(a){ for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+var LV = {1:{min:4,max:20,g:2}, 2:{min:8,max:36,g:3}, 3:{min:12,max:60,g:4}};
+function makePair(lv){
+  var c = LV[lv], a, b, g, tries = 0;
+  do {
+    a = rand(c.min, c.max); b = rand(c.min, c.max);
+    if (a > b) { var t = a; a = b; b = t; }
+    g = gcd(a, b); tries++;
+  } while ((a === b || g < c.g || g === a || factors(a).length < 4) && tries < 500);
+  return [a, b];
+}
+
+/* ---------- sound ---------- */
+var ac = null;
+function beep(freqs, dur){
+  if (!soundOn) return;
+  try{
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    freqs.forEach(function(f, i){
+      var o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + i * 0.09;
+      o.type = 'triangle'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.18, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + (dur || 0.18));
+      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + (dur || 0.18) + 0.02);
+    });
+  }catch(e){}
+}
+var good = function(){ beep([660, 880]); };
+var bad = function(){ beep([220, 180], 0.22); };
+var win = function(){ beep([523, 659, 784, 1046], 0.25); };
+
+/* ---------- confetti ---------- */
+var cv = document.getElementById('confetti'), cx = cv.getContext('2d'), bits = [], raf = 0;
+function confetti(){
+  cv.width = innerWidth; cv.height = innerHeight;
+  var cols = ['#F4B930', '#3D7BE0', '#E0703D', '#2E9D63', '#B05BB8'];
+  for (var i = 0; i < 120; i++) bits.push({x: Math.random() * cv.width, y: -20 - Math.random() * cv.height * 0.5, vx: (Math.random() - 0.5) * 3, vy: 2 + Math.random() * 3, s: 6 + Math.random() * 6, r: Math.random() * 6, c: cols[i % cols.length]});
+  if (!raf) tick();
+}
+function tick(){
+  cx.clearRect(0, 0, cv.width, cv.height);
+  bits = bits.filter(function(p){ return p.y < cv.height + 20; });
+  bits.forEach(function(p){ p.x += p.vx; p.y += p.vy; p.r += 0.1; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); cx.restore(); });
+  raf = bits.length ? requestAnimationFrame(tick) : 0;
+  if (!raf) cx.clearRect(0, 0, cv.width, cv.height);
+}
+
+/* ---------- ui helpers ---------- */
+var $ = function(id){ return document.getElementById(id); };
+function el(tag, cls, html){ var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function fracHTML(n, d){ return '<span class="frac"><span>' + n + '</span><span class="bar"></span><span>' + d + '</span></span>'; }
+function addStars(n){ stars += n; save('stars', stars); $('starTotal').textContent = stars; }
+function starsFor(m){ return m <= 1 ? 3 : m <= 4 ? 2 : 1; }
+function show(id){ ['menu', 'quest', 'quick'].forEach(function(s){ $(s).hidden = s !== id; }); $('homeBtn').hidden = id === 'menu'; scrollTo(0, 0); }
+
+$('starTotal').textContent = stars;
+function paintSound(){ $('soundBtn').textContent = soundOn ? '🔊 Sound' : '🔇 Sound'; $('soundBtn').setAttribute('aria-pressed', soundOn); }
+paintSound();
+$('soundBtn').onclick = function(){ soundOn = !soundOn; save('sound', soundOn); paintSound(); good(); };
+$('homeBtn').onclick = function(){ show('menu'); };
+
+document.querySelectorAll('.lv').forEach(function(b){
+  b.classList.toggle('on', +b.dataset.lv === level);
+  b.onclick = function(){ level = +b.dataset.lv; save('level', level); document.querySelectorAll('.lv').forEach(function(x){ x.classList.toggle('on', x === b); }); };
+});
+
+/* =====================================================
+   FACTOR QUEST
+   ===================================================== */
+var Q = null;
+var questCount = load('quests', 0);
+
+function startQuest(a, b){
+  Q = {a: a, b: b, fa: factors(a), fb: factors(b), g: gcd(a, b), step: 0, miss: 0, found: {}};
+  Q.common = Q.fa.filter(function(x){ return Q.fb.indexOf(x) >= 0; });
+  show('quest');
+  renderStep();
+}
+$('startQuest').onclick = function(){
+  // the very first quest is the worksheet pair, 12 and 18
+  var p = questCount === 0 ? [12, 18] : makePair(level);
+  startQuest(p[0], p[1]);
+};
+$('startMine').onclick = function(){
+  var a = parseInt($('mineA').value, 10), b = parseInt($('mineB').value, 10), msg = $('mineMsg');
+  if (!(a >= 2 && b >= 2 && a <= 100 && b <= 100)) { msg.textContent = 'Type two numbers from 2 to 100.'; return; }
+  if (a === b) { msg.textContent = 'Pick two different numbers.'; return; }
+  msg.textContent = '';
+  if (a > b) { var t = a; a = b; b = t; }
+  startQuest(a, b);
+};
+
+function paintSteps(){
+  var s = $('stepsBar').children;
+  for (var i = 0; i < s.length; i++) s[i].className = i < Q.step ? 'done' : i === Q.step ? 'now' : '';
+}
+
+function renderStep(){
+  paintSteps();
+  var c = $('questCard'); c.innerHTML = '';
+  [stepFactors, stepFactors, stepCommon, stepGCF, stepReduce, stepDone][Q.step](c);
+}
+function next(){ Q.step++; setTimeout(renderStep, 700); }
+
+/* Steps 1 & 2: tap every factor in the grid. Factor pairs light up together. */
+function stepFactors(c){
+  var isA = Q.step === 0, n = isA ? Q.a : Q.b, fs = isA ? Q.fa : Q.fb, cls = isA ? 'ca' : 'cb';
+  var got = {};
+  c.appendChild(el('p', 'muted', 'Step ' + (Q.step + 1) + ' of 5'));
+  c.appendChild(el('h2', 'q', 'Find all the factors of <span class="' + cls + '">' + n + '</span>'));
+  c.appendChild(el('p', 'muted', 'A factor divides ' + n + ' with no remainder. Tap a number — its partner lights up too!'));
+
+  var list = el('div', 'flist');
+  var boxes = {};
+  list.appendChild(el('span', 'lbl', 'The factors of ' + n + ' are'));
+  fs.forEach(function(f, i){
+    var bx = el('span', 'box empty', f); boxes[f] = bx; list.appendChild(bx);
+    if (i < fs.length - 1) list.appendChild(el('span', '', ','));
+  });
+  c.appendChild(list);
+
+  var say = el('div', 'say', '💡 Start with 1. Every number has 1 as a factor!');
+  var pairs = el('div', 'pairs');
+  var grid = el('div', 'grid');
+  for (var i = 1; i <= n; i++) (function(i){
+    var t = el('button', 'tile', i); t.dataset.n = i;
+    t.onclick = function(){
+      if (got[i]) return;
+      document.querySelectorAll('.tile.hint').forEach(function(h){ h.classList.remove('hint'); });
+      if (n % i === 0) {
+        var p = n / i;
+        [i, p].forEach(function(x){
+          if (got[x]) return; got[x] = 1;
+          var tx = grid.querySelector('[data-n="' + x + '"]'); tx.classList.add('yes', 'pair'); tx.disabled = true;
+          boxes[x].className = 'box ' + cls; boxes[x].classList.add('pair');
+        });
+        var lo = Math.min(i, p), hi = Math.max(i, p);
+        if (!pairs.querySelector('[data-p="' + lo + '"]')) {
+          var sp = el('span', '', lo + ' × ' + hi + ' = ' + n); sp.dataset.p = lo; pairs.appendChild(sp);
+          Array.prototype.slice.call(pairs.children).sort(function(x, y){ return x.dataset.p - y.dataset.p; }).forEach(function(s){ pairs.appendChild(s); });
+        }
+        say.className = 'say good';
+        say.innerHTML = '✅ ' + lo + ' × ' + hi + ' = ' + n + (lo === hi ? '. ' + lo + ' pairs with itself!' : '. So ' + lo + ' and ' + hi + ' are both factors!');
+        good();
+        if (Object.keys(got).length === fs.length) {
+          grid.querySelectorAll('.tile').forEach(function(x){ x.disabled = true; });
+          say.innerHTML = '🎉 You found all ' + fs.length + ' factors of ' + n + '!';
+          win(); next();
+        }
+      } else {
+        Q.miss++;
+        var q = Math.floor(n / i), r = n % i;
+        t.classList.remove('no'); void t.offsetWidth; t.classList.add('no');
+        setTimeout(function(){ t.classList.remove('no'); }, 600);
+        say.className = 'say bad';
+        say.innerHTML = '❌ ' + n + ' ÷ ' + i + ' = ' + q + ' remainder ' + r + '. So ' + i + ' is not a factor.';
+        bad();
+      }
+    };
+    grid.appendChild(t);
+  })(i);
+  c.appendChild(say); c.appendChild(pairs); c.appendChild(grid);
+
+  var hint = el('button', 'big alt', '🔎 Hint');
+  hint.onclick = function(){
+    var miss = fs.filter(function(f){ return !got[f]; })[0];
+    if (miss == null) return;
+    var t = grid.querySelector('[data-n="' + miss + '"]'); t.classList.add('hint'); t.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+    say.className = 'say'; say.innerHTML = '💡 Try ' + miss + '. Does ' + n + ' ÷ ' + miss + ' come out even?';
+  };
+  var r = el('div', 'row'); r.appendChild(hint); c.appendChild(r);
+}
+
+/* Step 3: tap the numbers that appear in BOTH lists. */
+function stepCommon(c){
+  var got = {};
+  c.appendChild(el('p', 'muted', 'Step 3 of 5'));
+  c.appendChild(el('h2', 'q', 'Which factors are in <span class="cboth">both</span> lists?'));
+  c.appendChild(el('p', 'muted', 'Tap a number that is a factor of <b class="ca">' + Q.a + '</b> AND of <b class="cb">' + Q.b + '</b>.'));
+
+  var all = {};
+  function row(n, fs, k){
+    var r = el('div', 'crow ' + k), l = el('div', 'flist');
+    l.appendChild(el('span', 'lbl ' + (k === 'a' ? 'ca' : 'cb'), n + ':'));
+    fs.forEach(function(f){ var b = el('button', 'box', f); b.dataset.n = f; (all[f] = all[f] || []).push(b); l.appendChild(b); });
+    r.appendChild(l); return r;
+  }
+  c.appendChild(row(Q.a, Q.fa, 'a'));
+  c.appendChild(row(Q.b, Q.fb, 'b'));
+
+  var ans = el('div', 'flist'), slots = [];
+  ans.appendChild(el('span', 'lbl', 'Common factors:'));
+  Q.common.forEach(function(f, i){ var s = el('span', 'box empty', f); slots.push(s); ans.appendChild(s); if (i < Q.common.length - 1) ans.appendChild(el('span', '', ',')); });
+  c.appendChild(ans);
+  var say = el('div', 'say', '💡 Look for numbers that show up in the blue row and the orange row.');
+  c.appendChild(say);
+
+  c.querySelectorAll('.crow .box').forEach(function(b){
+    b.onclick = function(){
+      var f = +b.dataset.n;
+      if (got[f]) return;
+      if (Q.common.indexOf(f) >= 0) {
+        got[f] = 1;
+        all[f].forEach(function(x){ x.className = 'box cboth pair'; });
+        slots[Q.common.indexOf(f)].className = 'box cboth pair';
+        say.className = 'say good'; say.innerHTML = '✅ ' + f + ' divides ' + Q.a + ' and ' + Q.b + '!';
+        good();
+        if (Object.keys(got).length === Q.common.length) {
+          say.innerHTML = '🎉 ' + Q.common.join(', ') + ' are the <b>common factors</b> of ' + Q.a + ' and ' + Q.b + '.';
+          c.appendChild(venn());
+          win(); Q.step++; paintSteps();
+          var go = el('button', 'big', 'Next ➜'); go.onclick = renderStep;
+          var r = el('div', 'row'); r.appendChild(go); c.appendChild(r);
+        }
+      } else {
+        Q.miss++;
+        var other = Q.fa.indexOf(f) >= 0 ? Q.b : Q.a;
+        b.classList.remove('no'); void b.offsetWidth; b.classList.add('no');
+        say.className = 'say bad'; say.innerHTML = '❌ ' + f + ' is not a factor of ' + other + '. It is only in one list.';
+        bad();
+      }
+    };
+  });
+}
+
+function venn(){
+  var onlyA = Q.fa.filter(function(x){ return Q.common.indexOf(x) < 0; });
+  var onlyB = Q.fb.filter(function(x){ return Q.common.indexOf(x) < 0; });
+  function col(nums, x){ return nums.map(function(v, i){ var cols = nums.length > 5 ? 2 : 1, cx = x + (cols === 2 ? (i % 2 ? 16 : -16) : 0), cy = 70 + Math.floor(i / cols) * 26 - (Math.ceil(nums.length / cols) - 1) * 13 + 30; return '<text x="' + cx + '" y="' + cy + '">' + v + '</text>'; }).join(''); }
+  var svg = '<svg class="venn" viewBox="0 0 420 220" role="img" aria-label="Venn diagram of the factors">' +
+    '<style>text{font-family:Fredoka,Nunito,sans-serif;font-size:20px;font-weight:600;text-anchor:middle;fill:#2A2F4A}</style>' +
+    '<circle cx="150" cy="115" r="98" fill="#3D7BE0" fill-opacity=".16" stroke="#3D7BE0" stroke-width="3"/>' +
+    '<circle cx="270" cy="115" r="98" fill="#E0703D" fill-opacity=".16" stroke="#E0703D" stroke-width="3"/>' +
+    '<text x="110" y="22" style="fill:#3D7BE0">' + Q.a + '</text><text x="310" y="22" style="fill:#E0703D">' + Q.b + '</text>' +
+    col(onlyA, 100) + col(onlyB, 320) + '<g style="fill:#2E9D63">' + col(Q.common, 210) + '</g></svg>';
+  return el('div', '', svg);
+}
+
+/* Step 4: pop the balloon with the GREATEST common factor. */
+function stepGCF(c){
+  c.appendChild(el('p', 'muted', 'Step 4 of 5'));
+  c.appendChild(el('h2', 'q', 'Pop the <b>Greatest</b> Common Factor!'));
+  c.appendChild(el('p', 'muted', 'The common factors of ' + Q.a + ' and ' + Q.b + ' are ' + Q.common.join(', ') + '. Which one is the biggest?'));
+  var cols = ['#FFD3D3', '#D3E6FF', '#D9F5D3', '#FFE9B8', '#EAD8FF', '#D3F5F1'];
+  var wrap = el('div', 'balloons'), say = el('div', 'say', '🎈 Among the common factors, the largest one is called the <b>GCF</b>.');
+  shuffle(Q.common.slice()).forEach(function(f, i){
+    var b = el('button', 'bal', f); b.style.background = cols[i % cols.length];
+    b.onclick = function(){
+      if (Q.step !== 3) return;
+      if (f === Q.g) {
+        b.classList.add('win');
+        say.className = 'say good'; say.innerHTML = '🏆 Yes! The GCF of ' + Q.a + ' and ' + Q.b + ' is <b>' + Q.g + '</b>.';
+        win(); confetti(); next();
+      } else {
+        Q.miss++;
+        b.classList.remove('no'); void b.offsetWidth; b.classList.add('no');
+        say.className = 'say bad'; say.innerHTML = '❌ ' + f + ' is a common factor, but there is a <b>bigger</b> one!';
+        bad();
+      }
+    };
+    wrap.appendChild(b);
+  });
+  c.appendChild(wrap); c.appendChild(say);
+}
+
+/* Step 5: reduce a/b by dividing top and bottom by the GCF. */
+function stepReduce(c){
+  var n = Q.a / Q.g, d = Q.b / Q.g;
+  c.appendChild(el('p', 'muted', 'Step 5 of 5'));
+  c.appendChild(el('h2', 'q', 'Reduce the fraction in ONE step'));
+  c.appendChild(el('p', 'muted', 'Divide the numerator and the denominator by the GCF, <b class="cboth">' + Q.g + '</b>.'));
+  var line = el('div', 'fracline');
+  line.innerHTML = fracHTML(Q.a, Q.b) +
+    '<span class="div">÷ ' + Q.g + '<br>→<br>÷ ' + Q.g + '</span>' +
+    '<span class="frac"><input class="num" id="rn" type="number" inputmode="numeric" aria-label="New numerator"><span class="bar"></span><input class="num" id="rd" type="number" inputmode="numeric" aria-label="New denominator"></span>';
+  c.appendChild(line);
+  var say = el('div', 'say', '💡 ' + Q.a + ' ÷ ' + Q.g + ' = ?  and  ' + Q.b + ' ÷ ' + Q.g + ' = ?');
+  c.appendChild(say);
+  var chk = el('button', 'big', '✔ Check'), r = el('div', 'row'); r.appendChild(chk); c.appendChild(r);
+  var rn = c.querySelector('#rn'), rd = c.querySelector('#rd');
+  rn.focus({preventScroll: true});
+  rn.addEventListener('keydown', function(e){ if (e.key === 'Enter') rd.focus(); });
+  rd.addEventListener('keydown', function(e){ if (e.key === 'Enter') chk.click(); });
+  chk.onclick = function(){
+    var a = +rn.value, b = +rd.value;
+    if (a === n && b === d) {
+      rn.disabled = rd.disabled = chk.disabled = true;
+      say.className = 'say good';
+      say.innerHTML = '🎉 ' + Q.a + '/' + Q.b + ' = <b>' + n + '/' + d + '</b>. Fractions can be reduced in one step by using the GCF!';
+      win(); confetti(); next();
+    } else {
+      Q.miss++;
+      say.className = 'say bad';
+      var bits = [];
+      if (a !== n) bits.push('top: ' + Q.a + ' ÷ ' + Q.g + ' = ' + (rn.value ? '?' : '…'));
+      if (b !== d) bits.push('bottom: ' + Q.b + ' ÷ ' + Q.g + ' = ' + (rd.value ? '?' : '…'));
+      if (a && b && a * Q.b === b * Q.a) say.innerHTML = '🤏 That fraction is equal, but not in ONE step. Divide by the GCF, ' + Q.g + '.';
+      else say.innerHTML = '❌ Not quite. Check the ' + bits.join(' and ');
+      bad();
+    }
+  };
+}
+
+/* Done: show the shortcut and give stars. */
+function stepDone(c){
+  var s = starsFor(Q.miss);
+  addStars(s); questCount++; save('quests', questCount);
+  var n = Q.a / Q.g, d = Q.b / Q.g;
+  // show what reducing by small common factors would look like
+  var slow = [[Q.a, Q.b]], x = Q.a, y = Q.b;
+  while (gcd(x, y) > 1) { var p = 2; while (x % p || y % p) p++; x /= p; y /= p; slow.push([x, y]); }
+  c.appendChild(el('h2', 'q center', 'Quest complete! 🏁'));
+  c.appendChild(el('div', 'stars', '⭐'.repeat(s) + '☆'.repeat(3 - s)));
+  c.appendChild(el('p', 'center muted', Q.miss === 0 ? 'Perfect — no mistakes!' : Q.miss + ' oops along the way. Practice makes perfect!'));
+  var cmp = el('div', 'compare');
+  cmp.appendChild(el('div', '', '<b>🐢 Small steps</b><br>' + slow.map(function(f){ return f[0] + '/' + f[1]; }).join(' → ') + '<br><span class="muted">' + (slow.length - 1) + ' step' + (slow.length > 2 ? 's' : '') + '</span>'));
+  cmp.appendChild(el('div', '', '<b>🚀 With the GCF (' + Q.g + ')</b><br>' + Q.a + '/' + Q.b + ' → ' + n + '/' + d + '<br><span class="muted">1 step!</span>'));
+  c.appendChild(cmp);
+  var r = el('div', 'row'); r.style.marginTop = '16px'; r.style.justifyContent = 'center';
+  var again = el('button', 'big', '🔁 New numbers'); again.onclick = function(){ var p = makePair(level); startQuest(p[0], p[1]); };
+  var qf = el('button', 'big blue', '⚡ Quick Fire'); qf.onclick = startQuick;
+  r.appendChild(again); r.appendChild(qf); c.appendChild(r);
+}
+
+/* =====================================================
+   QUICK FIRE
+   ===================================================== */
+var F = null;
+function startQuick(){
+  F = {i: 0, right: 0, qs: []};
+  for (var k = 0; k < 10; k++) {
+    var p = makePair(k < 4 ? 1 : k < 7 ? 2 : 3);
+    F.qs.push({a: p[0], b: p[1], type: k % 2 ? 'reduce' : 'gcf'});
+  }
+  show('quick'); renderQuick();
+}
+$('startQuick').onclick = startQuick;
+
+function renderQuick(){
+  var c = $('quickCard'); c.innerHTML = '';
+  if (F.i >= F.qs.length) return quickDone(c);
+  var q = F.qs[F.i], g = gcd(q.a, q.b), opts, answer;
+  c.appendChild(el('p', 'muted', 'Question ' + (F.i + 1) + ' of 10 · ✅ ' + F.right));
+  if (q.type === 'gcf') {
+    c.appendChild(el('h2', 'q', 'What is the GCF of <span class="ca">' + q.a + '</span> and <span class="cb">' + q.b + '</span>?'));
+    var cf = factors(q.a).filter(function(x){ return q.b % x === 0; });
+    // wrong answers: smaller common factors, factors of only one number, and double the GCF
+    var pool = cf.concat(factors(q.a), factors(q.b), [g * 2]).filter(function(x){ return x !== g; });
+    var set = {}; set[g] = 1; opts = [g];
+    shuffle(pool).forEach(function(x){ if (opts.length < 4 && !set[x] && x > 0) { set[x] = 1; opts.push(x); } });
+    answer = g;
+    opts = shuffle(opts).map(function(x){ return {html: String(x), ok: x === answer}; });
+  } else {
+    c.appendChild(el('h2', 'q', 'Reduce in one step: ' + fracHTML(q.a, q.b)));
+    var n = q.a / g, d = q.b / g, seen = {}, list = [[n, d]];
+    seen[n + '/' + d] = 1;
+    var cands = [];
+    // a half-way answer (divided by a smaller common factor)
+    factors(g).forEach(function(f){ if (f > 1 && f < g) cands.push([q.a / f, q.b / f]); });
+    cands.push([n + 1, d], [n, d + 1], [d, n], [q.a - g, q.b - g]);
+    shuffle(cands).forEach(function(f){ var k = f[0] + '/' + f[1]; if (list.length < 4 && !seen[k] && f[0] > 0 && f[1] > 0) { seen[k] = 1; list.push(f); } });
+    opts = shuffle(list).map(function(f){ return {html: fracHTML(f[0], f[1]), ok: f[0] === n && f[1] === d}; });
+  }
+  var box = el('div', 'opts'), say = el('div', 'say', q.type === 'gcf' ? '💡 The biggest number that divides both.' : '💡 Divide top and bottom by the GCF.');
+  var done = false;
+  opts.forEach(function(o){
+    var b = el('button', 'opt', o.html);
+    b.onclick = function(){
+      if (done) return; done = true;
+      if (o.ok) { b.classList.add('yes'); F.right++; good(); say.className = 'say good'; say.innerHTML = '✅ Correct! GCF = ' + g + '.'; }
+      else {
+        b.classList.add('no'); bad();
+        box.querySelectorAll('.opt').forEach(function(x, i){ if (opts[i].ok) x.classList.add('yes'); });
+        say.className = 'say bad';
+        say.innerHTML = '❌ The GCF of ' + q.a + ' and ' + q.b + ' is ' + g + (q.type === 'reduce' ? ', so ' + q.a + '/' + q.b + ' = ' + (q.a / g) + '/' + (q.b / g) : '') + '.';
+      }
+      setTimeout(function(){ F.i++; renderQuick(); }, o.ok ? 900 : 2200);
+    };
+    box.appendChild(b);
+  });
+  c.appendChild(box); c.appendChild(say);
+}
+
+function quickDone(c){
+  var s = F.right >= 9 ? 3 : F.right >= 7 ? 2 : F.right >= 4 ? 1 : 0;
+  addStars(s);
+  var best = load('best', 0); if (F.right > best) { best = F.right; save('best', best); }
+  c.appendChild(el('h2', 'q center', 'Quick Fire done! ⚡'));
+  c.appendChild(el('div', 'stars', '⭐'.repeat(s) + '☆'.repeat(3 - s)));
+  c.appendChild(el('p', 'center', 'You got <b>' + F.right + ' / 10</b>. Best: ' + best + ' / 10'));
+  if (s >= 2) { win(); confetti(); }
+  var r = el('div', 'row'); r.style.justifyContent = 'center'; r.style.marginTop = '14px';
+  var again = el('button', 'big blue', '⚡ Play again'); again.onclick = startQuick;
+  var qb = el('button', 'big', '🗺️ Factor Quest'); qb.onclick = function(){ var p = makePair(level); startQuest(p[0], p[1]); };
+  r.appendChild(again); r.appendChild(qb); c.appendChild(r);
+}
+
+})();
+</script>
+</body>
+</html>
