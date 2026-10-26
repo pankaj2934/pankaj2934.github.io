@@ -1,4 +1,4 @@
-<div align="center">
+<div align="center" markdown="1">
 
 # 🎈 Little Learners' Arcade 🎈
 
@@ -98,7 +98,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 2. Add a row for it to the right section of this README (and to **New and featured** if it's new).
 3. Commit and push. GitHub Pages publishes it at `https://pankaj2934.github.io/your-game.html`.
 
-<div align="center">
+<div align="center" markdown="1">
 
 Made with ❤️ for curious kids
 
