@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Divisibility Detective: learn the tricks for dividing by 2, 3, 4, 5, 6, 9, 10, 8 and 11 without long division. Wrong answers are explained step by step, read aloud slowly.">
+<meta name="theme-color" content="#F4F7FB">
+<title>Divisibility Detective</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%8D%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F7FB; --ink:#28304A; --muted:#626B85; --card:#FFFFFF; --line:#D9E0EC;
+  --yes:#2E9D63; --yes-bg:#E1F4E9; --no:#D04B4B; --no-bg:#FCE6E6; --gold:#F2B630; --gold-bg:#FFF3CF;
+  --rc:#3D7BE0;
+  --r:20px; --fd:'Fredoka','Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:700;color:var(--ink);background:var(--bg);min-height:100vh;font-size:17px;line-height:1.45}
+h1,h2,h3{font-family:var(--fd);font-weight:600;margin:0 0 .35em;line-height:1.15}
+p{margin:.4em 0}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+.wrap{max-width:720px;margin:0 auto;padding:14px 16px 48px}
+.muted{color:var(--muted)}
+.center{text-align:center}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:48px;height:48px;border-radius:14px;background:var(--gold);display:grid;place-items:center;font-size:26px;flex:none}
+h1{font-size:clamp(1.35rem,5.2vw,1.8rem);margin:0}
+.hud{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:2px solid var(--line);border-radius:999px;padding:5px 12px;font-family:var(--fd);font-weight:600}
+button.pill:active{transform:scale(.96)}
+
+.card{background:var(--card);border-radius:var(--r);padding:18px;box-shadow:0 2px 0 var(--line),0 8px 24px rgba(40,48,74,.06);margin-bottom:16px}
+
+/* buttons */
+.big{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:16px;padding:13px 20px;background:var(--gold);font-family:var(--fd);font-weight:600;font-size:1.15rem;box-shadow:0 4px 0 rgba(0,0,0,.18);transition:transform .08s}
+.big:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.big.soft{background:#fff;border:2px solid var(--line);box-shadow:0 3px 0 var(--line)}
+.big.rule{background:var(--rc);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.c{justify-content:center}
+
+/* menu badges */
+.secttl{font-family:var(--fd);font-weight:600;font-size:1.1rem;margin:18px 4px 8px}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.badge{border:0;border-radius:18px;background:#fff;padding:14px 10px;text-align:center;box-shadow:0 3px 0 var(--line);position:relative;border-top:6px solid var(--rc)}
+.badge:active{transform:translateY(2px)}
+.badge .d{font-family:var(--fd);font-weight:700;font-size:2.1rem;color:var(--rc);line-height:1}
+.badge .t{font-size:.92rem;color:var(--muted);margin-top:4px}
+.badge .medal{position:absolute;top:6px;right:8px;font-size:1.2rem}
+.badge.gold{background:var(--gold-bg)}
+
+details.grown{margin-top:18px;background:#fff;border-radius:16px;padding:12px 16px;box-shadow:0 2px 0 var(--line)}
+details.grown summary{font-family:var(--fd);font-weight:600;cursor:pointer}
+.opt-row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+.chip{border:2px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-family:var(--fd);font-weight:600}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* play area */
+.tag{display:inline-flex;align-items:center;gap:6px;background:var(--rc);color:#fff;border-radius:999px;padding:4px 12px;font-weight:900;font-size:1.05rem}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.q{font-family:var(--fd);font-weight:600;font-size:clamp(1.25rem,5vw,1.6rem);text-align:center;margin:8px 0 4px}
+.q b{color:var(--rc)}
+
+.digits{display:flex;justify-content:center;gap:8px;margin:16px 0;flex-wrap:nowrap}
+.dg{width:clamp(46px,15vw,66px);height:clamp(60px,19vw,84px);border-radius:14px;background:#fff;border:3px solid var(--line);display:grid;place-items:center;font-family:var(--fd);font-weight:700;font-size:clamp(2rem,9vw,2.8rem);transition:all .35s}
+.dg.hl{border-color:var(--rc);background:var(--rc);color:#fff;transform:translateY(-6px) scale(1.05);box-shadow:0 8px 16px rgba(0,0,0,.15)}
+.dg.dim{opacity:.3}
+.dg.cut{margin-left:14px}
+
+.work{min-height:10px;margin:6px 0 12px}
+.line{background:#F7F9FD;border-left:5px solid var(--line);border-radius:10px;padding:8px 12px;margin:6px 0;font-size:1.05rem;animation:in .35s}
+.line.now{border-left-color:var(--rc);background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.line.head{font-family:var(--fd);font-weight:600;background:transparent;border:0;padding:6px 2px 0}
+.line.verdict{font-family:var(--fd);font-weight:600;font-size:1.15rem}
+.line.verdict.yes{background:var(--yes-bg);border-left-color:var(--yes)}
+.line.verdict.no{background:var(--no-bg);border-left-color:var(--no)}
+.line .k{display:inline-block;background:var(--rc);color:#fff;border-radius:8px;padding:0 8px;margin:0 2px;font-family:var(--fd)}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+.ans{border:0;border-radius:20px;padding:18px 8px;font-family:var(--fd);font-weight:600;font-size:1.5rem;box-shadow:0 5px 0 rgba(0,0,0,.15)}
+.ans:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.ans.y{background:var(--yes-bg);color:var(--yes)}
+.ans.n{background:var(--no-bg);color:var(--no)}
+.ans.y.picked{background:var(--yes);color:#fff} .ans.n.picked{background:var(--no);color:#fff}
+.hintrow{display:flex;justify-content:center;margin-top:14px}
+.flash{text-align:center;font-family:var(--fd);font-weight:600;font-size:1.25rem;min-height:1.6em}
+.flash.good{color:var(--yes)} .flash.bad{color:var(--no)}
+
+.speaking{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:.95rem}
+.speaking i{width:6px;height:14px;background:var(--rc);border-radius:3px;animation:eq .8s infinite ease-in-out}
+.speaking i:nth-child(2){animation-delay:.15s} .speaking i:nth-child(3){animation-delay:.3s}
+@keyframes eq{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+
+/* learn card */
+.tool{font-size:3.4rem;text-align:center;line-height:1}
+.rulebox{background:var(--gold-bg);border-radius:16px;padding:12px 14px;font-size:1.12rem;margin:12px 0;text-align:center}
+
+/* baskets */
+.baskets{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.bk{border:3px dashed var(--rc);background:#fff;border-radius:18px 18px 28px 28px;padding:12px 4px 10px;font-family:var(--fd);font-weight:700;font-size:1.6rem;color:var(--rc);transition:all .2s}
+.bk small{display:block;font-size:.8rem;font-weight:600;color:var(--muted)}
+.bk.on{background:var(--rc);color:#fff;border-style:solid}
+.bk.on small{color:#fff}
+.bk.right{outline:4px solid var(--yes);outline-offset:2px}
+.bk.wrong{outline:4px solid var(--no);outline-offset:2px;animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.stars{font-size:2.6rem;letter-spacing:4px;text-align:center}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+.foot{text-align:center;color:var(--muted);font-size:.9rem;margin-top:16px}
+.foot a{color:var(--ink)}
+@media (max-width:420px){ .card{padding:14px} .digits{gap:6px} .bk{font-size:1.35rem} }
+@media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">🔍</div>
+      <div><h1>Divisibility Detective</h1><div class="muted" style="font-size:.9rem">Tricks instead of long division</div></div>
+    </div>
+    <div class="hud">
+      <span class="pill" title="Stars earned">⭐ <span id="starTotal">0</span></span>
+      <button class="pill" id="voiceBtn" aria-pressed="true">🔊 Voice</button>
+      <button class="pill" id="homeBtn" hidden>🏠 Menu</button>
+    </div>
+  </header>
+  <main id="main"></main>
+  <p class="foot"><a href="./">More games</a></p>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- storage ---------- */
+function load(k, d){ try{ var v = localStorage.getItem('div_' + k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } }
+function save(k, v){ try{ localStorage.setItem('div_' + k, JSON.stringify(v)); }catch(e){} }
+
+var S = {
+  stars: load('stars', 0),
+  gold: load('gold', {}),
+  voice: load('voice', true),
+  rate: load('rate', 0.75),
+  size: load('size', 3),
+  sortRules: load('sortRules', [2, 3, 4, 5, 6, 9, 10])
+};
+
+/* ---------- helpers ---------- */
+var $ = function(id){ return document.getElementById(id); };
+function el(tag, cls, html){ var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function rand(a, b){ return a + Math.floor(Math.random() * (b - a + 1)); }
+function pick(a){ return a[Math.floor(Math.random() * a.length)]; }
+function shuffle(a){ for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+function digitsOf(n){ return String(n).split('').map(Number); }
+function range(){ return S.size === 2 ? [10, 99] : S.size === 3 ? [100, 999] : [1000, 99999]; }
+
+/* ---------- voice ---------- */
+var synth = window.speechSynthesis, voice = null;
+function pickVoice(){
+  if (!synth) return;
+  var vs = synth.getVoices().filter(function(v){ return /^en/i.test(v.lang); });
+  voice = vs.filter(function(v){ return /Samantha|Google US English|Karen|Daniel|Moira|Aria|Jenny/i.test(v.name); })[0] || vs.filter(function(v){ return /en-US/i.test(v.lang); })[0] || vs[0] || null;
+}
+if (synth) { pickVoice(); synth.onvoiceschanged = pickVoice; }
+function speak(text){
+  return new Promise(function(res){
+    // with the voice off, still pause long enough to read the step
+    if (!S.voice || !synth) return setTimeout(res, Math.min(4500, 900 + text.length * 35));
+    var done = false, tm;
+    var fin = function(){ if (!done) { done = true; clearTimeout(tm); res(); } };
+    try{
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = S.rate; u.pitch = 1.05; u.lang = 'en-US'; if (voice) u.voice = voice;
+      u.onend = fin; u.onerror = fin;
+      // safety net in case the browser never fires onend
+      tm = setTimeout(fin, 2500 + text.length * 95 / S.rate);
+      synth.speak(u);
+    }catch(e){ fin(); }
+  });
+}
+function hush(){ if (synth) try{ synth.cancel(); }catch(e){} }
+
+/* ---------- sounds ---------- */
+var ac = null;
+function tone(freqs, dur){
+  try{
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    freqs.forEach(function(f, i){
+      var o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + i * 0.09;
+      o.type = 'triangle'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.12, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + dur + 0.02);
+    });
+  }catch(e){}
+}
+function dingGood(){ if (S.voice) tone([660, 880], 0.16); }
+function dingBad(){ if (S.voice) tone([300, 220], 0.2); }
+
+/* ---------- confetti ---------- */
+var cv = $('confetti'), cx = cv.getContext('2d'), bits = [], raf = 0;
+function confetti(){
+  cv.width = innerWidth; cv.height = innerHeight;
+  var cols = ['#F2B630', '#3D7BE0', '#E0703D', '#2E9D63', '#8A5CD6', '#D6509A'];
+  for (var i = 0; i < 110; i++) bits.push({x: Math.random() * cv.width, y: -20 - Math.random() * cv.height * 0.5, vx: (Math.random() - 0.5) * 3, vy: 2 + Math.random() * 3, s: 6 + Math.random() * 6, r: Math.random() * 6, c: cols[i % cols.length]});
+  if (!raf) tick();
+}
+function tick(){
+  cx.clearRect(0, 0, cv.width, cv.height);
+  bits = bits.filter(function(p){ return p.y < cv.height + 20; });
+  bits.forEach(function(p){ p.x += p.vx; p.y += p.vy; p.r += 0.1; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); cx.restore(); });
+  raf = bits.length ? requestAnimationFrame(tick) : 0;
+  if (!raf) cx.clearRect(0, 0, cv.width, cv.height);
+}
+
+/* =====================================================
+   THE TRICKS
+   Each rule builds a list of steps: which digits to light up,
+   what to show on screen, and what to say (slowly).
+   ===================================================== */
+function word(d){ return {2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven'}[d]; }
+
+// Is m in the d times table? Shows the neighbours when it isn't.
+function tableCheck(m, d){
+  if (m === 0) return {ok: true, html: '0 always shares evenly ✓', say: 'Zero always shares evenly.'};
+  var q = Math.floor(Math.abs(m) / d), a = Math.abs(m);
+  if (a % d === 0) return {ok: true, html: d + ' × ' + q + ' = ' + a + ' ✓', say: a + ' is in the ' + word(d) + ' times table. ' + d + ' times ' + q + ' is ' + a + '.'};
+  var lo = d * q, hi = lo + d;
+  return {ok: false, html: d + ' × ' + q + ' = ' + lo + ', &nbsp;' + d + ' × ' + (q + 1) + ' = ' + hi + '. ' + a + ' is in between ✗',
+    say: a + ' is not in the ' + word(d) + ' times table. ' + d + ' times ' + q + ' is ' + lo + ', and ' + d + ' times ' + (q + 1) + ' is ' + hi + '. ' + a + ' is in between.'};
+}
+function lastIdx(n, k){ var L = String(n).length, out = []; for (var i = Math.max(0, L - k); i < L; i++) out.push(i); return out; }
+function allIdx(n){ return digitsOf(n).map(function(_, i){ return i; }); }
+
+function lastDigitSteps(n, d, okDigits, okText){
+  var ds = digitsOf(n), last = ds[ds.length - 1], ok = okDigits.indexOf(last) >= 0;
+  return [
+    {hl: lastIdx(n, 1), html: '🔦 Shine the torch on the last digit: <span class="k">' + last + '</span>', say: 'Shine the torch on the last digit. It is ' + last + '.'},
+    {hl: lastIdx(n, 1), html: ok ? last + ' is ' + okText + ' ✓' : last + ' is not ' + okText + ' ✗', say: ok ? last + ' is ' + okText + '.' : last + ' is not ' + okText + '.', ok: ok}
+  ];
+}
+
+function blendSteps(n, d){
+  var ds = digitsOf(n), steps = [], sum = ds.reduce(function(a, b){ return a + b; }, 0);
+  steps.push({hl: allIdx(n), html: '🧮 Add up all the digits: ' + ds.join(' + ') + ' = <span class="k">' + sum + '</span>', say: 'Add up all the digits. ' + ds.join(', plus ') + ', makes ' + sum + '.'});
+  var m = sum;
+  if (m >= 20) {
+    var d2 = digitsOf(m), s2 = d2[0] + d2[1];
+    steps.push({hl: allIdx(n), html: m + ' is still big. Blend again: ' + d2.join(' + ') + ' = <span class="k">' + s2 + '</span>', say: m + ' is still big, so blend again. ' + d2.join(', plus ') + ', makes ' + s2 + '.'});
+    m = s2;
+  }
+  var t = tableCheck(m, d); t.hl = allIdx(n);
+  steps.push(t);
+  return steps;
+}
+
+function snipSteps(n, d, k){
+  var s = String(n), part = s.length > k ? s.slice(-k) : s, m = parseInt(part, 10);
+  var name = k === 2 ? 'two' : 'three';
+  var shown = part + (String(m) !== part ? ' (that is ' + m + ')' : '');
+  var steps = [{hl: lastIdx(n, k), cut: s.length > k ? s.length - k : -1,
+    html: '✂️ Snip off the last ' + name + ' digits: <span class="k">' + shown + '</span>',
+    say: s.length > k ? 'Snip off the last ' + name + ' digits. They make ' + m + '. We can forget the rest!' : 'This number only has ' + s.length + ' digits, so we check all of it: ' + m + '.'}];
+  var t = tableCheck(m, d); t.hl = lastIdx(n, k); t.cut = steps[0].cut;
+  if (!t.ok && m >= 100) t.html = m + ' ÷ ' + d + ' leaves a remainder ✗', t.say = m + ' divided by ' + d + ' leaves a remainder of ' + (m % d) + '.';
+  if (t.ok && m >= 100) t.html = m + ' ÷ ' + d + ' = ' + (m / d) + ' ✓', t.say = m + ' divided by ' + d + ' is exactly ' + (m / d) + '.';
+  steps.push(t);
+  return steps;
+}
+
+function zigzagSteps(n){
+  var ds = digitsOf(n), total = 0, parts = [], words = [];
+  ds.forEach(function(x, i){ total += i % 2 ? -x : x; parts.push(i ? (i % 2 ? ' − ' : ' + ') + x : String(x)); words.push(i ? (i % 2 ? ', minus ' : ', plus ') + x : String(x)); });
+  var ok = total % 11 === 0;
+  return [
+    {hl: allIdx(n), html: '🔀 Zig-zag: add, subtract, add… ' + parts.join('') + ' = <span class="k">' + total + '</span>', say: 'Zig-zag. Add, then subtract, then add. ' + words.join('') + ', makes ' + (total < 0 ? 'minus ' + (-total) : total) + '.'},
+    {hl: allIdx(n), ok: ok, html: ok ? total + ' is 0 or a multiple of 11 ✓' : total + ' is not 0 and not a multiple of 11 ✗', say: ok ? (total === 0 ? 'We got zero. That means yes!' : total + ' is in the eleven times table.') : 'That is not zero, and not in the eleven times table.'}
+  ];
+}
+
+var RULES = {
+  2: {color: '#3D7BE0', tool: '🔦', name: 'Last-digit torch', rule: 'If the last digit is <b>even</b> (0, 2, 4, 6, 8), the number divides by 2.', say: 'If the last digit is even, zero, two, four, six or eight, the number divides by two.',
+      steps: function(n){ return lastDigitSteps(n, 2, [0, 2, 4, 6, 8], 'even (0, 2, 4, 6, 8)'); }},
+  3: {color: '#8A5CD6', tool: '🧮', name: 'Digit blender', rule: '<b>Add up all the digits.</b> If the total divides by 3, so does the number.', say: 'Add up all the digits. If the total divides by three, so does the number.',
+      steps: function(n){ return blendSteps(n, 3); }},
+  4: {color: '#1F9E8F', tool: '✂️', name: 'Last-two snip', rule: 'Look at the <b>last two digits</b>. If they divide by 4, so does the number.', say: 'Look at the last two digits only. If they divide by four, so does the whole number.',
+      steps: function(n){ return snipSteps(n, 4, 2); }, trap: function(n){ return n % 2 === 0; }},
+  5: {color: '#E0703D', tool: '🔦', name: 'Last-digit torch', rule: 'If the last digit is <b>0 or 5</b>, the number divides by 5.', say: 'If the last digit is zero or five, the number divides by five.',
+      steps: function(n){ return lastDigitSteps(n, 5, [0, 5], '0 or 5'); }},
+  6: {color: '#D6509A', tool: '🤝', name: 'Team-up', rule: 'It must pass <b>both</b> tests: ÷2 (even last digit) <b>and</b> ÷3 (digit sum).', say: 'Six is two times three. So the number must pass both tests: the two test and the three test.',
+      steps: function(n){
+        var a = RULES[2].steps(n), b = RULES[3].steps(n), okA = a[a.length - 1].ok, okB = b[b.length - 1].ok;
+        var s = [{head: true, html: 'Test 1: ÷2', say: 'Test one. Does it divide by two?'}].concat(a, [{head: true, html: 'Test 2: ÷3', say: 'Test two. Does it divide by three?'}], b);
+        s.push({ok: okA && okB, html: okA && okB ? 'Both tests passed ✓' : (!okA && !okB ? 'Both tests failed ✗' : 'Test ' + (okA ? '2' : '1') + ' failed, and we need both ✗'), say: okA && okB ? 'Both tests passed.' : (!okA && !okB ? 'Both tests failed.' : 'One test failed, and six needs both.')});
+        return s;
+      }, trap: function(n){ return n % 2 === 0 || n % 3 === 0; }},
+  9: {color: '#2E9D63', tool: '🧮', name: 'Digit blender', rule: '<b>Add up all the digits.</b> If the total divides by 9, so does the number.', say: 'Add up all the digits. If the total divides by nine, so does the number.',
+      steps: function(n){ return blendSteps(n, 9); }, trap: function(n){ return n % 3 === 0; }},
+  10: {color: '#B8860B', tool: '🔦', name: 'Last-digit torch', rule: 'If the last digit is <b>0</b>, the number divides by 10.', say: 'If the last digit is zero, the number divides by ten.',
+      steps: function(n){ return lastDigitSteps(n, 10, [0], '0'); }, trap: function(n){ return n % 5 === 0; }},
+  8: {color: '#1A8FB8', tool: '✂️', name: 'Last-three snip', bonus: true, rule: 'Look at the <b>last three digits</b>. If they divide by 8, so does the number.', say: 'Look at the last three digits only. If they divide by eight, so does the whole number.',
+      steps: function(n){ return snipSteps(n, 8, 3); }, trap: function(n){ return n % 4 === 0; }},
+  11: {color: '#C2413B', tool: '🔀', name: 'Zig-zag', bonus: true, rule: '<b>Add, subtract, add…</b> the digits in turn. If you get 0 or a multiple of 11, it divides by 11.', say: 'Add and subtract the digits in turn. If you get zero, or a number in the eleven times table, it divides by eleven.',
+      steps: zigzagSteps}
+};
+var MAIN = [2, 3, 4, 5, 6, 9, 10], BONUS = [8, 11];
+
+// add the verdict as the last step
+function explain(n, d){
+  var s = RULES[d].steps(n), ok = n % d === 0;
+  s.forEach(function(x){ x.color = x.color || RULES[d].color; });
+  s.push({color: RULES[d].color, verdict: true, ok: ok,
+    html: ok ? '✅ So yes! ' + n + ' divides by ' + d + '.' : '❌ So no. ' + n + ' does not divide by ' + d + '.',
+    say: ok ? 'So yes! ' + n + ' divides by ' + d + '.' : 'So no. ' + n + ' does not divide by ' + d + '.'});
+  return s;
+}
+
+/* make a number for rule d: half yes, half no; "no" numbers often fall into a trap
+   (e.g. even but not ÷4, or ÷3 but not ÷9) */
+function makeNumber(d, wantYes){
+  var r = range(), lo = r[0], hi = r[1], n, i;
+  if (wantYes) return d * rand(Math.ceil(lo / d), Math.floor(hi / d));
+  var trap = RULES[d].trap && Math.random() < 0.6;
+  for (i = 0; i < 300; i++) {
+    n = rand(lo, hi);
+    if (n % d !== 0 && (!trap || RULES[d].trap(n))) return n;
+  }
+  do { n = rand(lo, hi); } while (n % d === 0);
+  return n;
+}
+
+/* ---------- the step player ---------- */
+var token = 0;
+function stop(){ token++; hush(); }
+function renderDigits(box, n, color){
+  box.innerHTML = ''; box.style.setProperty('--rc', color);
+  digitsOf(n).forEach(function(x){ box.appendChild(el('div', 'dg', x)); });
+}
+function light(box, step){
+  if (step.color) box.style.setProperty('--rc', step.color);
+  var tiles = box.children, hl = step.hl || [];
+  for (var i = 0; i < tiles.length; i++) {
+    tiles[i].classList.toggle('hl', hl.indexOf(i) >= 0);
+    tiles[i].classList.toggle('dim', hl.length > 0 && hl.indexOf(i) < 0);
+    tiles[i].classList.toggle('cut', step.cut === i);
+  }
+}
+function lineFor(step){
+  var c = 'line' + (step.head ? ' head' : '') + (step.verdict ? ' verdict ' + (step.ok ? 'yes' : 'no') : '');
+  var li = el('div', c, step.html);
+  if (step.color) li.style.setProperty('--rc', step.color);
+  return li;
+}
+/* plays steps one by one: lights digits, writes the line, speaks it slowly */
+async function play(steps, box, work, status){
+  var my = ++token; hush();
+  work.innerHTML = '';
+  if (status) status.hidden = false;
+  for (var i = 0; i < steps.length; i++) {
+    if (my !== token) return false;
+    var st = steps[i];
+    if (!st.head && st.hl) light(box, st);
+    var prev = work.querySelector('.now'); if (prev) prev.classList.remove('now');
+    if (st.html) {
+      var li = lineFor(st); if (!st.head) li.classList.add('now'); work.appendChild(li);
+      li.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+    }
+    await speak(st.say);
+    if (my !== token) return false;
+    await wait(st.head ? 150 : 450);
+  }
+  if (status) status.hidden = true;
+  return true;
+}
+/* shows all steps at once, no voice (used after a right answer) */
+function showAll(steps, box, work){
+  work.innerHTML = '';
+  steps.forEach(function(st){ work.appendChild(lineFor(st)); });
+  var last = steps.filter(function(s){ return s.hl && s.hl.length; }).pop();
+  if (last) light(box, last);
+}
+function speakingBadge(){ var s = el('div', 'speaking', '<i></i><i></i><i></i> Listen…'); s.hidden = true; return s; }
+
+/* ---------- top bar ---------- */
+function addStars(n){ S.stars += n; save('stars', S.stars); $('starTotal').textContent = S.stars; }
+$('starTotal').textContent = S.stars;
+function paintVoice(){ $('voiceBtn').textContent = S.voice ? '🔊 Voice' : '🔇 Voice'; $('voiceBtn').setAttribute('aria-pressed', S.voice); }
+paintVoice();
+$('voiceBtn').onclick = function(){ S.voice = !S.voice; save('voice', S.voice); paintVoice(); if (!S.voice) hush(); else speak('Voice is on.'); };
+$('homeBtn').onclick = function(){ menu(); };
+function screen(isMenu){ stop(); $('homeBtn').hidden = isMenu; var m = $('main'); m.innerHTML = ''; scrollTo(0, 0); return m; }
+
+/* =====================================================
+   MENU
+   ===================================================== */
+function menu(){
+  var m = screen(true);
+  var hi = el('div', 'card');
+  hi.innerHTML = '<h2>Hi Aadvik! 🕵️</h2><p>Can a big number be shared out <b>evenly</b>? A detective doesn\'t do long division. A detective uses a <b>trick</b>!</p><p class="muted">Pick a tool. Get 5 right in a row to win its gold badge 🏅.</p>';
+  m.appendChild(hi);
+  function grid(list){
+    var g = el('div', 'badges');
+    list.forEach(function(d){
+      var R = RULES[d], b = el('button', 'badge' + (S.gold[d] ? ' gold' : ''));
+      b.style.setProperty('--rc', R.color);
+      b.innerHTML = (S.gold[d] ? '<span class="medal">🏅</span>' : '') + '<div class="d">÷' + d + '</div><div class="t">' + R.tool + ' ' + R.name + '</div>';
+      b.onclick = function(){ learn(d); };
+      g.appendChild(b);
+    });
+    return g;
+  }
+  m.appendChild(el('div', 'secttl', '🧰 Detective tools'));
+  m.appendChild(grid(MAIN));
+  m.appendChild(el('div', 'secttl', '🏆 Bonus tricks'));
+  m.appendChild(grid(BONUS));
+
+  var sc = el('div', 'card'); sc.style.marginTop = '18px';
+  sc.innerHTML = '<h3>🧺 Basket Sort</h3><p class="muted">Mix it up! Put each number in <b>every</b> basket it fits. 30 fits ÷2, ÷3 <i>and</i> ÷5!</p>';
+  var sb = el('button', 'big', '🧺 Play Basket Sort'); sb.onclick = sortGame;
+  var r = el('div', 'row'); r.appendChild(sb); sc.appendChild(r); m.appendChild(sc);
+
+  // grown-ups
+  var g = el('details', 'grown');
+  g.innerHTML = '<summary>⚙️ Grown-ups</summary>';
+  function chips(label, opts, cur, onPick, multi){
+    g.appendChild(el('div', 'muted', label));
+    var row = el('div', 'opt-row');
+    opts.forEach(function(o){
+      var c = el('button', 'chip' + ((multi ? cur.indexOf(o[0]) >= 0 : cur === o[0]) ? ' on' : ''), o[1]);
+      c.onclick = function(){ onPick(o[0], c, row); };
+      row.appendChild(c);
+    });
+    g.appendChild(row);
+  }
+  chips('Number size', [[2, '2 digits'], [3, '3 digits'], [5, '4–5 digits']], S.size, function(v, c, row){
+    S.size = v; save('size', v); row.querySelectorAll('.chip').forEach(function(x){ x.classList.toggle('on', x === c); });
+  });
+  chips('Voice speed', [[0.75, '🐢 Slow'], [0.6, '🐌 Extra slow'], [0.9, 'Normal']], S.rate, function(v, c, row){
+    S.rate = v; save('rate', v); row.querySelectorAll('.chip').forEach(function(x){ x.classList.toggle('on', x === c); });
+    speak('This is how fast I will talk.');
+  });
+  chips('Basket Sort uses these rules', MAIN.concat(BONUS).map(function(d){ return [d, '÷' + d]; }), S.sortRules, function(v, c){
+    var i = S.sortRules.indexOf(v);
+    if (i >= 0) { if (S.sortRules.length <= 2) return; S.sortRules.splice(i, 1); } else S.sortRules.push(v);
+    save('sortRules', S.sortRules); c.classList.toggle('on', i < 0);
+  }, true);
+  g.appendChild(el('p', 'muted', '<span style="font-size:.9rem">The voice uses your device\'s built-in speech. If you hear nothing, check that the phone is not on silent.</span>'));
+  m.appendChild(g);
+}
+
+/* =====================================================
+   LEARN CARD: the rule plus a worked example
+   ===================================================== */
+function learn(d){
+  var m = screen(false), R = RULES[d], c = el('div', 'card');
+  c.style.setProperty('--rc', R.color);
+  c.innerHTML = '<div class="meta"><span class="tag">÷' + d + ' · ' + R.name + '</span></div><div class="tool">' + R.tool + '</div>';
+  c.appendChild(el('div', 'rulebox', R.rule));
+  var box = el('div', 'digits'), work = el('div', 'work'), status = speakingBadge();
+  var exN = makeNumber(d, true), yes = true;
+  c.appendChild(el('p', 'center muted', 'Watch the trick:'));
+  c.appendChild(box); c.appendChild(status); c.appendChild(work);
+  var r = el('div', 'row c');
+  var again = el('button', 'big soft', '▶ Another example');
+  var go = el('button', 'big rule', '🕵️ I\'m ready!');
+  r.appendChild(again); r.appendChild(go); c.appendChild(r);
+  m.appendChild(c);
+
+  function run(n){
+    renderDigits(box, n, R.color);
+    var steps = explain(n, d);
+    play([{head: true, html: '<span class="muted">📣 The rule</span>', say: R.say}].concat(steps), box, work, status);
+  }
+  again.onclick = function(){ yes = !yes; exN = makeNumber(d, yes); run(exN); };
+  go.onclick = function(){ practice(d); };
+  run(exN);
+}
+
+/* =====================================================
+   PRACTICE: yes or no, 10 questions
+   ===================================================== */
+function practice(d){
+  var m = screen(false), R = RULES[d];
+  var P = {i: 0, miss: 0, streak: 0, best: 0, prev: null};
+  var c = el('div', 'card'); c.style.setProperty('--rc', R.color); m.appendChild(c);
+
+  function ask(){
+    stop();
+    if (P.i >= 10) return finish();
+    var want = Math.random() < 0.5, n;
+    do { n = makeNumber(d, want); } while (n === P.prev);
+    P.prev = n;
+    var ok = n % d === 0, steps = explain(n, d);
+    c.innerHTML = '';
+    c.appendChild(el('div', 'meta', '<span class="tag">' + R.tool + ' ÷' + d + '</span><span class="muted">Question ' + (P.i + 1) + ' of 10 · 🔥 ' + P.streak + '</span>'));
+    c.appendChild(el('div', 'q', 'Does this number divide by <b>' + d + '</b>?'));
+    var box = el('div', 'digits'); renderDigits(box, n, R.color); c.appendChild(box);
+    var status = speakingBadge(), work = el('div', 'work'), flash = el('div', 'flash');
+    c.appendChild(status); c.appendChild(work); c.appendChild(flash);
+    var ans = el('div', 'answers');
+    var by = el('button', 'ans y', '✅ Yes'), bn = el('button', 'ans n', '❌ No');
+    ans.appendChild(by); ans.appendChild(bn); c.appendChild(ans);
+    var hr = el('div', 'hintrow'), hint = el('button', 'big soft', R.tool + ' Use the trick');
+    hr.appendChild(hint); c.appendChild(hr);
+    var answered = false;
+
+    hint.onclick = function(){
+      // run the trick but keep the verdict hidden, so he still decides
+      play(steps.slice(0, -1).concat([{html: '🤔 So… yes or no?', say: 'So, what do you think? Yes, or no?'}]), box, work, status);
+    };
+    function choose(saidYes, btn){
+      if (answered) return; answered = true;
+      stop(); btn.classList.add('picked'); hint.disabled = true;
+      P.i++;
+      if (saidYes === ok) {
+        P.streak++; P.best = Math.max(P.best, P.streak);
+        flash.className = 'flash good'; flash.textContent = pick(['Great detective work! 🕵️', 'Correct! 🎉', 'Yes! Case closed! 📁', 'Spot on! ⭐']);
+        dingGood(); showAll(steps, box, work);
+        if (P.streak === 5 && !S.gold[d]) { S.gold[d] = true; save('gold', S.gold); confetti(); flash.textContent = '🏅 5 in a row! Gold badge for ÷' + d + '!'; speak('Five in a row! You won the gold badge!'); }
+        hr.innerHTML = ''; var nx = el('button', 'big rule', 'Next ➜'); nx.onclick = ask; hr.appendChild(nx);
+        ans.hidden = true;
+      } else {
+        P.miss++; P.streak = 0;
+        flash.className = 'flash bad'; flash.textContent = 'Not quite. Let\'s check together 👇';
+        dingBad(); ans.hidden = true;
+        hr.innerHTML = '';
+        var say = el('button', 'big soft', '🔁 Say it again'), got = el('button', 'big rule', '👍 Got it');
+        say.hidden = got.hidden = true;
+        say.onclick = function(){ play(steps, box, work, status); };
+        got.onclick = ask;
+        hr.appendChild(say); hr.appendChild(got);
+        play([{head: true, html: '', say: 'Not quite. Let\'s check together.'}].concat(steps), box, work, status).then(function(){ say.hidden = got.hidden = false; });
+        // never leave him stuck if speech stalls
+        setTimeout(function(){ say.hidden = got.hidden = false; }, 25000);
+      }
+    }
+    by.onclick = function(){ choose(true, by); };
+    bn.onclick = function(){ choose(false, bn); };
+  }
+
+  function finish(){
+    var s = P.miss <= 1 ? 3 : P.miss <= 3 ? 2 : 1;
+    addStars(s);
+    c.innerHTML = '';
+    c.appendChild(el('h2', 'center', 'Case closed! 📁'));
+    c.appendChild(el('div', 'stars', '⭐'.repeat(s) + '☆'.repeat(3 - s)));
+    c.appendChild(el('p', 'center', 'You got <b>' + (10 - P.miss) + ' / 10</b> right. Best streak: 🔥 ' + P.best));
+    if (S.gold[d]) c.appendChild(el('p', 'center', '🏅 You have the gold ÷' + d + ' badge!'));
+    if (s === 3) { confetti(); speak('Amazing! Three stars!'); }
+    var r = el('div', 'row c');
+    var a = el('button', 'big rule', '🔁 Play ÷' + d + ' again'); a.onclick = function(){ practice(d); };
+    var b = el('button', 'big soft', '🧰 Pick another tool'); b.onclick = menu;
+    r.appendChild(a); r.appendChild(b); c.appendChild(r);
+  }
+  ask();
+}
+
+/* =====================================================
+   BASKET SORT: tap every basket the number fits in
+   ===================================================== */
+function sortGame(){
+  var m = screen(false);
+  var G = {i: 0, miss: 0, prev: null};
+  var c = el('div', 'card'); m.appendChild(c);
+
+  function ask(){
+    stop();
+    if (G.i >= 8) return finish();
+    var rules = shuffle(S.sortRules.slice()).slice(0, 3).sort(function(a, b){ return a - b; });
+    var n;
+    // usually make it fit at least one basket
+    do { n = Math.random() < 0.75 ? makeNumber(pick(rules), true) : makeNumber(rules[0], false); } while (n === G.prev);
+    G.prev = n;
+    var picked = {};
+    c.innerHTML = '';
+    c.appendChild(el('div', 'meta', '<span class="tag" style="--rc:var(--ink)">🧺 Basket Sort</span><span class="muted">Number ' + (G.i + 1) + ' of 8</span>'));
+    c.appendChild(el('div', 'q', 'Tap <b style="color:var(--ink)">every</b> basket it fits in'));
+    var box = el('div', 'digits'); renderDigits(box, n, '#28304A'); c.appendChild(box);
+    var bks = el('div', 'baskets');
+    rules.forEach(function(d){
+      var b = el('button', 'bk', '÷' + d + '<small>' + RULES[d].tool + '</small>'); b.style.setProperty('--rc', RULES[d].color);
+      b.onclick = function(){ if (b.disabled) return; picked[d] = !picked[d]; b.classList.toggle('on', !!picked[d]); };
+      bks.appendChild(b);
+    });
+    c.appendChild(bks);
+    c.appendChild(el('p', 'center muted', 'Fits none? Leave them empty and tap Check.'));
+    var status = speakingBadge(), work = el('div', 'work'), flash = el('div', 'flash');
+    c.appendChild(flash); c.appendChild(status); c.appendChild(work);
+    var hr = el('div', 'row c'), chk = el('button', 'big', '✔ Check'); hr.appendChild(chk); c.appendChild(hr);
+
+    chk.onclick = function(){
+      G.i++;
+      var wrong = [];
+      Array.prototype.forEach.call(bks.children, function(b, k){
+        var d = rules[k], fits = n % d === 0;
+        b.disabled = true;
+        if (!!picked[d] === fits) b.classList.add('right'); else { b.classList.add('wrong'); wrong.push(d); }
+        if (fits && !picked[d]) b.classList.add('on');
+      });
+      var fitList = rules.filter(function(d){ return n % d === 0; });
+      hr.innerHTML = '';
+      if (!wrong.length) {
+        flash.className = 'flash good';
+        flash.textContent = fitList.length ? '🎉 Yes! ' + n + ' fits ' + fitList.map(function(d){ return '÷' + d; }).join(', ') + '.' : '🎉 Right! ' + n + ' fits none of them.';
+        dingGood();
+        var nx = el('button', 'big', 'Next ➜'); nx.onclick = ask; hr.appendChild(nx);
+      } else {
+        G.miss++;
+        flash.className = 'flash bad'; flash.textContent = 'Let\'s check the red basket' + (wrong.length > 1 ? 's' : '') + ' 👇';
+        dingBad();
+        var steps = [{head: true, html: '', say: 'Let\'s check together.'}];
+        wrong.forEach(function(d){ steps.push({head: true, color: RULES[d].color, html: '<span style="color:' + RULES[d].color + '">' + RULES[d].tool + ' Basket ÷' + d + '</span>', say: 'The divide by ' + word(d) + ' basket.'}); steps = steps.concat(explain(n, d)); });
+        var say = el('button', 'big soft', '🔁 Say it again'), got = el('button', 'big', '👍 Got it');
+        say.hidden = got.hidden = true;
+        say.onclick = function(){ play(steps, box, work, status); };
+        got.onclick = ask;
+        hr.appendChild(say); hr.appendChild(got);
+        play(steps, box, work, status).then(function(){ say.hidden = got.hidden = false; });
+        setTimeout(function(){ say.hidden = got.hidden = false; }, 30000);
+      }
+    };
+  }
+
+  function finish(){
+    var s = G.miss <= 1 ? 3 : G.miss <= 3 ? 2 : 1;
+    addStars(s);
+    c.innerHTML = '';
+    c.appendChild(el('h2', 'center', 'All sorted! 🧺'));
+    c.appendChild(el('div', 'stars', '⭐'.repeat(s) + '☆'.repeat(3 - s)));
+    c.appendChild(el('p', 'center', 'You sorted <b>' + (8 - G.miss) + ' / 8</b> numbers perfectly.'));
+    if (s === 3) { confetti(); speak('Super sorting! Three stars!'); }
+    var r = el('div', 'row c');
+    var a = el('button', 'big', '🔁 Sort again'); a.onclick = sortGame;
+    var b = el('button', 'big soft', '🧰 Menu'); b.onclick = menu;
+    r.appendChild(a); r.appendChild(b); c.appendChild(r);
+  }
+  ask();
+}
+
+menu();
+})();
+</script>
+</body>
+</html>
