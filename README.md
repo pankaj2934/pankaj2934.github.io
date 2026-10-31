@@ -7,7 +7,7 @@
 No sign-up. No ads. Nothing to install. Open a link and play.
 
 [![Play now](https://img.shields.io/badge/▶_Play_now-pankaj2934.github.io-F5B301?style=for-the-badge)](https://pankaj2934.github.io/)
-![Pages](https://img.shields.io/badge/games-17-2F80ED?style=for-the-badge)
+![Pages](https://img.shields.io/badge/games-18-2F80ED?style=for-the-badge)
 ![Works on](https://img.shields.io/badge/works_on-phone_·_tablet_·_laptop-1F9D63?style=for-the-badge)
 
 </div>
@@ -18,6 +18,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 
 | | Game | What you learn |
 |:-:|---|---|
+| 🔍 | **[Divisibility Detective](https://pankaj2934.github.io/divide.html)** | Check whether a number divides by 2, 3, 4, 5, 6, 9 or 10 (plus bonus 8 and 11) using tricks instead of long division. Wrong answers are explained step by step, read aloud slowly. |
 | 🧩 | **[GCF Quest](https://pankaj2934.github.io/gcf.html)** | Made for Aadvik's Kumon D200b page. Tap every factor of two numbers, spot the common factors, pop the **Greatest Common Factor** balloon, then reduce the fraction in one step. Plus a 10-question Quick Fire round. |
 | ✏️ | **[Trace with Buddy](https://pankaj2934.github.io/trace.html)** | Made for phones. Follow the ladybug with your finger to trace lines, shapes, a–z, A–Z and 0–9 in the right stroke order. |
 | 👾 | **[Munchy's Letter Sounds](https://pankaj2934.github.io/phonics.html)** | Phonics for ages 4–6. Meet the letters, trace them, feed Munchy the monster things that start with the same sound, and pop letter bubbles. Earn stickers! |
@@ -57,6 +58,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 | | Game | What you do |
 |:-:|---|---|
 | 🍕 | [Fraction Shading Quest](https://pankaj2934.github.io/fraction.html) | Read a fraction from a picture, then shade one yourself. |
+| 🔍 | [Divisibility Detective](https://pankaj2934.github.io/divide.html) | Learn one trick at a time (last-digit torch, digit blender, last-two snip, zig-zag…), answer yes/no to win a gold badge per rule, then sort numbers into every basket they fit. |
 | 🕵️ | [Fraction Detective](https://pankaj2934.github.io/fractionnew.html) | Simplify fractions using divisibility clues. |
 | 🧩 | [GCF Quest](https://pankaj2934.github.io/gcf.html) | List factors (factor pairs light up together), find common factors on a Venn diagram, pick the GCF and use it to reduce a fraction in one step. |
 | 🪜 | [HCF Tricks](https://pankaj2934.github.io/hcf.html) | Use the Ladder and Remainder tricks to find the HCF. |
@@ -75,7 +77,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 ## 🧭 Learning path
 
 ```
-👾 Letter sounds  →  ✏️ Tracing  →  🍎 Count & Compare  →  ✖️ Times tables  →  ➗ Word problems  →  🍕 Fractions  →  🕵️ Simplifying  →  🧩 GCF  →  🪜 HCF
+👾 Letter sounds  →  ✏️ Tracing  →  🍎 Count & Compare  →  ✖️ Times tables  →  ➗ Word problems  →  🍕 Fractions  →  🔍 Divisibility tricks  →  🕵️ Simplifying  →  🧩 GCF  →  🪜 HCF
 ```
 
 ---
@@ -86,6 +88,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 - 🔒 **Private.** Nothing is uploaded. Scores stay in your own browser.
 - ✏️ **Set your own problems.** Many games let you type in your own numbers: look for **"Mine"** or **"My numbers"**.
 - 🔇 **Sensory friendly.** In HCF Tricks, sound and animations start **off**. Turn them on with the buttons at the top.
+- 🗣️ **Explained out loud.** In Divisibility Detective, a wrong answer replays the trick step by step in a slow voice. Open **⚙️ Grown-ups** to set the number size, the voice speed and which rules Basket Sort uses.
 - 🧩 **Kumon friendly.** GCF Quest starts with 12 and 18, the same numbers as Kumon D200b. Type in **"My numbers"** to practise any pair up to 100.
 - ⭐ **Shared stickers.** Stars from Trace with Buddy and Munchy's Letter Sounds add up to the same sticker book.
 - 🎙️ **Your voice, your accent.** In Munchy's Letter Sounds, open **⚙️ Grown-ups** to pick which letters to practise and to record each letter sound yourself.
