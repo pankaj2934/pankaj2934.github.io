@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="High Five Hop: learn to count by 5s with high-five hands, a hopping frog, a number train and a counting chart. Read aloud for young kids.">
+<meta name="theme-color" content="#C9F2D6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>High Five Hop</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%96%90%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2B2550; --bg1:#C9F2D6; --bg2:#FFF1B8; --paper:#FFFDF6; --purple:#7C5CFF; --yellow:#FFD23F; --pink:#FF6FA8; --green:#2ECC71; --blue:#4BA3E3; --red:#E8453C;
+  --fd:'Baloo 2','Comic Sans MS',system-ui,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{font-family:var(--fd);color:var(--ink);background:linear-gradient(160deg,var(--bg1),var(--bg2)) fixed;min-height:100vh;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-action:manipulation}
+[hidden]{display:none!important}
+
+.screen{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:max(8px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));max-width:720px;margin:0 auto}
+.bar{display:flex;align-items:center;gap:8px;flex:none}
+.rbtn{width:52px;height:52px;flex:none;border-radius:16px;background:#fff;border:3.5px solid var(--ink);box-shadow:0 4px 0 var(--ink);font-size:1.6rem;display:grid;place-items:center}
+.rbtn:active,.tile:active,.bigbtn:active,.choice:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.bar .mid{flex:1;min-width:0;text-align:center;font-weight:800;font-size:1.3rem;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stars{display:flex;align-items:center;gap:4px;background:#fff;border:3.5px solid var(--ink);border-radius:999px;padding:4px 12px;font-weight:800;font-size:1.25rem;box-shadow:0 4px 0 var(--ink);flex:none}
+.stars.bump{animation:bump .5s}
+@keyframes bump{40%{transform:scale(1.3)}}
+
+/* home */
+.home-hero{text-align:center;margin:8px 0 4px}
+.home-hero .big{font-size:4.2rem;line-height:1;display:inline-block;animation:wave 1.6s ease-in-out infinite;transform-origin:70% 90%}
+.home-hero h1{margin:2px 0 0;font-size:clamp(1.7rem,8vw,2.4rem);line-height:1.1}
+.home-hero p{margin:2px 0 0;font-weight:700;opacity:.75}
+@keyframes wave{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+.sets{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.tile{background:#fff;border:4px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);padding:12px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:800;font-size:1.25rem;min-height:128px}
+.tile .ico{font-size:2.9rem;line-height:1.1}
+.tile .sub{font-size:.85rem;font-weight:700;opacity:.7}
+.sets .tile:nth-child(1){background:#FFE3EE} .sets .tile:nth-child(2){background:#DFF7E8} .sets .tile:nth-child(3){background:#DDF1FF} .sets .tile:nth-child(4){background:#E6E0FF}
+.levelrow{display:flex;justify-content:center;gap:10px;margin-top:16px}
+.lv{background:#fff;border:3.5px solid var(--ink);border-radius:999px;padding:6px 16px;font-weight:800;font-size:1.1rem;box-shadow:0 3px 0 var(--ink)}
+.lv.on{background:var(--yellow)}
+.grownrow{display:flex;justify-content:center;gap:10px;margin-top:12px;font-weight:700}
+.grownrow button{background:rgba(255,255,255,.7);border:2.5px solid var(--ink);border-radius:999px;padding:4px 12px}
+
+/* shared */
+.panel{background:var(--paper);border:4px solid var(--ink);border-radius:26px;box-shadow:0 6px 0 var(--ink);padding:14px 12px;margin-top:10px;position:relative}
+.ask{text-align:center;font-weight:800;font-size:clamp(1.35rem,6vw,1.8rem);line-height:1.15;margin:4px 0 8px}
+.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.choice{background:#fff;border:4px solid var(--ink);border-radius:22px;box-shadow:0 5px 0 var(--ink);font-weight:800;font-size:clamp(2rem,10vw,2.8rem);padding:6px 0;min-height:84px}
+.choice.ok{background:var(--green);color:#fff}
+.choice.no{background:#FFD6D6;animation:shake .45s}
+.choice.glow{animation:glow 1s ease-in-out infinite}
+.choice:disabled{opacity:.45}
+.choice.ok:disabled{opacity:1}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes glow{50%{transform:scale(1.08);background:#FFE066}}
+@keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+.say{min-height:2.6em;text-align:center;font-weight:800;font-size:1.25rem;margin-top:10px;line-height:1.25}
+.bigbtn{height:60px;padding:0 22px;border-radius:18px;background:#fff;border:3.5px solid var(--ink);box-shadow:0 4px 0 var(--ink);font-size:1.4rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.bigbtn.yellow{background:var(--yellow)}
+.center{text-align:center}
+
+/* high fives */
+.hands{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;justify-items:center}
+.hand{position:relative;width:100%;min-width:0;padding:0;aspect-ratio:1/1.15;border-radius:18px;background:#fff;border:3px dashed #C8C2E0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:clamp(2.1rem,11vw,3.2rem);line-height:1;transition:transform .2s}
+.hand .n{font-size:1.05rem;font-weight:800;height:1.3em;line-height:1.3em;margin-top:2px}
+.hand.done{background:#FFF1B8;border:3px solid var(--ink);animation:pop .35s}
+.hand.lit{transform:scale(1.15);background:var(--yellow)}
+
+/* frog */
+.pond{position:relative;height:190px;overflow-x:auto;overflow-y:hidden;background:linear-gradient(#BDE6FF,#8FD0F5);border:4px solid var(--ink);border-radius:26px;box-shadow:0 6px 0 var(--ink);margin-top:10px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.track{position:relative;height:100%}
+.pad{position:absolute;bottom:22px;width:76px;height:44px;margin-left:-38px;border-radius:50%;background:#3DBB63;border:3px solid #1F7A3D;display:grid;place-items:center;font-weight:800;font-size:1.4rem;color:#fff}
+.pad.q{background:#9BDDAE;color:var(--ink)}
+.pad.goal::after{content:'🏁';position:absolute;top:-34px;font-size:1.6rem}
+.frog{position:absolute;bottom:52px;margin-left:-28px;font-size:3.4rem;line-height:1;transition:left .55s ease-in-out;z-index:2}
+.frog.hop{animation:hop .55s ease-in-out}
+@keyframes hop{50%{transform:translateY(-70px) rotate(-10deg)}}
+.trail{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;min-height:38px}
+.trail span{background:#fff;border:3px solid var(--ink);border-radius:12px;padding:0 10px;font-weight:800;font-size:1.2rem;animation:pop .35s}
+.steps5{display:flex;justify-content:center;gap:6px;margin-top:6px;min-height:46px}
+.steps5 span{width:44px;height:44px;border-radius:50%;background:#fff;border:3px solid var(--ink);display:grid;place-items:center;font-weight:800;font-size:1.15rem;animation:pop .3s}
+.steps5 span.last{background:var(--yellow)}
+
+/* train */
+.train{display:flex;align-items:flex-end;justify-content:center;gap:4px;margin:10px 0 0;flex-wrap:nowrap}
+.loco{font-size:clamp(2.6rem,12vw,3.6rem);line-height:1;transform:scaleX(-1)}
+.car{width:clamp(50px,15vw,74px);height:clamp(54px,15vw,70px);border:3.5px solid var(--ink);border-radius:12px 12px 6px 6px;display:grid;place-items:center;font-weight:800;font-size:clamp(1.35rem,6.5vw,2rem);position:relative;margin-bottom:12px}
+.car::before,.car::after{content:'';position:absolute;bottom:-14px;width:16px;height:16px;border-radius:50%;background:var(--ink)}
+.car::before{left:8px} .car::after{right:8px}
+.car.q{background:#fff;border-style:dashed;animation:glow 1.2s ease-in-out infinite}
+.train.go{animation:chug 1.4s ease-in forwards}
+@keyframes chug{to{transform:translateX(120vw)}}
+
+/* chart */
+.chart{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px}
+.cell{aspect-ratio:1;min-width:0;padding:0;border-radius:10px;background:#fff;border:2px solid #D8D3EA;display:grid;place-items:center;font-weight:800;font-size:clamp(.85rem,3.9vw,1.25rem);transition:all .2s}
+.cell.five{border-color:var(--ink)}
+.cell.lit{background:var(--yellow);transform:scale(1.15);z-index:1;position:relative}
+.cell.seen{background:#FFE3EE}
+.cell.col5{box-shadow:0 0 0 3px var(--pink)} .cell.col0{box-shadow:0 0 0 3px var(--blue)}
+.chartbtns{display:flex;justify-content:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+
+/* sticker overlay */
+.overlay{position:fixed;inset:0;background:rgba(43,37,80,.6);display:grid;place-items:center;z-index:50;padding:16px}
+.celebrate{background:#fff;border:5px solid var(--ink);border-radius:30px;padding:20px;text-align:center;animation:pop .5s;width:100%;max-width:340px}
+.celebrate .sticker{font-size:6.5rem;line-height:1.1;animation:spin 1.1s ease-out}
+.celebrate h2{margin:4px 0 12px;font-size:1.8rem}
+@keyframes spin{0%{transform:scale(0) rotate(-200deg)}100%{transform:scale(1) rotate(0)}}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+@media (min-width:560px){ .sets{grid-template-columns:repeat(4,1fr)} }
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<!-- HOME -->
+<section class="screen" id="s-home">
+  <div class="bar"><div class="mid"></div><div class="stars"><span aria-hidden="true">⭐</span><span class="sn">0</span></div></div>
+  <div class="home-hero"><span class="big" aria-hidden="true">🖐️</span><h1>High Five Hop</h1><p id="hello">Let's count by 5s!</p></div>
+  <div class="sets">
+    <button class="tile" data-go="hands"><span class="ico">🖐️</span>High Fives<span class="sub">count the fingers</span></button>
+    <button class="tile" data-go="frog"><span class="ico">🐸</span>Frog Hop<span class="sub">hop 5 at a time</span></button>
+    <button class="tile" data-go="train"><span class="ico">🚂</span>Number Train<span class="sub">find the missing car</span></button>
+    <button class="tile" data-go="chart"><span class="ico">🌟</span>Count with Me<span class="sub">watch the pattern</span></button>
+  </div>
+  <div class="levelrow">
+    <button class="lv" data-max="50">Up to 50</button>
+    <button class="lv" data-max="100">Up to 100</button>
+  </div>
+  <div class="grownrow"><button id="voiceBtn">🔊 Voice on</button><button id="speedBtn">🐢 Slow voice</button></div>
+</section>
+
+<!-- HIGH FIVES -->
+<section class="screen" id="s-hands" hidden>
+  <div class="bar"><button class="rbtn" data-act="home" aria-label="Home">🏠</button><div class="mid">🖐️ High Fives</div><div class="stars"><span aria-hidden="true">⭐</span><span class="sn">0</span></div></div>
+  <div class="panel">
+    <div class="ask" id="hAsk">Tap each hand and count by 5!</div>
+    <div class="hands" id="hands"></div>
+    <div class="choices" id="hChoices" hidden></div>
+    <div class="say" id="hSay"></div>
+  </div>
+</section>
+
+<!-- FROG HOP -->
+<section class="screen" id="s-frog" hidden>
+  <div class="bar"><button class="rbtn" data-act="home" aria-label="Home">🏠</button><div class="mid">🐸 Frog Hop</div><div class="stars"><span aria-hidden="true">⭐</span><span class="sn">0</span></div></div>
+  <div class="pond" id="pond"><div class="track" id="track"><div class="frog" id="frog">🐸</div></div></div>
+  <div class="panel">
+    <div class="ask" id="fAsk">Where does Froggy hop next?</div>
+    <div class="steps5" id="steps5"></div>
+    <div class="choices" id="fChoices"></div>
+    <div class="say" id="fSay"></div>
+    <div class="trail" id="trail"></div>
+  </div>
+</section>
+
+<!-- NUMBER TRAIN -->
+<section class="screen" id="s-train" hidden>
+  <div class="bar"><button class="rbtn" data-act="home" aria-label="Home">🏠</button><div class="mid">🚂 Number Train</div><div class="stars"><span aria-hidden="true">⭐</span><span class="sn">0</span></div></div>
+  <div class="panel" style="overflow:hidden">
+    <div class="ask">Which number is missing?</div>
+    <div class="train" id="train"></div>
+    <div class="choices" id="tChoices"></div>
+    <div class="say" id="tSay"></div>
+  </div>
+</section>
+
+<!-- COUNT WITH ME -->
+<section class="screen" id="s-chart" hidden>
+  <div class="bar"><button class="rbtn" data-act="home" aria-label="Home">🏠</button><div class="mid">🌟 Count with Me</div><div class="stars"><span aria-hidden="true">⭐</span><span class="sn">0</span></div></div>
+  <div class="panel">
+    <div class="ask" id="cAsk">Count by 5s with me!</div>
+    <div class="chart" id="chart"></div>
+    <div class="say" id="cSay"></div>
+    <div class="chartbtns">
+      <button class="bigbtn yellow" id="cPlay">▶ Count</button>
+      <button class="bigbtn" id="cTap">👆 You tap!</button>
+    </div>
+  </div>
+</section>
+
+<div class="overlay" id="celebrate" hidden>
+  <div class="celebrate">
+    <div class="sticker" id="cSticker">🦄</div>
+    <h2>New sticker!</h2>
+    <button class="bigbtn yellow" id="cOk" style="width:100%">Yay! ▶</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const rand = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const restart = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+const STICKERS = ['🦄','🐲','🦖','🐙','🦋','🐳','🦁','🐼','🐸','🚀','🌈','🍩','🦕','🐬','🦜','🐞','🌟','🎈','🦒','🐯','🚒','🏎️','🦀','🐧','🍦','🎸','🐨','🦩','🛸','🏰'];
+const COLORS = ['#E8453C','#F28C28','#E0B000','#2EAA4F','#1E90D6','#7C5CFF','#D63AA8'];
+const CAR_COLORS = ['#FFB3C7','#FFE08A','#B8F0C8','#B9E1FF','#D9CCFF','#FFD0A8'];
+
+/* Same keys as Munchy's Letter Sounds and Trace with Buddy, so stars and stickers are shared. */
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('phx_' + k); return v === null ? d : JSON.parse(v); } catch (e){ return d; } },
+  set(k, v){ try { localStorage.setItem('phx_' + k, JSON.stringify(v)); } catch (e){} }
+};
+const own = {
+  get(k, d){ try { const v = localStorage.getItem('c5_' + k); return v === null ? d : JSON.parse(v); } catch (e){ return d; } },
+  set(k, v){ try { localStorage.setItem('c5_' + k, JSON.stringify(v)); } catch (e){} }
+};
+const S = { name: store.get('name', 'Kiyansh'), rate: store.get('rate', 0.85), stars: store.get('stars', 0), stickers: store.get('stickers', []),
+  max: own.get('max', 50), voice: own.get('voice', true) };
+
+/* ---------- voice ---------- */
+const canSpeak = 'speechSynthesis' in window;
+let voice = null, talkId = 0;
+function pickVoice(){
+  if (!canSpeak) return;
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v => /en[-_]US/i.test(v.lang) && /Samantha|Google US|Aria|Jenny|Ava|Allison/i.test(v.name)) || vs.find(v => /en[-_]US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+}
+if (canSpeak){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function sayOne(text){
+  return new Promise(res => {
+    if (!S.voice || !canSpeak || !text) return setTimeout(res, S.voice ? 0 : 250 + text.length * 25);
+    const u = new SpeechSynthesisUtterance(text); if (voice) u.voice = voice;
+    u.lang = 'en-US'; u.rate = S.rate; u.pitch = 1.15;
+    let done = false; const fin = () => { if (!done){ done = true; res(); } };
+    u.onend = fin; u.onerror = fin; setTimeout(fin, 1200 + text.length * 120 / S.rate);
+    speechSynthesis.speak(u);
+  });
+}
+function hush(){ talkId++; try { if (canSpeak) speechSynthesis.cancel(); } catch (e){} }
+/* says each part in turn; a newer talk() cancels an older one */
+async function talk(...parts){
+  hush(); const id = talkId; await sleep(60);
+  for (const p of parts){ if (id !== talkId) return false; await sayOne(p); }
+  return id === talkId;
+}
+
+/* ---------- little sounds ---------- */
+let actx = null;
+function sfx(kind){
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const now = actx.currentTime;
+    const tone = (f, t, d, type = 'sine', v = .12) => { const o = actx.createOscillator(), g = actx.createGain(); o.type = type; o.frequency.value = f; g.gain.setValueAtTime(.0001, now + t); g.gain.exponentialRampToValueAtTime(v, now + t + .02); g.gain.exponentialRampToValueAtTime(.0001, now + t + d); o.connect(g); g.connect(actx.destination); o.start(now + t); o.stop(now + t + d + .05); };
+    if (kind === 'clap') { tone(1200, 0, .04, 'square', .05); tone(700, .02, .06, 'triangle', .08); }
+    else if (kind === 'boing') { tone(300, 0, .12, 'sine', .1); tone(520, .08, .16, 'sine', .1); }
+    else if (kind === 'yay') [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .1, .28, 'triangle'));
+    else if (kind === 'boop') tone(260, 0, .18, 'sine', .08);
+    else if (kind === 'toot') { tone(392, 0, .25, 'sawtooth', .05); tone(523, .25, .35, 'sawtooth', .05); }
+  } catch (e){}
+}
+
+/* ---------- stars, stickers, confetti ---------- */
+function renderStars(){ $$('.sn').forEach(e => { e.textContent = S.stars; }); }
+async function addStar(){
+  S.stars++; store.set('stars', S.stars); renderStars(); $$('.stars').forEach(e => restart(e, 'bump'));
+  if (S.stars % 5 !== 0) return;
+  const fresh = STICKERS.filter(x => !S.stickers.includes(x)), st = fresh.length ? pick(fresh) : pick(STICKERS);
+  S.stickers.push(st); store.set('stickers', S.stickers);
+  await new Promise(res => {
+    $('#cSticker').textContent = st; $('#celebrate').hidden = false; confetti(); sfx('yay');
+    talk(`Five stars! A new sticker for ${S.name}!`);
+    $('#cOk').onclick = () => { $('#celebrate').hidden = true; hush(); res(); };
+  });
+}
+const cv = $('#confetti'), cx = cv.getContext('2d'); let bits = [], raf = null;
+function confetti(){
+  const dpr = devicePixelRatio || 1; cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  for (let i = 0; i < 110; i++) bits.push({ x: innerWidth / 2, y: innerHeight * .45, vx: (Math.random() - .5) * 13, vy: -Math.random() * 12 - 4, s: 7 + Math.random() * 7, r: Math.random() * 6, c: pick(COLORS), life: 0 });
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function tick(){
+  cx.clearRect(0, 0, innerWidth, innerHeight);
+  for (const p of bits){ p.vy += .35; p.x += p.vx; p.y += p.vy; p.r += .1; p.life++; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); cx.restore(); }
+  bits = bits.filter(p => p.y < innerHeight + 40 && p.life < 220);
+  raf = bits.length ? requestAnimationFrame(tick) : null;
+  if (!raf) cx.clearRect(0, 0, innerWidth, innerHeight);
+}
+
+/* ---------- screens ---------- */
+let screenId = 0;
+function go(name){
+  hush(); screenId++;
+  $$('.screen').forEach(s => { s.hidden = s.id !== 's-' + name; });
+  scrollTo(0, 0);
+  ({ home, hands: handsRound, frog: frogStart, train: trainRound, chart: chartStart })[name]();
+}
+$$('[data-go]').forEach(b => { b.onclick = () => go(b.dataset.go); });
+$$('[data-act="home"]').forEach(b => { b.onclick = () => go('home'); });
+
+/* three choices: the answer plus two near misses (5 off, or 1 off) */
+function makeChoices(ans, box, onPick, skip = []){
+  const pool = shuffle([ans + 5, ans - 5, ans + 1, ans - 1, ans + 10, ans + 2, ans - 2].filter(x => x > 0 && x !== ans && !skip.includes(x)));
+  const opts = shuffle([ans, pool[0], pool[1]]);
+  box.innerHTML = '';
+  opts.forEach(v => {
+    const b = document.createElement('button'); b.className = 'choice'; b.textContent = v; b.dataset.v = v;
+    b.onclick = () => onPick(v, b);
+    box.appendChild(b);
+  });
+}
+const numsUpTo = n => Array.from({ length: n / 5 }, (_, i) => (i + 1) * 5);
+
+/* =================== HOME =================== */
+function paintHome(){
+  $$('.lv').forEach(b => b.classList.toggle('on', +b.dataset.max === S.max));
+  $('#voiceBtn').textContent = S.voice ? '🔊 Voice on' : '🔇 Voice off';
+  $('#speedBtn').textContent = S.rate < 0.8 ? '🐌 Extra slow' : '🐢 Slow voice';
+}
+function home(){ $('#hello').textContent = `Let's count by 5s, ${S.name}!`; paintHome(); }
+$$('.lv').forEach(b => { b.onclick = () => { S.max = +b.dataset.max; own.set('max', S.max); paintHome(); talk(`Up to ${S.max}!`); }; });
+$('#voiceBtn').onclick = () => { S.voice = !S.voice; own.set('voice', S.voice); paintHome(); if (S.voice) talk('Voice on!'); else hush(); };
+$('#speedBtn').onclick = () => { S.rate = S.rate < 0.8 ? 0.85 : 0.7; store.set('rate', S.rate); paintHome(); talk('5, 10, 15, 20.'); };
+
+/* =================== HIGH FIVES ===================
+   Tap each hand: 5, 10, 15... then pick how many fingers in all. */
+function handsRound(){
+  const my = screenId, n = S.max > 50 ? rand(4, 20) : rand(2, 10);
+  const box = $('#hands'), ch = $('#hChoices'), say = $('#hSay');
+  box.innerHTML = ''; ch.hidden = true; say.textContent = '';
+  $('#hAsk').textContent = 'Tap each hand and count by 5!';
+  let count = 0;
+  const hands = [];
+  for (let i = 0; i < n; i++){
+    const h = document.createElement('button'); h.className = 'hand'; h.innerHTML = '🖐️<span class="n"></span>';
+    h.setAttribute('aria-label', 'Hand with 5 fingers');
+    h.onclick = () => {
+      if (h.classList.contains('done')) return;
+      count += 5; h.classList.add('done'); h.querySelector('.n').textContent = count; sfx('clap');
+      say.textContent = count; talk(String(count));
+      if (hands.every(x => x.classList.contains('done'))) setTimeout(() => { if (my === screenId) askFingers(); }, 900);
+    };
+    hands.push(h); box.appendChild(h);
+  }
+  talk(`Tap each hand. Every hand has 5 fingers. Count by 5!`);
+
+  function askFingers(){
+    const ans = n * 5;
+    $('#hAsk').textContent = `How many fingers in all?`;
+    say.textContent = '';
+    hands.forEach(h => { h.querySelector('.n').textContent = ''; });
+    ch.hidden = false;
+    talk(`${n} hands. How many fingers in all?`);
+    let tries = 0;
+    makeChoices(ans, ch, async (v, b) => {
+      if (v === ans){
+        $$('#hChoices .choice').forEach(x => { x.disabled = true; x.classList.remove('glow'); });
+        b.classList.add('ok'); sfx('yay'); confetti();
+        say.textContent = `Yes! ${ans} fingers! 🙌`;
+        await talk(`Yes! ${ans} fingers! High five!`);
+        if (my !== screenId) return;
+        if (tries === 0) await addStar();
+        if (my === screenId) setTimeout(() => { if (my === screenId) handsRound(); }, 600);
+        return;
+      }
+      tries++; b.classList.add('no'); b.disabled = true; sfx('boop');
+      $$('#hChoices .choice').forEach(x => { x.disabled = true; });
+      say.textContent = `Let's count together!`;
+      // count the hands again, slowly, lighting each one
+      if (!(await talk(`Not quite. Let's count together.`))) return;
+      for (let i = 0; i < hands.length; i++){
+        if (my !== screenId) return;
+        hands[i].classList.add('lit'); hands[i].querySelector('.n').textContent = (i + 1) * 5; say.textContent = (i + 1) * 5;
+        sfx('clap');
+        await talk(String((i + 1) * 5));
+        await sleep(250);
+        hands[i].classList.remove('lit');
+      }
+      if (my !== screenId) return;
+      say.textContent = `${n} hands make ${ans}! Tap ${ans}.`;
+      await talk(`${n} hands make ${ans} fingers. Tap ${ans}.`);
+      $$('#hChoices .choice').forEach(x => { if (!x.classList.contains('no')) x.disabled = false; if (+x.dataset.v === ans) x.classList.add('glow'); });
+    });
+  }
+}
+
+/* =================== FROG HOP ===================
+   Froggy hops along lily pads 0, 5, 10 ... to the flag. */
+const PAD_GAP = 96;
+let F = null;
+function frogStart(){
+  F = { pos: 0, slips: 0 };
+  const track = $('#track'), last = S.max;
+  $$('#track .pad').forEach(p => p.remove());
+  track.style.width = (last / 5 + 1) * PAD_GAP + 60 + 'px';
+  for (let v = 0; v <= last; v += 5){
+    const p = document.createElement('div');
+    p.className = 'pad' + (v === 0 ? '' : ' q') + (v === last ? ' goal' : '');
+    p.style.left = (v / 5) * PAD_GAP + 54 + 'px';
+    p.dataset.v = v; p.textContent = v === 0 ? '0' : '?';
+    track.appendChild(p);
+  }
+  $('#trail').innerHTML = '<span>0</span>';
+  placeFrog(false);
+  talk(`Froggy hops 5 at a time. Help Froggy hop to ${last}!`);
+  frogAsk();
+}
+function placeFrog(anim){
+  const fr = $('#frog'), x = (F.pos / 5) * PAD_GAP + 54;
+  fr.style.left = x + 'px';
+  if (anim) restart(fr, 'hop');
+  const pond = $('#pond'); pond.scrollLeft = Math.max(0, x - pond.clientWidth / 2 + 40);
+}
+function frogAsk(){
+  const my = screenId, ans = F.pos + 5, say = $('#fSay');
+  $('#fAsk').textContent = `Froggy is on ${F.pos}. Hop 5 more!`;
+  $('#steps5').innerHTML = ''; say.textContent = '';
+  makeChoices(ans, $('#fChoices'), async (v, b) => {
+    if (v === ans){
+      $$('#fChoices .choice').forEach(x => { x.disabled = true; x.classList.remove('glow'); });
+      b.classList.add('ok'); sfx('boing');
+      F.pos = ans;
+      const pad = $(`#track .pad[data-v="${ans}"]`); pad.textContent = ans; pad.classList.remove('q');
+      placeFrog(true);
+      const t = document.createElement('span'); t.textContent = ans; $('#trail').appendChild(t);
+      say.textContent = ans;
+      await talk(String(ans));
+      if (my !== screenId) return;
+      if (F.pos >= S.max){
+        sfx('yay'); confetti();
+        say.textContent = `Froggy made it to ${S.max}! 🏁`;
+        await talk(`Hooray! Froggy made it to ${S.max}! Let's say it all: ` + numsUpTo(S.max).join(', '));
+        if (my !== screenId) return;
+        await addStar();
+        if (my !== screenId) return;
+        $('#fChoices').innerHTML = '';
+        const again = document.createElement('button'); again.className = 'bigbtn yellow'; again.textContent = '🔁 Hop again';
+        again.onclick = frogStart; $('#fChoices').appendChild(again); again.style.gridColumn = '1 / -1';
+        return;
+      }
+      // every 5 good hops (in a row) earns a star along the way
+      if (F.slips === 0 && (F.pos / 5) % 5 === 0) await addStar();
+      if (my === screenId) frogAsk();
+      return;
+    }
+    F.slips++; b.classList.add('no'); b.disabled = true; sfx('boop');
+    $$('#fChoices .choice').forEach(x => { x.disabled = true; });
+    // show the 5 little steps: 16, 17, 18, 19, 20
+    const st = $('#steps5'); st.innerHTML = '';
+    if (!(await talk(`Oops, splash! Let's count 5 more from ${F.pos}.`))) return;
+    for (let k = 1; k <= 5; k++){
+      if (my !== screenId) return;
+      const s = document.createElement('span'); s.textContent = F.pos + k; if (k === 5) s.className = 'last'; st.appendChild(s);
+      await talk(String(F.pos + k));
+    }
+    if (my !== screenId) return;
+    say.textContent = `${F.pos} and 5 more is ${ans}!`;
+    await talk(`${F.pos}, and 5 more, is ${ans}. Tap ${ans}.`);
+    $$('#fChoices .choice').forEach(x => { if (!x.classList.contains('no')) x.disabled = false; if (+x.dataset.v === ans) x.classList.add('glow'); });
+  });
+}
+
+/* =================== NUMBER TRAIN ===================
+   Four cars counting by 5, one of them is missing. */
+let trainRight = 0;
+function trainRound(){
+  const my = screenId, len = 4;
+  const start = rand(0, S.max / 5 - len) * 5 + 5;
+  const nums = Array.from({ length: len }, (_, i) => start + i * 5);
+  const gap = rand(1, len - 1), ans = nums[gap];
+  const tr = $('#train'), say = $('#tSay');
+  tr.classList.remove('go'); tr.innerHTML = '<span class="loco">🚂</span>';
+  nums.forEach((v, i) => {
+    const c = document.createElement('div'); c.className = 'car' + (i === gap ? ' q' : '');
+    c.style.background = i === gap ? '#fff' : CAR_COLORS[i % CAR_COLORS.length];
+    c.textContent = i === gap ? '?' : v; tr.appendChild(c);
+  });
+  say.textContent = '';
+  let missed = false;
+  talk(nums.map((v, i) => i === gap ? 'what' : String(v)).join(', ') + '?');
+  makeChoices(ans, $('#tChoices'), async (v, b) => {
+    if (v === ans){
+      $$('#tChoices .choice').forEach(x => { x.disabled = true; x.classList.remove('glow'); });
+      b.classList.add('ok'); sfx('toot');
+      const car = tr.children[gap + 1]; car.textContent = ans; car.classList.remove('q'); car.style.background = CAR_COLORS[gap % CAR_COLORS.length];
+      say.textContent = nums.join(', ') + ' 🎉';
+      await talk(nums.join(', ') + '!');
+      if (my !== screenId) return;
+      tr.classList.add('go');
+      if (!missed && ++trainRight % 3 === 0) await addStar();
+      await sleep(1200);
+      if (my === screenId) trainRound();
+      return;
+    }
+    missed = true;
+    b.classList.add('no'); b.disabled = true; sfx('boop');
+    $$('#tChoices .choice').forEach(x => { x.disabled = true; });
+    const before = gap > 0 ? nums[gap - 1] : null;
+    say.textContent = `${before} and 5 more is…`;
+    if (!(await talk(`Not quite. Let's check. ${before}, and 5 more…`))) return;
+    for (let k = 1; k <= 5; k++){ if (my !== screenId) return; say.textContent = `${before} → ${before + k}`; await talk(String(before + k)); }
+    if (my !== screenId) return;
+    say.textContent = `${before} and 5 more is ${ans}!`;
+    await talk(`is ${ans}. Tap ${ans}.`);
+    $$('#tChoices .choice').forEach(x => { if (!x.classList.contains('no')) x.disabled = false; if (+x.dataset.v === ans) x.classList.add('glow'); });
+  }, nums);
+}
+
+/* =================== COUNT WITH ME ===================
+   A number chart. Play lights up the 5s while we count;
+   "You tap" lets him find them himself. */
+let tapMode = false, tapNext = 5, playStar = false;
+function chartStart(){
+  const ch = $('#chart'); ch.innerHTML = '';
+  for (let i = 1; i <= S.max; i++){
+    const c = document.createElement('button'); c.className = 'cell' + (i % 5 === 0 ? ' five' : ''); c.textContent = i; c.dataset.v = i;
+    c.onclick = () => cellTap(i, c);
+    ch.appendChild(c);
+  }
+  tapMode = false; playStar = false;
+  $('#cAsk').textContent = 'Count by 5s with me!';
+  $('#cSay').textContent = 'Tap ▶ Count to start.';
+  talk('Count by 5s with me! Tap the Count button.');
+}
+async function chartPlay(){
+  const my = ++screenId; tapMode = false;
+  $$('.cell').forEach(c => c.classList.remove('lit', 'seen', 'col5', 'col0'));
+  $('#cAsk').textContent = 'Count by 5s with me!';
+  for (const v of numsUpTo(S.max)){
+    if (my !== screenId) return;
+    const c = $(`.cell[data-v="${v}"]`); c.classList.add('lit'); $('#cSay').textContent = v;
+    c.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    sfx('clap');
+    await talk(String(v));
+    c.classList.remove('lit'); c.classList.add('seen');
+  }
+  if (my !== screenId) return;
+  // show the pattern: the 5s are in two columns, ending in 5 or 0
+  $$('.cell').forEach(c => { const v = +c.dataset.v; if (v % 10 === 5) c.classList.add('col5'); else if (v % 10 === 0) c.classList.add('col0'); });
+  $('#cSay').innerHTML = 'Look! They all end in <b style="color:#FF6FA8">5</b> or <b style="color:#4BA3E3">0</b>!';
+  await talk('Look! When we count by 5s, the numbers end in 5, or 0. 5, 0, 5, 0!');
+  if (my !== screenId || playStar) return;
+  playStar = true; addStar();
+}
+function chartTapMode(){
+  screenId++; hush(); tapMode = true; tapNext = 5;
+  $$('.cell').forEach(c => c.classList.remove('lit', 'seen', 'col5', 'col0'));
+  $('#cAsk').textContent = 'Tap the 5s in order!';
+  $('#cSay').textContent = 'Start with 5.';
+  talk('Your turn! Tap the numbers when we count by 5. Start with 5.');
+}
+async function cellTap(v, c){
+  if (!tapMode){ talk(String(v)); return; }
+  if (v === tapNext){
+    c.classList.add('seen'); sfx('clap'); $('#cSay').textContent = v;
+    tapNext += 5;
+    if (tapNext > S.max){
+      tapMode = false; sfx('yay'); confetti();
+      $('#cSay').textContent = `You counted to ${S.max} by 5s! 🌟`;
+      await talk(`Amazing! You counted all the way to ${S.max} by 5s!`);
+      addStar();
+    } else talk(String(v));
+    return;
+  }
+  if (c.classList.contains('seen')) return;
+  sfx('boop'); restart(c, 'lit'); setTimeout(() => c.classList.remove('lit'), 400);
+  const prev = tapNext - 5;
+  $('#cSay').textContent = prev ? `After ${prev}, count 5 more: ${tapNext}!` : 'We start at 5!';
+  const glow = $(`.cell[data-v="${tapNext}"]`); restart(glow, 'lit'); setTimeout(() => glow.classList.remove('lit'), 1500);
+  talk(prev ? `Not ${v}. After ${prev}, count 5 more. ${tapNext}!` : `Not ${v}. We start at 5!`);
+}
+$('#cPlay').onclick = chartPlay;
+$('#cTap').onclick = chartTapMode;
+
+renderStars();
+go('home');
+</script>
+</body>
+</html>
