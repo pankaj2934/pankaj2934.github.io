@@ -7,7 +7,7 @@
 No sign-up. No ads. Nothing to install. Open a link and play.
 
 [![Play now](https://img.shields.io/badge/▶_Play_now-pankaj2934.github.io-F5B301?style=for-the-badge)](https://pankaj2934.github.io/)
-![Pages](https://img.shields.io/badge/games-18-2F80ED?style=for-the-badge)
+![Pages](https://img.shields.io/badge/games-19-2F80ED?style=for-the-badge)
 ![Works on](https://img.shields.io/badge/works_on-phone_·_tablet_·_laptop-1F9D63?style=for-the-badge)
 
 </div>
@@ -18,6 +18,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 
 | | Game | What you learn |
 |:-:|---|---|
+| 🖐️ | **[High Five Hop](https://pankaj2934.github.io/count5.html)** | Made for Kiyansh. Count by 5s to 50 or 100: tap high-five hands, help a frog hop lily pads, fix the number train and watch the 5s light up on a counting chart. Everything is read aloud. |
 | 🔍 | **[Divisibility Detective](https://pankaj2934.github.io/divide.html)** | Check whether a number divides by 2, 3, 4, 5, 6, 9 or 10 (plus bonus 8 and 11) using tricks instead of long division. Wrong answers are explained step by step, read aloud slowly. |
 | 🧩 | **[GCF Quest](https://pankaj2934.github.io/gcf.html)** | Made for Aadvik's Kumon D200b page. Tap every factor of two numbers, spot the common factors, pop the **Greatest Common Factor** balloon, then reduce the fraction in one step. Plus a 10-question Quick Fire round. |
 | ✏️ | **[Trace with Buddy](https://pankaj2934.github.io/trace.html)** | Made for phones. Follow the ladybug with your finger to trace lines, shapes, a–z, A–Z and 0–9 in the right stroke order. |
@@ -37,6 +38,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 | 🔵 | [Count & Compare to 20](https://pankaj2934.github.io/greater20.html) | The same game with balls and bigger numbers. |
 | 🔢 | [Greater or Smaller?](https://pankaj2934.github.io/greaterconfigure.html) | A comparing quiz where grown-ups can set the number range. |
 | 🧺 | [Apple Compare](https://pankaj2934.github.io/pk.html) | A short version of the apple comparing game. |
+| 🖐️ | [High Five Hop](https://pankaj2934.github.io/count5.html) | Count by 5s. Every hand has 5 fingers, Froggy hops 5 at a time, and the chart shows that the 5s always end in 5 or 0. A wrong answer counts the 5 little steps out loud. |
 
 ### ✖️ Times tables
 
@@ -77,7 +79,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 ## 🧭 Learning path
 
 ```
-👾 Letter sounds  →  ✏️ Tracing  →  🍎 Count & Compare  →  ✖️ Times tables  →  ➗ Word problems  →  🍕 Fractions  →  🔍 Divisibility tricks  →  🕵️ Simplifying  →  🧩 GCF  →  🪜 HCF
+👾 Letter sounds  →  ✏️ Tracing  →  🍎 Count & Compare  →  🖐️ Count by 5s  →  ✖️ Times tables  →  ➗ Word problems  →  🍕 Fractions  →  🔍 Divisibility tricks  →  🕵️ Simplifying  →  🧩 GCF  →  🪜 HCF
 ```
 
 ---
@@ -90,7 +92,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 - 🔇 **Sensory friendly.** In HCF Tricks, sound and animations start **off**. Turn them on with the buttons at the top.
 - 🗣️ **Explained out loud.** In Divisibility Detective, a wrong answer replays the trick step by step in a slow voice. Open **⚙️ Grown-ups** to set the number size, the voice speed and which rules Basket Sort uses.
 - 🧩 **Kumon friendly.** GCF Quest starts with 12 and 18, the same numbers as Kumon D200b. Type in **"My numbers"** to practise any pair up to 100.
-- ⭐ **Shared stickers.** Stars from Trace with Buddy and Munchy's Letter Sounds add up to the same sticker book.
+- ⭐ **Shared stickers.** Stars from Trace with Buddy, Munchy's Letter Sounds and High Five Hop add up to the same sticker book.
 - 🎙️ **Your voice, your accent.** In Munchy's Letter Sounds, open **⚙️ Grown-ups** to pick which letters to practise and to record each letter sound yourself.
 
 ---
