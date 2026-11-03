@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<meta name="description" content="Hungry Hole: drag a hole around the park and swallow only the right things — letters, first sounds, numbers in order, colours and shapes. A learning game inspired by hole.io.">
+<meta name="description" content="Hungry Hole: a hole.io-style learning game. Eat everything in the park! The mission things (a letter, a first sound, the next number, a colour or a shape) make the hole grow super fast.">
 <meta name="theme-color" content="#7CCB6B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Hungry Hole</title>
@@ -25,7 +25,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-
 .screen{height:100vh;height:100dvh;display:flex;flex-direction:column;padding:max(8px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom));max-width:900px;margin:0 auto}
 .bar{display:flex;align-items:center;gap:8px;flex:none}
 .rbtn{width:50px;height:50px;flex:none;border-radius:16px;background:#fff;border:3.5px solid var(--ink);box-shadow:0 4px 0 var(--ink);font-size:1.5rem;display:grid;place-items:center}
-.rbtn:active,.tile:active,.bigbtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.rbtn:active,.tile:active,.bigbtn:active,.qbtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
 .stars{display:flex;align-items:center;gap:4px;background:#fff;border:3.5px solid var(--ink);border-radius:999px;padding:4px 12px;font-weight:800;font-size:1.2rem;box-shadow:0 4px 0 var(--ink);flex:none}
 .stars.bump{animation:bump .5s}
 @keyframes bump{40%{transform:scale(1.3)}}
@@ -36,7 +36,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-
 .hero .big{display:inline-block;width:110px;height:56px;border-radius:50%;background:radial-gradient(#000 55%,#3a2f6b 75%,#6a5aa8);box-shadow:0 6px 0 rgba(0,0,0,.15);animation:breathe 2s ease-in-out infinite}
 @keyframes breathe{50%{transform:scale(1.12,1.08)}}
 .hero h1{margin:4px 0 0;font-size:clamp(1.8rem,8vw,2.5rem);line-height:1.1}
-.hero p{margin:0;font-weight:700;opacity:.75}
+.hero p{margin:0;font-weight:700;opacity:.8;line-height:1.25}
 .play{display:block;margin:12px auto 4px;font-size:1.7rem;height:70px;padding:0 34px}
 .sets{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
 .tile{background:#fff;border:4px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);padding:10px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-weight:800;font-size:1.15rem;min-height:110px}
@@ -51,20 +51,38 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-
 
 /* game */
 .mission{flex:1;min-width:0;background:#fff;border:3.5px solid var(--ink);border-radius:18px;box-shadow:0 4px 0 var(--ink);padding:2px 10px;display:flex;align-items:center;gap:8px;height:50px}
-.mission .txt{flex:1;min-width:0;font-weight:800;font-size:1.15rem;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mission .chip{font-size:1.6rem;line-height:1;flex:none;font-weight:800}
+.mission .txt{flex:1;min-width:0;font-weight:800;font-size:1.12rem;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mission .chip{font-size:1.5rem;line-height:1;flex:none;font-weight:800}
 .mission .say{font-size:1.3rem;flex:none}
-.prog{height:14px;border-radius:99px;background:#fff;border:3px solid var(--ink);margin:8px 2px 0;overflow:hidden;flex:none}
+.progrow{display:flex;align-items:center;gap:8px;margin:8px 2px 0;flex:none}
+.prog{flex:1;height:14px;border-radius:99px;background:#fff;border:3px solid var(--ink);overflow:hidden}
 .prog i{display:block;height:100%;width:0;background:var(--green);transition:width .3s}
+.plabel{font-weight:800;font-size:.95rem;white-space:nowrap}
 .field{flex:1;min-height:0;position:relative;margin-top:8px;border:4px solid var(--ink);border-radius:26px;box-shadow:0 6px 0 var(--ink);overflow:hidden;background:var(--grass)}
 #cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
-.tip{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-weight:800;font-size:1.05rem;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35);pointer-events:none;transition:opacity .4s}
+.tip{position:absolute;left:8px;right:8px;bottom:10px;text-align:center;font-weight:800;font-size:1.05rem;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35);pointer-events:none;transition:opacity .4s;line-height:1.2}
 
 .overlay{position:fixed;inset:0;background:rgba(43,37,80,.6);display:grid;place-items:center;z-index:50;padding:16px}
-.pop{background:#fff;border:5px solid var(--ink);border-radius:30px;padding:20px;text-align:center;animation:pop .5s;width:100%;max-width:340px}
+.pop{background:#fff;border:5px solid var(--ink);border-radius:30px;padding:18px;text-align:center;animation:pop .5s;width:100%;max-width:380px;max-height:100%;overflow-y:auto}
 .pop .em{font-size:5.5rem;line-height:1.1}
-.pop h2{margin:4px 0 12px;font-size:1.7rem;line-height:1.15}
+.pop h2{margin:2px 0 8px;font-size:1.6rem;line-height:1.15}
 .pop .row{display:flex;flex-direction:column;gap:10px}
+.pop .q{font-weight:800;font-size:1.3rem;margin:8px 0 4px;line-height:1.2}
+.belly{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;background:#1a1533;border-radius:20px;padding:10px;margin:4px 0}
+.belly .it{aspect-ratio:1;display:grid;place-items:center;font-size:1.9rem;line-height:1;border-radius:12px;transition:transform .2s,background .2s}
+.belly .it.lit{background:var(--yellow);transform:scale(1.15)}
+.belly .bub{width:80%;height:80%;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:1.3rem;border:2px solid #fff}
+.belly .qm{color:#fff;font-weight:800;font-size:1.8rem}
+.belly.seq{grid-template-columns:repeat(4,1fr)}
+.qopts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.qbtn{background:#fff;border:4px solid var(--ink);border-radius:18px;box-shadow:0 5px 0 var(--ink);font-weight:800;font-size:2rem;min-height:70px}
+.qbtn.ok{background:var(--green);color:#fff}
+.qbtn.no{background:#FFD6D6;animation:shake .45s}
+.qbtn.glow{animation:glow 1s ease-in-out infinite}
+.qbtn:disabled{opacity:.45} .qbtn.ok:disabled{opacity:1}
+.qsay{min-height:1.5em;font-weight:800;font-size:1.15rem;margin-top:8px}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes glow{50%{transform:scale(1.08);background:#FFE066}}
 @keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
 @keyframes spin{0%{transform:scale(0) rotate(-200deg)}100%{transform:scale(1) rotate(0)}}
 .pop .em.spin{animation:spin 1.1s ease-out}
@@ -79,15 +97,15 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-
 <!-- HOME -->
 <section class="screen" id="s-home">
   <div class="bar"><div style="flex:1"></div><div class="stars"><span aria-hidden="true">⭐</span><span class="sn">0</span></div></div>
-  <div class="hero"><span class="big" aria-hidden="true"></span><h1>Hungry Hole</h1><p id="hello">Only eat the right things!</p></div>
+  <div class="hero"><span class="big" aria-hidden="true"></span><h1>Hungry Hole</h1><p id="hello">Eat everything!</p><p>⭐ Mission things make you grow super fast!</p></div>
   <button class="bigbtn yellow play" id="playBtn">▶ Play</button>
   <div class="sets">
-    <button class="tile" data-kind="letter"><span class="ico">🔤</span>Letters<span class="sub">eat the B's</span></button>
+    <button class="tile" data-kind="letter"><span class="ico">🔤</span>Letters<span class="sub">B's = super growth</span></button>
     <button class="tile" data-kind="sound"><span class="ico">🐍</span>First sounds<span class="sub">s… like snake</span></button>
     <button class="tile" data-kind="order"><span class="ico">🔢</span>Numbers<span class="sub">1, 2, 3… in order</span></button>
     <button class="tile" data-kind="five"><span class="ico">🖐️</span>Count by 5s<span class="sub">5, 10, 15…</span></button>
-    <button class="tile" data-kind="color"><span class="ico">🎨</span>Colours<span class="sub">eat the red things</span></button>
-    <button class="tile" data-kind="shape"><span class="ico">🔺</span>Shapes<span class="sub">eat the triangles</span></button>
+    <button class="tile" data-kind="color"><span class="ico">🎨</span>Colours<span class="sub">red things = super growth</span></button>
+    <button class="tile" data-kind="shape"><span class="ico">🔺</span>Shapes<span class="sub">triangles = super growth</span></button>
   </div>
   <div class="grown"><button id="voiceBtn">🔊 Voice on</button></div>
 </section>
@@ -99,10 +117,10 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-
     <button class="mission" id="missionBox" aria-label="Hear the mission again"><span class="chip" id="mChip"></span><span class="txt" id="mTxt"></span><span class="say">🔊</span></button>
     <div class="stars"><span aria-hidden="true">⭐</span><span class="sn">0</span></div>
   </div>
-  <div class="prog"><i id="progFill"></i></div>
+  <div class="progrow"><div class="prog"><i id="progFill"></i></div><span class="plabel" id="pLabel">0 eaten</span></div>
   <div class="field" id="field">
     <canvas id="cv"></canvas>
-    <div class="tip" id="tip">Drag your finger to move the hole</div>
+    <div class="tip" id="tip">Drag your finger to move the hole.<br>Eat everything!</div>
   </div>
 </section>
 
@@ -115,6 +133,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const pick = a => a[Math.floor(Math.random() * a.length)];
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const rand = (a, b) => a + Math.random() * (b - a);
+const randInt = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 const restart = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
 const STICKERS = ['🦄','🐲','🦖','🐙','🦋','🐳','🦁','🐼','🐸','🚀','🌈','🍩','🦕','🐬','🦜','🐞','🌟','🎈','🦒','🐯','🚒','🏎️','🦀','🐧','🍦','🎸','🐨','🦩','🛸','🏰'];
 const COLORS = ['#E8453C','#F28C28','#E0B000','#2EAA4F','#1E90D6','#7C5CFF','#D63AA8'];
@@ -128,7 +147,7 @@ const store = {
 const S = { name: store.get('name', 'Kiyansh'), rate: store.get('rate', 0.85), stars: store.get('stars', 0), stickers: store.get('stickers', []), voice: true };
 try { S.voice = JSON.parse(localStorage.getItem('hole_voice') ?? 'true'); } catch (e){}
 
-/* ---------- what can be eaten ---------- */
+/* ---------- what is in the park ---------- */
 const WORDS = {
   s: [['☀️','sun'],['🐍','snake'],['🧦','sock'],['⭐','star'],['🕷️','spider'],['🥄','spoon']],
   b: [['🍌','banana'],['🐝','bee'],['🚌','bus'],['🐻','bear'],['📖','book'],['🎈','balloon']],
@@ -143,13 +162,22 @@ const WORDS = {
   l: [['🦁','lion'],['🍃','leaf'],['🍋','lemon'],['🍭','lollipop'],['🐞','ladybug'],['💡','light bulb']]
 };
 const COLOR_THINGS = {
-  red: { hex: '#E8453C', items: [['🍎','apple'],['🍓','strawberry'],['🍅','tomato'],['🚒','fire truck'],['❤️','heart'],['🌹','rose'],['🍒','cherries']] },
+  red: { hex: '#E8453C', items: [['🍎','apple'],['🍓','strawberry'],['🍅','tomato'],['❤️','heart'],['🌹','rose'],['🍒','cherries']] },
   yellow: { hex: '#E0B000', items: [['🍌','banana'],['⭐','star'],['🌻','sunflower'],['🐤','chick'],['🧀','cheese'],['🍋','lemon']] },
-  green: { hex: '#2EAA4F', items: [['🐸','frog'],['🥦','broccoli'],['🍀','clover'],['🐢','turtle'],['🍏','apple'],['🌲','tree'],['🥒','cucumber']] },
-  blue: { hex: '#1E90D6', items: [['🐳','whale'],['💙','heart'],['🚙','car'],['🧢','cap'],['💧','raindrop'],['🦋','butterfly']] },
+  green: { hex: '#2EAA4F', items: [['🐸','frog'],['🥦','broccoli'],['🍀','clover'],['🐢','turtle'],['🍏','apple'],['🥒','cucumber']] },
+  blue: { hex: '#1E90D6', items: [['🐳','whale'],['💙','heart'],['🧢','cap'],['💧','raindrop'],['🦋','butterfly'],['🫐','blueberries']] },
   orange: { hex: '#F28C28', items: [['🍊','orange'],['🥕','carrot'],['🎃','pumpkin'],['🦊','fox'],['🏀','basketball'],['🦁','lion']] }
 };
+/* park things to make the hole big: [emoji, word, first letter, colour, size tier] */
+const PARK = [
+  ['🌼','flower','f','yellow',0], ['🍄','mushroom','m','red',0], ['⚽','ball','b','',0], ['🐌','snail','s','',0], ['🌷','tulip','t','red',0],
+  ['🐿️','squirrel','s','',1], ['🚲','bike','b','',1], ['🛴','scooter','s','',1], ['🪁','kite','k','',1], ['🐕','dog','d','',1], ['🦆','duck','d','',1],
+  ['🌳','tree','t','green',2], ['🚗','car','c','red',2], ['🚌','bus','b','yellow',2], ['🚒','fire truck','f','red',2], ['🚙','jeep','j','blue',2],
+  ['🏠','house','h','',3], ['🏫','school','s','',3], ['⛲','fountain','f','',3], ['🎪','circus tent','c','red',3], ['🏰','castle','c','',3]
+];
+const TIER = [[0.035, 0.045], [0.06, 0.08], [0.10, 0.125], [0.15, 0.18]];
 const SHAPES = ['circle', 'square', 'triangle', 'star', 'heart'];
+const SHAPE_CH = { circle: '●', square: '■', triangle: '▲', star: '★', heart: '♥' };
 const LETTER_TWINS = { b: 'd', d: 'b', p: 'q', q: 'p', m: 'n', n: 'm', u: 'n', w: 'm' };
 const ABC = 'abcdefghijklmnoprstuw'.split('');
 
@@ -172,14 +200,20 @@ function sayOne(text){
     speechSynthesis.speak(u);
   });
 }
-function hush(){ talkId++; try { if (canSpeak) speechSynthesis.cancel(); } catch (e){} }
+function hush(){ talkId++; speakEnd = 0; try { if (canSpeak) speechSynthesis.cancel(); } catch (e){} }
 async function talk(...parts){
   hush(); const id = talkId; await sleep(60);
-  for (const p of parts){ if (id !== talkId) return; await sayOne(p); }
+  for (const p of parts){ if (id !== talkId) return false; await sayOne(p); }
+  return id === talkId;
 }
-let lastNag = 0;
-// explanations for wrong things, at most one every couple of seconds
-function nag(text){ const t = performance.now(); if (t - lastNag < 2600) return; lastNag = t; talk(text); }
+/* While gobbling fast, mission things (pri 2) may cut in; everyday names (pri 1)
+   only speak when nothing else is being said. */
+let speakEnd = 0, speakPri = 0;
+function say(text, pri){
+  const now = performance.now();
+  if (now < speakEnd && (pri < speakPri || pri === 1)) return;
+  talk(text); speakPri = pri; speakEnd = performance.now() + 350 + text.length * 75 / S.rate;
+}
 
 /* ---------- little sounds ---------- */
 let actx = null;
@@ -189,21 +223,22 @@ function sfx(kind){
     if (actx.state === 'suspended') actx.resume();
     const now = actx.currentTime;
     const tone = (f, t, d, type = 'sine', v = .12, f2) => { const o = actx.createOscillator(), g = actx.createGain(); o.type = type; o.frequency.setValueAtTime(f, now + t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, now + t + d); g.gain.setValueAtTime(.0001, now + t); g.gain.exponentialRampToValueAtTime(v, now + t + .02); g.gain.exponentialRampToValueAtTime(.0001, now + t + d); o.connect(g); g.connect(actx.destination); o.start(now + t); o.stop(now + t + d + .05); };
-    if (kind === 'gulp') tone(700, 0, .22, 'sine', .14, 180);
-    else if (kind === 'bonk') tone(180, 0, .15, 'square', .05);
+    if (kind === 'gulp') tone(620, 0, .18, 'sine', .1, 200);
+    else if (kind === 'power') [523, 784, 1047, 1319].forEach((f, i) => tone(f, i * .06, .18, 'triangle', .09));
+    else if (kind === 'chomp') { tone(220, 0, .3, 'sawtooth', .06, 70); tone(160, .05, .3, 'sine', .12, 60); }
     else if (kind === 'yay') [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .1, .28, 'triangle'));
+    else if (kind === 'boop') tone(260, 0, .18, 'sine', .08);
   } catch (e){}
 }
 
 /* ---------- stars, stickers, confetti ---------- */
 function renderStars(){ $$('.sn').forEach(e => { e.textContent = S.stars; }); }
-let newSticker = null;
 function addStar(){
   S.stars++; store.set('stars', S.stars); renderStars(); $$('.stars').forEach(e => restart(e, 'bump'));
-  newSticker = null;
-  if (S.stars % 5 !== 0) return;
-  const fresh = STICKERS.filter(x => !S.stickers.includes(x)); newSticker = fresh.length ? pick(fresh) : pick(STICKERS);
-  S.stickers.push(newSticker); store.set('stickers', S.stickers);
+  if (S.stars % 5 !== 0) return null;
+  const fresh = STICKERS.filter(x => !S.stickers.includes(x)), st = fresh.length ? pick(fresh) : pick(STICKERS);
+  S.stickers.push(st); store.set('stickers', S.stickers);
+  return st;
 }
 const ccv = $('#confetti'), ccx = ccv.getContext('2d'); let bits = [], craf = null;
 function confetti(){
@@ -221,63 +256,87 @@ function ctick(){
 
 /* =====================================================
    MISSIONS
-   Each mission lists the things on the grass. "good" things can be
-   eaten; the rest bounce off with a little explanation.
+   Everything in the park can be eaten. The mission things make the
+   hole grow 3 times faster, so spotting them is the way to get big
+   enough for the trees, buses and houses. Sizes are in "units"
+   (a fraction of the smaller side of the park).
    ===================================================== */
 const LETTER_COLORS = ['#E8453C','#F28C28','#1E90D6','#7C5CFF','#D63AA8','#2EAA4F'];
 function bubble(text, extra){ return Object.assign({ kind: 'bubble', text, color: pick(LETTER_COLORS) }, extra); }
+function emoji(w, extra){ return Object.assign({ kind: 'emoji', text: w[0], word: w[1] }, extra); }
+// mission things: the first few are small, so the hole can start on them
+function sizeUp(list, lo, hi){ list.forEach((o, i) => { o.u = lo + (hi - lo) * (i / Math.max(1, list.length - 1)) * rand(0.85, 1.05); }); return list; }
+function sizeRand(list, lo, hi){ list.forEach(o => { o.u = rand(lo, hi); }); return list; }
+function parkThings(n){
+  const by = [0, 1, 2, 3].map(t => shuffle(PARK.filter(p => p[4] === t)));
+  const counts = n === 'few' ? [2, 2, 2, 1] : [3, 3, 3, 2];
+  const out = [];
+  counts.forEach((c, t) => by[t].slice(0, c).forEach(p => out.push({ kind: 'emoji', text: p[0], word: p[1], first: p[2], col: p[3], park: true, u: rand(TIER[t][0], TIER[t][1]) })));
+  return out;
+}
 
 function letterMission(){
-  const L = pick(ABC), twin = LETTER_TWINS[L];
+  const L = pick(ABC), U = L.toUpperCase(), twin = LETTER_TWINS[L];
   const others = shuffle(ABC.filter(x => x !== L)).slice(0, 5);
   if (twin && !others.includes(twin)) others[0] = twin;
-  const items = [];
-  for (let i = 0; i < 10; i++) items.push(bubble(i % 2 ? L : L.toUpperCase(), { good: true, say: L.toUpperCase() }));
-  for (let i = 0; i < 12; i++){ const o = others[i % others.length]; items.push(bubble(i % 2 ? o : o.toUpperCase(), { good: false, name: o.toUpperCase() })); }
-  return { chip: L.toUpperCase() + ' ' + L, text: `Eat the ${L.toUpperCase()}'s!`, goal: 8,
-    intro: `Eat the letter ${L.toUpperCase()}. Big ${L.toUpperCase()}, and little ${L}!`, items,
-    wrong: o => `That's ${o.name}. Find ${L.toUpperCase()}!` };
+  const goods = sizeUp(Array.from({ length: randInt(6, 8) }, (_, i) => bubble(i % 2 ? L : U, { letter: L })), 0.032, 0.07);
+  const rest = sizeRand(Array.from({ length: 10 }, (_, i) => { const o = others[i % others.length]; return bubble(i % 2 ? o : o.toUpperCase(), { letter: o }); }), 0.032, 0.07);
+  return { chip: U + ' ' + L, intro: `Eat everything! The letter ${U} makes you grow super fast. Big ${U}, and little ${L}!`,
+    items: goods.concat(rest, parkThings()), isGood: o => o.letter === L,
+    sayGood: () => U + '!', sayOther: o => o.park ? o.word + '!' : 'That was ' + o.letter.toUpperCase() + '.',
+    tip: `Eat the ${U}'s to grow super fast!`, quiz: { ask: `How many ${U}'s did the hole eat?`, label: U + "'s" } };
 }
 function soundMission(){
-  const keys = Object.keys(WORDS), L = pick(keys), others = shuffle(keys.filter(k => k !== L && !(L === 'c' && k === 'k'))).slice(0, 3);
-  const items = [];
-  shuffle(WORDS[L].slice()).concat(shuffle(WORDS[L].slice())).slice(0, 9).forEach(w => items.push({ kind: 'emoji', text: w[0], good: true, say: w[1] }));
-  others.forEach(k => shuffle(WORDS[k].slice()).slice(0, 4).forEach(w => items.push({ kind: 'emoji', text: w[0], good: false, name: w[1], first: k })));
-  const ex = WORDS[L][0][1];
-  return { chip: L.toUpperCase() + ' ' + WORDS[L][0][0], text: `Starts with ${L.toUpperCase()}!`, goal: 7,
-    intro: `Eat the things that start with ${L.toUpperCase()}. Like ${ex}!`, items,
-    wrong: o => `${o.name} starts with ${o.first.toUpperCase()}. Find ${L.toUpperCase()}, like ${ex}!` };
+  const keys = Object.keys(WORDS), L = pick(keys), U = L.toUpperCase(), others = shuffle(keys.filter(k => k !== L)).slice(0, 3);
+  const goods = sizeUp(shuffle(WORDS[L].slice()).slice(0, randInt(5, 6)).map(w => emoji(w, { first: L })), 0.035, 0.07);
+  const rest = [];
+  others.forEach(k => shuffle(WORDS[k].slice()).slice(0, 3).forEach(w => rest.push(emoji(w, { first: k }))));
+  sizeRand(rest, 0.035, 0.07);
+  const ex = goods[0].word;
+  return { chip: U + ' ' + goods[0].text, intro: `Eat everything! Things that start with ${U}, like ${ex}, make you grow super fast!`,
+    items: goods.concat(rest, parkThings()), isGood: o => o.first === L,
+    sayGood: o => `${o.word}! ${U}, ${o.word}!`, sayOther: o => `${o.word}. ${o.first.toUpperCase()}, ${o.word}.`,
+    tip: `Things that start with ${U} make you grow fast!`, quiz: { ask: `How many things that start with ${U} did the hole eat?`, label: U + ' things' } };
 }
 function orderMission(){
-  const top = pick([10, 10, 12, 15, 20]), start = top > 12 ? top - 9 : 1, items = [];
-  for (let v = start; v <= top; v++) items.push(bubble(String(v), { val: v, say: String(v) }));
-  return { chip: '🔢', text: '', goal: items.length, ordered: true, start, step: 1,
-    intro: `Eat the numbers in order. Start with ${start}!`, items,
-    label: n => `Find ${n}!`, wrong: (o, n) => `That's ${o.val}. ${n === start ? 'Start with ' + n : 'After ' + (n - 1) + ' comes ' + n}!` };
+  const top = pick([10, 10, 12, 15, 20]), start = top > 12 ? top - 9 : 1, nums = [];
+  for (let v = start; v <= top; v++) nums.push(bubble(String(v), { val: v, seq: true }));
+  sizeRand(nums, 0.035, 0.05);
+  return { chip: '🔢', ordered: true, seqVals: nums.map(o => o.val), step: 1,
+    intro: `Eat everything! Eat the numbers in order to grow super fast. Start with ${start}!`,
+    items: nums.concat(parkThings()), sayOther: o => o.park ? o.word + '!' : `${o.val}! Next is ${G.next}.`,
+    tip: `Eat the numbers in order to grow fast!` };
 }
 function fiveMission(){
-  const top = pick([30, 40, 50]), items = [];
-  for (let v = 5; v <= top; v += 5) items.push(bubble(String(v), { val: v, say: String(v) }));
-  // a few sneaky numbers that are not in the count
-  [7, 12, 18, 23, 31, 44].filter(v => v < top).forEach(v => items.push(bubble(String(v), { val: v, decoy: true })));
-  return { chip: '🖐️', text: '', goal: top / 5, ordered: true, start: 5, step: 5,
-    intro: `Count by 5s! Eat 5, then 10, then 15!`, items,
-    label: n => `Find ${n}!`, wrong: (o, n) => `That's ${o.val}. ${n === 5 ? 'Start with 5' : (n - 5) + ' and 5 more is ' + n}!` };
+  const top = pick([30, 40, 50]), nums = [];
+  for (let v = 5; v <= top; v += 5) nums.push(bubble(String(v), { val: v, seq: true }));
+  // a few sneaky numbers that are not in the count by 5s
+  [7, 12, 18, 23, 31, 44].filter(v => v < top).forEach(v => nums.push(bubble(String(v), { val: v })));
+  sizeRand(nums, 0.035, 0.05);
+  return { chip: '🖐️', ordered: true, seqVals: nums.filter(o => o.seq).map(o => o.val), step: 5,
+    intro: `Eat everything! Count by 5s to grow super fast. 5, then 10, then 15!`,
+    items: nums.concat(parkThings()), sayOther: o => o.park ? o.word + '!' : o.seq ? `${o.val}! Next is ${G.next}.` : `${o.val}. That's not a 5s number.`,
+    tip: `Count by 5s to grow fast!` };
 }
 function colorMission(){
   const names = Object.keys(COLOR_THINGS), C = pick(names), others = shuffle(names.filter(n => n !== C)).slice(0, 3);
-  const items = [];
-  shuffle(COLOR_THINGS[C].items.slice()).concat(shuffle(COLOR_THINGS[C].items.slice())).slice(0, 10).forEach(w => items.push({ kind: 'emoji', text: w[0], good: true, say: w[1] }));
-  others.forEach(k => shuffle(COLOR_THINGS[k].items.slice()).slice(0, 4).forEach(w => items.push({ kind: 'emoji', text: w[0], good: false, name: w[1], col: k })));
-  return { chip: `<span style="color:${COLOR_THINGS[C].hex}">⬤</span>`, text: `Eat the ${C} things!`, goal: 8,
-    intro: `Eat the ${C} things!`, items, wrong: o => `The ${o.name} is ${o.col}. Find ${C} things!` };
+  const goods = sizeUp(shuffle(COLOR_THINGS[C].items.slice()).slice(0, randInt(5, 6)).map(w => emoji(w, { col: C })), 0.035, 0.07);
+  const rest = [];
+  others.forEach(k => shuffle(COLOR_THINGS[k].items.slice()).slice(0, 3).forEach(w => rest.push(emoji(w, { col: k }))));
+  sizeRand(rest, 0.035, 0.07);
+  return { chip: `<span style="color:${COLOR_THINGS[C].hex}">⬤</span>`, intro: `Eat everything! The ${C} things make you grow super fast!`,
+    items: goods.concat(rest, parkThings('few')), isGood: o => o.col === C,
+    sayGood: o => `${C} ${o.word}!`, sayOther: o => o.col ? `${o.col} ${o.word}.` : o.word + '!',
+    tip: `The ${C} things make you grow fast!`, quiz: { ask: `How many ${C} things did the hole eat?`, label: C + ' things' } };
 }
 function shapeMission(){
-  const T = pick(SHAPES), others = shuffle(SHAPES.filter(s => s !== T)).slice(0, 3), items = [];
-  for (let i = 0; i < 10; i++) items.push({ kind: 'shape', shape: T, color: COLORS[i % COLORS.length], good: true, say: T });
-  for (let i = 0; i < 12; i++) items.push({ kind: 'shape', shape: others[i % 3], color: COLORS[(i + 3) % COLORS.length], good: false, name: others[i % 3] });
-  return { chip: '', chipShape: T, text: `Eat the ${T}s!`, goal: 8, intro: `Eat the ${T}s! Any colour!`, items,
-    wrong: o => `That's a ${o.name}. Find the ${T}s!` };
+  const T = pick(SHAPES), others = shuffle(SHAPES.filter(s => s !== T)).slice(0, 3);
+  const goods = sizeUp(Array.from({ length: randInt(6, 8) }, (_, i) => ({ kind: 'shape', shape: T, color: COLORS[i % COLORS.length] })), 0.032, 0.07);
+  const rest = sizeRand(Array.from({ length: 10 }, (_, i) => ({ kind: 'shape', shape: others[i % 3], color: COLORS[(i + 3) % COLORS.length] })), 0.032, 0.07);
+  return { chip: '', chipShape: T, intro: `Eat everything! The ${T}s make you grow super fast. Any colour!`,
+    items: goods.concat(rest, parkThings()), isGood: o => o.shape === T,
+    sayGood: () => T + '!', sayOther: o => o.park ? o.word + '!' : o.shape + '.',
+    tip: `Eat the ${T}s to grow fast!`, quiz: { ask: `How many ${T}s did the hole eat?`, label: T + 's' } };
 }
 const MAKERS = { letter: letterMission, sound: soundMission, order: orderMission, five: fiveMission, color: colorMission, shape: shapeMission };
 
@@ -285,62 +344,71 @@ const MAKERS = { letter: letterMission, sound: soundMission, order: orderMission
    THE GAME
    ===================================================== */
 const cv = $('#cv'), cx = cv.getContext('2d');
-let W = 0, H = 0, dpr = 1;
+let W = 0, H = 0, dpr = 1, U = 1;
 let G = null, raf = 0;
+const GROW = 0.35, BOOST = 3, HOLE0 = 0.06, HOLE_MAX = 0.3;
 
 function resize(){
   const r = cv.getBoundingClientRect(), ow = W, oh = H;
-  dpr = Math.min(devicePixelRatio || 1, 2); W = r.width; H = r.height;
+  dpr = Math.min(devicePixelRatio || 1, 2); W = r.width; H = r.height; U = Math.min(W, H);
   cv.width = W * dpr; cv.height = H * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  if (G && ow && oh){ const sx = W / ow, sy = H / oh; G.objs.forEach(o => { o.x *= sx; o.y *= sy; }); G.hole.x *= sx; G.hole.y *= sy; G.aim.x *= sx; G.aim.y *= sy; }
+  if (G && ow && oh){
+    const sx = W / ow, sy = H / oh, su = U / Math.min(ow, oh);
+    G.objs.forEach(o => { o.x *= sx; o.y *= sy; o.r *= su; }); G.hole.x *= sx; G.hole.y *= sy; G.hole.r *= su; G.hole.show *= su; G.aim.x *= sx; G.aim.y *= sy;
+  }
 }
 addEventListener('resize', () => { if (!$('#s-game').hidden) resize(); });
 
+// mission thing right now? (for numbers: the next one in the count)
+function isGood(o){ return G.M.ordered ? o.seq && o.val === G.next : G.M.isGood(o); }
+function nextNum(){ const left = G.M.seqVals.filter(v => !G.ate.some(o => o.seq && o.val === v)); return left.length ? left[0] : null; }
+
 function startMission(kind){
   kind = kind || pick(Object.keys(MAKERS));
-  const M = MAKERS[kind]();
-  $('#s-home').hidden = true; $('#s-game').hidden = false;
+  $('#s-home').hidden = true; $('#s-game').hidden = false; $('#overlay').hidden = true;
   resize();
-  const unit = Math.min(W, H), hr = Math.max(26, unit * 0.075);
-  G = { M, kind, eaten: 0, next: M.start, hole: { x: W / 2, y: H / 2, r: hr, show: hr }, aim: { x: W / 2, y: H / 2 }, objs: [], fx: [], last: performance.now(), lastGood: performance.now(), over: false, base: hr };
-  // sizes: "good" things start small, so the hole can eat them, and get bigger
-  const goods = M.items.filter(o => o.good || M.ordered && !o.decoy);
-  goods.forEach((o, i) => { o.r = hr * (0.42 + 0.5 * (i / Math.max(1, goods.length - 1))) * rand(0.9, 1.05); });
-  M.items.filter(o => !goods.includes(o)).forEach(o => { o.r = hr * rand(0.45, 0.95); });
-  if (M.ordered) M.items.forEach(o => { o.r = hr * rand(0.55, 0.75); });
+  const M = MAKERS[kind](), hr = HOLE0 * U;
+  G = { M, kind, hole: { x: W / 2, y: H / 2, r: hr, show: hr }, aim: { x: W / 2, y: H / 2 }, objs: [], fx: [], ate: [], good: 0, inOrder: 0,
+    last: performance.now(), lastGood: performance.now(), lastNag: 0, over: false, sticker: null };
+  M.items.forEach(o => { o.r = o.u * U; });
   placeAll(M.items);
-  G.objs = M.items.map(o => Object.assign(o, { st: 'idle', t: 0, wob: 0, hit: 0 }));
+  G.objs = M.items.map(o => Object.assign(o, { st: 'idle', t: 0, wob: 0 }));
+  G.goodTotal = M.ordered ? M.seqVals.length : G.objs.filter(o => M.isGood(o)).length;
+  if (M.ordered) G.next = M.seqVals[0];
   paintHud();
   $('#tip').style.opacity = 1;
-  talk(M.intro);
+  talk(M.intro); speakEnd = performance.now() + 4000; speakPri = 3;
   cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
 }
 function placeAll(items){
-  const pad = 10, placed = [];
-  shuffle(items).forEach(o => {
-    let best = null, bestD = -1;
-    for (let k = 0; k < 60; k++){
+  const pad = 6, placed = [];
+  // big things first, so they find room
+  items.slice().sort((a, b) => b.r - a.r).forEach(o => {
+    let best = null, bestD = -1e9;
+    for (let k = 0; k < 80; k++){
       const x = rand(o.r + pad, W - o.r - pad), y = rand(o.r + pad, H - o.r - pad);
-      if (Math.hypot(x - W / 2, y - H / 2) < G.hole.r + o.r + 20) continue;
+      if (Math.hypot(x - W / 2, y - H / 2) < G.hole.r + o.r + 16) continue;
       const d = placed.reduce((m, p) => Math.min(m, Math.hypot(p.x - x, p.y - y) - p.r - o.r), 1e9);
       if (d > bestD){ bestD = d; best = { x, y }; }
-      if (d > 14) break;
+      if (d > 12) break;
     }
     best = best || { x: rand(o.r, W - o.r), y: rand(o.r, H - o.r) };
     o.x = best.x; o.y = best.y; placed.push(o);
   });
 }
 function paintHud(){
-  const M = G.M;
-  $('#mTxt').textContent = M.ordered ? M.label(G.next) : M.text;
-  const chip = $('#mChip');
-  if (M.chipShape){ chip.innerHTML = ''; const c = document.createElement('canvas'); c.width = c.height = 64; c.style.cssText = 'width:30px;height:30px;display:block'; const x = c.getContext('2d'); drawShape(x, M.chipShape, 32, 32, 26, '#2B2550'); chip.appendChild(c); }
-  else chip.innerHTML = M.ordered ? `<span style="color:#7C5CFF">${G.next}</span>` : M.chip;
-  $('#progFill').style.width = (G.eaten / M.goal * 100) + '%';
+  const M = G.M, chip = $('#mChip');
+  if (M.ordered){
+    chip.innerHTML = `<span style="color:#7C5CFF">${G.next ?? '✓'}</span>`;
+    $('#mTxt').textContent = (G.next != null ? 'next · ' : 'done! ') + `⭐ ${G.inOrder}/${G.goodTotal}`;
+  } else {
+    if (M.chipShape){ chip.innerHTML = ''; const c = document.createElement('canvas'); c.width = c.height = 64; c.style.cssText = 'width:30px;height:30px;display:block'; drawShape(c.getContext('2d'), M.chipShape, 32, 32, 26, '#2B2550'); chip.appendChild(c); }
+    else chip.innerHTML = M.chip;
+    $('#mTxt').textContent = `⭐ ${G.good}/${G.goodTotal}`;
+  }
+  $('#progFill').style.width = (G.ate.length / G.objs.length * 100) + '%';
+  $('#pLabel').textContent = `${G.ate.length}/${G.objs.length} eaten`;
 }
-
-/* is this thing the right one to eat right now? */
-function isGood(o){ return G.M.ordered ? (!o.decoy && o.val === G.next) : o.good; }
 
 /* --- input: the hole glides towards your finger --- */
 let dragging = false;
@@ -358,79 +426,161 @@ function loop(now){
   const dt = Math.min(0.05, (now - G.last) / 1000); G.last = now;
   step(dt, now); draw(now);
 }
+const fits = o => o.r < G.hole.show * 0.95;
 function step(dt, now){
   const h = G.hole;
-  // keyboard nudges the aim point
   const kv = 360 * dt;
   if (keys.ArrowLeft) G.aim.x -= kv; if (keys.ArrowRight) G.aim.x += kv; if (keys.ArrowUp) G.aim.y -= kv; if (keys.ArrowDown) G.aim.y += kv;
   G.aim.x = Math.max(0, Math.min(W, G.aim.x)); G.aim.y = Math.max(0, Math.min(H, G.aim.y));
   const dx = G.aim.x - h.x, dy = G.aim.y - h.y, d = Math.hypot(dx, dy), sp = Math.min(d, (260 + h.r * 2) * dt);
   if (d > 0.5){ h.x += dx / d * sp; h.y += dy / d * sp; }
-  h.x = Math.max(h.r * 0.6, Math.min(W - h.r * 0.6, h.x)); h.y = Math.max(h.r * 0.6, Math.min(H - h.r * 0.6, h.y));
+  h.x = Math.max(h.r * 0.5, Math.min(W - h.r * 0.5, h.x)); h.y = Math.max(h.r * 0.5, Math.min(H - h.r * 0.5, h.y));
   h.show += (h.r - h.show) * Math.min(1, dt * 6);
 
+  let idle = 0, smallest = Infinity;
   for (const o of G.objs){
     if (o.st === 'gone') continue;
     if (o.st === 'fall'){
       o.t += dt / 0.35;
       o.x += (h.x - o.x) * Math.min(1, dt * 10); o.y += (h.y - o.y) * Math.min(1, dt * 10);
-      if (o.t >= 1){ o.st = 'gone'; }
+      if (o.t >= 1) o.st = 'gone';
       continue;
     }
-    o.wob = Math.max(0, o.wob - dt * 2); o.hit = Math.max(0, o.hit - dt * 1.5);
+    idle++; smallest = Math.min(smallest, o.r);
+    o.wob = Math.max(0, o.wob - dt * 2);
     const dist = Math.hypot(o.x - h.x, o.y - h.y);
-    if (dist > h.show + o.r * 0.2) continue;
-    const good = isGood(o);
-    if (good && o.r < h.show * 0.92 && dist < h.show - o.r * 0.3) { swallow(o, now); continue; }
-    if (good){
-      // the right thing, but too big for the hole yet
+    if (dist > h.show + o.r * 0.3) continue;
+    if (fits(o) && dist < h.show - o.r * 0.3) { swallow(o, now); continue; }
+    if (!fits(o)){
+      // too big for now: it wobbles on the edge of the hole
       o.wob = 1;
-      if (dist < h.show * 0.8) nag('Too big! Eat small ones first to grow.');
-      continue;
+      if (now - G.lastNag > 4500 && dist < h.show + o.r * 0.1){ G.lastNag = now; say(`Too big! Grow first. ${G.M.tip}`, 1); }
     }
-    // the wrong thing: it bounces off
-    const ux = (o.x - h.x) / (dist || 1), uy = (o.y - h.y) / (dist || 1), push = h.show + o.r * 0.25 - dist;
-    if (push > 0){ o.x += ux * push; o.y += uy * push; }
-    o.x = Math.max(o.r, Math.min(W - o.r, o.x)); o.y = Math.max(o.r, Math.min(H - o.r, o.y));
-    if (o.hit <= 0){ o.hit = 1; sfx('bonk'); G.fx.push({ x: o.x, y: o.y - o.r, t: 0, txt: '✖', c: '#E8453C' }); nag(G.M.wrong(o, G.next)); }
   }
+  // never get stuck: if nothing left fits, the hole slowly gets hungrier
+  if (idle && smallest >= h.r * 0.95) h.r += (smallest / 0.9 - h.r) * Math.min(1, dt * 0.8);
   for (const f of G.fx) f.t += dt;
   G.fx = G.fx.filter(f => f.t < 1);
-  // a gentle hint if nothing good has been eaten for a while
-  G.hint = now - G.lastGood > 9000;
+  G.hint = now - G.lastGood > 8000;
+  if (!idle && !G.over && G.objs.every(o => o.st === 'gone')) finish();
 }
 function swallow(o, now){
-  const M = G.M;
-  o.st = 'fall'; o.t = 0; sfx('gulp');
-  G.eaten++; G.lastGood = now;
-  G.hole.r = Math.min(G.base * 2.3, G.hole.r + G.base * 0.12);
-  G.fx.push({ x: o.x, y: o.y - o.r, t: 0, txt: '+1', c: '#fff' });
-  if (M.ordered) G.next += M.step;
+  const M = G.M, h = G.hole, good = isGood(o);
+  o.st = 'fall'; o.t = 0;
+  G.ate.push(o);
+  h.r = Math.min(HOLE_MAX * U, Math.sqrt(h.r * h.r + GROW * o.r * o.r * (good ? BOOST : 1)));
+  if (good){
+    G.lastGood = now; sfx('power');
+    G.fx.push({ x: o.x, y: o.y - o.r, t: 0, txt: '⭐ Super!', c: '#FFD23F', big: true });
+    G.ring = 1;
+    if (M.ordered){ G.inOrder++; o.inOrder = true; } else G.good++;
+  } else {
+    sfx(o.r > U * 0.09 ? 'chomp' : 'gulp');
+    G.fx.push({ x: o.x, y: o.y - o.r, t: 0, txt: '+1', c: '#fff' });
+  }
+  if (M.ordered) G.next = nextNum();
   paintHud();
-  if (G.eaten >= M.goal) { win(); return; }
-  if (o.say) talk(o.say);
+  if (good) say(M.ordered ? `${o.val}!` + (G.next != null ? '' : ' Done!') : M.sayGood(o), 2);
+  else say(M.sayOther(o), 1);
 }
-async function win(){
-  G.over = true; hush();
-  sfx('yay'); confetti(); addStar();
-  await talk(pick(['Yummy! You did it!', 'Great eating! Mission complete!', `Well done, ${S.name}!`]));
-  setTimeout(() => { cancelAnimationFrame(raf); showWin(); }, 300);
+
+/* ---------- the end: look in the belly ---------- */
+async function finish(){
+  G.over = true;
+  await sleep(450);
+  cancelAnimationFrame(raf); hush();
+  sfx('yay'); confetti();
+  G.sticker = addStar();
+  talk(`Wow! You ate the whole park! Let's look in the hole's belly.`);
+  quiz();
+}
+function bellyItem(o){
+  const d = document.createElement('div'); d.className = 'it';
+  if (o.kind === 'emoji') d.textContent = o.text;
+  else if (o.kind === 'bubble') d.innerHTML = `<span class="bub" style="background:${o.color}">${o.text}</span>`;
+  else d.innerHTML = `<span style="color:${o.color};font-size:2.1rem">${SHAPE_CH[o.shape]}</span>`;
+  return d;
+}
+function quiz(){
+  const M = G.M, box = $('#popBox'), ov = $('#overlay');
+  box.innerHTML = `<h2>You ate the whole park! 🎉</h2>`;
+  let ans, choices, sayRight, countEls = [];
+  if (M.ordered){
+    // what comes next?
+    const seq = M.seqVals, i = randInt(1, seq.length - 2), shown = seq.slice(Math.max(0, i - 2), i + 1);
+    ans = seq[i + 1];
+    box.insertAdjacentHTML('beforeend', `<div class="q">What comes next?</div>`);
+    const b = document.createElement('div'); b.className = 'belly seq';
+    shown.forEach(v => { const d = document.createElement('div'); d.className = 'it'; d.innerHTML = `<span class="bub" style="background:#7C5CFF">${v}</span>`; b.appendChild(d); });
+    const qm = document.createElement('div'); qm.className = 'it'; qm.innerHTML = '<span class="qm">?</span>'; b.appendChild(qm);
+    box.appendChild(b);
+    // near misses that are not already in the row
+    choices = shuffle([...new Set([ans + 1, ans - 1, ans + M.step, ans + 2 * M.step, ans + 2])].filter(v => v > 0 && v !== ans && !shown.includes(v))).slice(0, 2).concat([ans]);
+    talk(`${shown.join(', ')}. What comes next?`);
+    sayRight = `${shown.join(', ')}, ${ans}!`;
+  } else {
+    // count the mission things in the belly
+    const goods = G.ate.filter(o => M.isGood(o));
+    ans = goods.length;
+    box.insertAdjacentHTML('beforeend', `<div class="q">${M.quiz.ask}</div>`);
+    const b = document.createElement('div'); b.className = 'belly';
+    goods.forEach(o => { const d = bellyItem(o); countEls.push(d); b.appendChild(d); });
+    box.appendChild(b);
+    choices = shuffle([ans - 2, ans - 1, ans + 1, ans + 2].filter(v => v > 0)).slice(0, 2).concat([ans]);
+    talk(`Look in the belly! ${M.quiz.ask} Count them!`);
+    sayRight = `Yes! ${ans} ${M.quiz.label}!`;
+  }
+  const opts = document.createElement('div'); opts.className = 'qopts';
+  const msg = document.createElement('div'); msg.className = 'qsay';
+  let tries = 0;
+  shuffle(choices).forEach(v => {
+    const btn = document.createElement('button'); btn.className = 'qbtn'; btn.textContent = v;
+    btn.onclick = async () => {
+      if (v === ans){
+        [...opts.children].forEach(x => { x.disabled = true; x.classList.remove('glow'); });
+        btn.classList.add('ok'); sfx('yay');
+        let st = null;
+        if (tries === 0) { st = addStar(); msg.textContent = '⭐ Bonus star!'; } else msg.textContent = 'You got it!';
+        G.sticker = G.sticker || st;
+        await talk(sayRight + (tries === 0 ? ' Bonus star!' : ''));
+        setTimeout(showWin, 400);
+        return;
+      }
+      tries++; btn.classList.add('no'); btn.disabled = true; sfx('boop');
+      [...opts.children].forEach(x => { x.disabled = true; });
+      if (M.ordered){
+        msg.textContent = `We count by ${M.step === 5 ? '5s' : '1s'}!`;
+        await talk(`Not quite. We count by ${M.step === 5 ? 'fives' : 'ones'}. ${sayRight} Tap ${ans}.`);
+      } else {
+        // count them together, one by one
+        msg.textContent = `Let's count together!`;
+        if (!(await talk(`Let's count together.`))) return;
+        for (let k = 0; k < countEls.length; k++){ countEls[k].classList.add('lit'); msg.textContent = k + 1; await talk(String(k + 1)); countEls[k].classList.remove('lit'); }
+        msg.textContent = `${ans}! Tap ${ans}.`;
+        await talk(`${ans}! Tap ${ans}.`);
+      }
+      [...opts.children].forEach(x => { if (!x.classList.contains('no')) x.disabled = false; if (+x.textContent === ans) x.classList.add('glow'); });
+    };
+    opts.appendChild(btn);
+  });
+  box.append(opts, msg);
+  ov.hidden = false;
 }
 function showWin(){
   const box = $('#popBox'), o = $('#overlay');
-  box.innerHTML = newSticker
-    ? `<div class="em spin">${newSticker}</div><h2>Mission complete!<br>New sticker!</h2>`
-    : `<div class="em">🕳️</div><h2>Mission complete! ⭐</h2>`;
+  box.innerHTML = G.sticker
+    ? `<div class="em spin">${G.sticker}</div><h2>New sticker!</h2>`
+    : `<div class="em">🕳️</div><h2>What a hungry hole! ⭐</h2>`;
   const row = document.createElement('div'); row.className = 'row';
   const again = document.createElement('button'); again.className = 'bigbtn yellow'; again.textContent = '▶ Next mission';
-  again.onclick = () => { o.hidden = true; startMission(); };
+  again.onclick = () => startMission();
   const same = document.createElement('button'); same.className = 'bigbtn'; same.textContent = '🔁 Same kind again';
-  same.onclick = () => { o.hidden = true; startMission(G.kind); };
+  same.onclick = () => startMission(G.kind);
   const home = document.createElement('button'); home.className = 'bigbtn'; home.textContent = '🏠 Home';
-  home.onclick = () => { o.hidden = true; goHome(); };
+  home.onclick = goHome;
   row.append(again, same, home); box.appendChild(row);
   o.hidden = false;
-  if (newSticker) talk(`Wow! A new sticker for ${S.name}!`);
+  if (G.sticker) talk(`Wow! A new sticker for ${S.name}!`);
 }
 
 /* --- drawing --- */
@@ -447,12 +597,11 @@ function drawObj(o, now){
   let s = 1, ox = 0;
   if (o.st === 'fall') s = Math.max(0, 1 - o.t);
   if (o.wob > 0) ox = Math.sin(now / 40) * 3 * o.wob;
-  if (o.hit > 0) ox += Math.sin(now / 25) * 4 * o.hit;
   const x = o.x + ox, y = o.y, r = o.r * s;
   if (r < 0.5) return;
-  // shadow
-  cx.fillStyle = 'rgba(0,0,0,.15)'; cx.beginPath(); cx.ellipse(x + r * 0.12, y + r * 0.85, r * 0.8, r * 0.25, 0, 0, Math.PI * 2); cx.fill();
-  if (G.hint && o.st === 'idle' && isGood(o) && o.r < G.hole.show * 0.92){
+  if (o.st === 'idle'){ cx.fillStyle = 'rgba(0,0,0,.15)'; cx.beginPath(); cx.ellipse(x + r * 0.12, y + r * 0.85, r * 0.8, r * 0.25, 0, 0, Math.PI * 2); cx.fill(); }
+  // a gentle hint when no mission thing has been eaten for a while
+  if (G.hint && o.st === 'idle' && isGood(o) && fits(o)){
     cx.strokeStyle = 'rgba(255,255,255,' + (0.5 + 0.5 * Math.sin(now / 200)) + ')'; cx.lineWidth = 4;
     cx.beginPath(); cx.arc(x, y, r * 1.25, 0, Math.PI * 2); cx.stroke();
   }
@@ -467,15 +616,13 @@ function drawObj(o, now){
   } else drawShape(cx, o.shape, x, y, r, o.color);
 }
 function draw(now){
-  // grass with a path and some flowers
   cx.fillStyle = '#7CCB6B'; cx.fillRect(0, 0, W, H);
   cx.fillStyle = '#86D375';
-  for (let y = 0; y < H; y += 48) for (let x = (y / 48 % 2) * 24; x < W; x += 48) { cx.fillRect(x, y, 24, 24); }
+  for (let y = 0; y < H; y += 48) for (let x = (y / 48 % 2) * 24; x < W; x += 48) cx.fillRect(x, y, 24, 24);
   cx.strokeStyle = '#E9D9A6'; cx.lineWidth = 26; cx.lineCap = 'round'; cx.beginPath(); cx.moveTo(-20, H * 0.75); cx.quadraticCurveTo(W * 0.5, H * 0.45, W + 20, H * 0.85); cx.stroke();
-  const h = G.hole;
-  // objects that are falling are drawn under the hole rim
-  G.objs.filter(o => o.st === 'idle').forEach(o => drawObj(o, now));
-  // the hole
+  const h = G.hole, idle = G.objs.filter(o => o.st === 'idle').sort((a, b) => a.y - b.y);
+  // things that fit are drawn under the hole; things that are too big sit on top of it
+  idle.filter(fits).forEach(o => drawObj(o, now));
   const r = h.show;
   const grd = cx.createRadialGradient(h.x, h.y, r * 0.2, h.x, h.y, r * 1.08);
   grd.addColorStop(0, '#000'); grd.addColorStop(0.78, '#0d0a1f'); grd.addColorStop(0.92, '#3a2f6b'); grd.addColorStop(1, 'rgba(58,47,107,0)');
@@ -484,10 +631,16 @@ function draw(now){
   G.objs.filter(o => o.st === 'fall').forEach(o => drawObj(o, now));
   cx.restore();
   cx.strokeStyle = 'rgba(255,255,255,.35)'; cx.lineWidth = 3; cx.beginPath(); cx.ellipse(h.x, h.y, r, r * 0.9, 0, Math.PI * 1.1, Math.PI * 1.9); cx.stroke();
-  // little popups
+  // golden ring after a super bite
+  if (G.ring > 0){
+    cx.strokeStyle = `rgba(255,210,63,${G.ring})`; cx.lineWidth = 6;
+    cx.beginPath(); cx.ellipse(h.x, h.y, r * (1.25 - 0.2 * G.ring), r * (1.13 - 0.18 * G.ring), 0, 0, Math.PI * 2); cx.stroke();
+    G.ring = Math.max(0, G.ring - 0.03);
+  }
+  idle.filter(o => !fits(o)).forEach(o => drawObj(o, now));
   for (const f of G.fx){
-    cx.globalAlpha = 1 - f.t; cx.fillStyle = f.c; cx.font = `800 ${Math.round(24 + 10 * f.t)}px 'Baloo 2', sans-serif`; cx.textAlign = 'center';
-    cx.lineWidth = 4; cx.strokeStyle = 'rgba(0,0,0,.35)'; cx.strokeText(f.txt, f.x, f.y - f.t * 40); cx.fillText(f.txt, f.x, f.y - f.t * 40);
+    cx.globalAlpha = Math.max(0, 1 - f.t); cx.fillStyle = f.c; cx.font = `800 ${Math.round((f.big ? 28 : 22) + 10 * f.t)}px 'Baloo 2', sans-serif`; cx.textAlign = 'center';
+    cx.lineWidth = 4; cx.strokeStyle = 'rgba(0,0,0,.4)'; cx.strokeText(f.txt, f.x, f.y - f.t * 40); cx.fillText(f.txt, f.x, f.y - f.t * 40);
     cx.globalAlpha = 1;
   }
 }
@@ -496,13 +649,13 @@ function draw(now){
 function goHome(){
   hush(); cancelAnimationFrame(raf); G = null;
   $('#s-game').hidden = true; $('#s-home').hidden = false; $('#overlay').hidden = true;
-  $('#hello').textContent = `Only eat the right things, ${S.name}!`;
+  $('#hello').textContent = `Eat everything, ${S.name}!`;
   $('#voiceBtn').textContent = S.voice ? '🔊 Voice on' : '🔇 Voice off';
 }
 $('#playBtn').onclick = () => startMission();
 $$('[data-kind]').forEach(b => { b.onclick = () => startMission(b.dataset.kind); });
 $('#homeBtn').onclick = goHome;
-$('#missionBox').onclick = () => { if (G) talk(G.M.ordered ? G.M.label(G.next) : G.M.intro); };
+$('#missionBox').onclick = () => { if (G) talk(G.M.ordered && G.next != null ? `Next is ${G.next}. ${G.M.tip}` : G.M.intro); };
 $('#voiceBtn').onclick = () => { S.voice = !S.voice; try { localStorage.setItem('hole_voice', JSON.stringify(S.voice)); } catch (e){} goHome(); if (S.voice) talk('Voice on!'); };
 document.addEventListener('visibilitychange', () => { if (document.hidden) hush(); });
 

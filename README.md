@@ -18,7 +18,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 
 | | Game | What you learn |
 |:-:|---|---|
-| 🕳️ | **[Hungry Hole](https://pankaj2934.github.io/hole.html)** | Made for Kiyansh, inspired by hole.io. Drag a hole around the park and swallow only the right things: a letter, things that start with a sound, numbers in order, counting by 5s, a colour or a shape. Wrong things bounce off with a spoken reason, and the hole grows with every right one. |
+| 🕳️ | **[Hungry Hole](https://pankaj2934.github.io/hole.html)** | Made for Kiyansh, inspired by hole.io. Eat the whole park, from flowers up to trees, buses and houses! The mission things (a letter, a first sound, numbers in order, counting by 5s, a colour or a shape) make the hole grow super fast, and every bite is named out loud. Ends with a quick "look in the belly" counting question. |
 | 📖 | **[Story Problem Quest](https://pankaj2934.github.io/division.html)** | Redesigned for Aadvik. 13 levels of word problems that get harder step by step, up to division with remainders and two-step problems. Fresh questions every day, with clues and worked steps for wrong answers. |
 | 🖐️ | **[High Five Hop](https://pankaj2934.github.io/count5.html)** | Made for Kiyansh. Count by 5s to 50 or 100: tap high-five hands, help a frog hop lily pads, fix the number train and watch the 5s light up on a counting chart. Everything is read aloud. |
 | 🔍 | **[Divisibility Detective](https://pankaj2934.github.io/divide.html)** | Check whether a number divides by 2, 3, 4, 5, 6, 9 or 10 (plus bonus 8 and 11) using tricks instead of long division. Wrong answers are explained step by step, read aloud slowly. |
@@ -73,7 +73,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 |:-:|---|---|
 | ✏️ | [Trace with Buddy](https://pankaj2934.github.io/trace.html) | Drag a little buddy along each stroke to trace shapes, small letters, big letters and numbers. Arrows show which way to go, and 👀 shows how. |
 | 👾 | [Munchy's Letter Sounds](https://pankaj2934.github.io/phonics.html) | Learn the sound each letter makes with pictures, tracing, a hungry monster and floating bubbles. A grown-up can record the sounds in their own voice. |
-| 🕳️ | [Hungry Hole](https://pankaj2934.github.io/hole.html) | A hole.io-style game where the hole only eats the right letter, first sound, colour or shape, or numbers in the right order. |
+| 🕳️ | [Hungry Hole](https://pankaj2934.github.io/hole.html) | A hole.io-style game: eat everything in the park, and spot the right letters, first sounds, numbers, colours or shapes to grow super fast. |
 | 🎈 | [Balloon Letter Pop](https://pankaj2934.github.io/letterbaloon.html) | Find the letter shown at the top and pop its balloon. |
 | 💥 | [Missing Letter](https://pankaj2934.github.io/cannon.html) | Fill in the missing letter of a word, with read-aloud. Works offline. |
 
