@@ -18,6 +18,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 
 | | Game | What you learn |
 |:-:|---|---|
+| 📖 | **[Story Problem Quest](https://pankaj2934.github.io/division.html)** | Redesigned for Aadvik. 13 levels of word problems that get harder step by step, up to division with remainders and two-step problems. Fresh questions every day, with clues and worked steps for wrong answers. |
 | 🖐️ | **[High Five Hop](https://pankaj2934.github.io/count5.html)** | Made for Kiyansh. Count by 5s to 50 or 100: tap high-five hands, help a frog hop lily pads, fix the number train and watch the 5s light up on a counting chart. Everything is read aloud. |
 | 🔍 | **[Divisibility Detective](https://pankaj2934.github.io/divide.html)** | Check whether a number divides by 2, 3, 4, 5, 6, 9 or 10 (plus bonus 8 and 11) using tricks instead of long division. Wrong answers are explained step by step, read aloud slowly. |
 | 🧩 | **[GCF Quest](https://pankaj2934.github.io/gcf.html)** | Made for Aadvik's Kumon D200b page. Tap every factor of two numbers, spot the common factors, pop the **Greatest Common Factor** balloon, then reduce the fraction in one step. Plus a 10-question Quick Fire round. |
@@ -53,7 +54,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 
 | | Game | What you do |
 |:-:|---|---|
-| 📖 | [Math Word Problems](https://pankaj2934.github.io/division.html) | 500 story problems. They start with adding and subtracting and move on to multiplying and dividing. A wrong answer shows a picture hint. |
+| 📖 | [Story Problem Quest](https://pankaj2934.github.io/division.html) | 13 levels of story problems, from adding within 20 to regrouping, times tables, division, remainders and two-step problems. Type the answer on a number pad. A wrong answer first gives a clue with a bar-model picture, then the worked steps. New questions every day: ones already seen don't come back. |
 
 ### 🍕 Fractions and factors
 
