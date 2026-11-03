@@ -1,396 +1,600 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Math Word Problems (500)</title>
-  <style>
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#0b1020;color:#fff}
-    .wrap{max-width:900px;margin:0 auto;padding:14px}
-    .card{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:14px;margin-bottom:12px}
-    h1{margin:0 0 6px;font-size:22px}
-    .muted{color:rgba(255,255,255,.72)}
-    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .pill{padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);font-weight:800;font-size:12px}
-    .bar{height:10px;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.25);margin-top:10px}
-    .bar>div{height:100%;width:0%;background:rgba(70,230,162,.6)}
-    .q{font-size:18px;font-weight:900;line-height:1.25;margin:0}
-    .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-    @media (max-width:520px){.choices{grid-template-columns:1fr}}
-    button{min-height:52px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.10);color:#fff;font-weight:900;font-size:18px;cursor:pointer}
-    button:disabled{opacity:.55;cursor:not-allowed}
-    .actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .btn{padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.10);font-weight:900}
-    .btn.primary{border-color:rgba(70,230,162,.5);background:rgba(70,230,162,.18)}
-    .hint{white-space:pre-wrap;line-height:1.35;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px}
-    .error{display:none;background:rgba(255,107,107,.18);border:1px solid rgba(255,107,107,.55);border-radius:14px;padding:12px;font-weight:900}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Story Problem Quest: math word problems in 12 levels, from adding within 20 up to division with remainders and two-step problems. New questions every day.">
+<meta name="theme-color" content="#F3F6FC">
+<title>Story Problem Quest</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F6FC; --ink:#26304A; --muted:#626B85; --card:#FFFFFF; --line:#DCE3EF;
+  --add:#2E9D63; --sub:#E0703D; --mul:#3D7BE0; --div:#8A5CD6; --mix:#D6509A; --two:#B8860B;
+  --good:#2E9D63; --good-bg:#E1F4E9; --bad:#D04B4B; --bad-bg:#FCE6E6; --gold:#F2B630; --gold-bg:#FFF3CF;
+  --lc:#3D7BE0;
+  --r:20px; --fd:'Fredoka','Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;font-weight:700;color:var(--ink);background:var(--bg);min-height:100vh;font-size:17px;line-height:1.45}
+h1,h2,h3{font-family:var(--fd);font-weight:600;margin:0 0 .35em;line-height:1.15}
+p{margin:.4em 0}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+.wrap{max-width:720px;margin:0 auto;padding:14px 16px 48px}
+.muted{color:var(--muted)}
+.center{text-align:center}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:48px;height:48px;border-radius:14px;background:var(--gold);display:grid;place-items:center;font-size:26px;flex:none}
+h1{font-size:clamp(1.35rem,5.2vw,1.8rem);margin:0}
+.hud{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#fff;border:2px solid var(--line);border-radius:999px;padding:5px 12px;font-family:var(--fd);font-weight:600}
+button.pill:active{transform:scale(.96)}
+
+.card{background:var(--card);border-radius:var(--r);padding:18px;box-shadow:0 2px 0 var(--line),0 8px 24px rgba(38,48,74,.06);margin-bottom:16px}
+.big{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:16px;padding:13px 20px;background:var(--gold);font-family:var(--fd);font-weight:600;font-size:1.15rem;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.big:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.big.soft{background:#fff;border:2px solid var(--line);box-shadow:0 3px 0 var(--line)}
+.big.lv{background:var(--lc);color:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.c{justify-content:center}
+
+/* level map */
+.levels{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.lvl{border:0;border-radius:18px;background:#fff;padding:12px 10px 10px;text-align:left;box-shadow:0 3px 0 var(--line);border-top:6px solid var(--lc);position:relative;min-height:112px}
+.lvl:active{transform:translateY(2px)}
+.lvl .no{font-family:var(--fd);font-weight:700;color:var(--lc);font-size:.95rem}
+.lvl .ti{font-family:var(--fd);font-weight:600;font-size:1.08rem;line-height:1.15;margin:2px 0 6px}
+.lvl .em{position:absolute;top:8px;right:10px;font-size:1.4rem}
+.lvl.locked{opacity:.5;filter:grayscale(.6)}
+.lvl.done{background:var(--good-bg)}
+.meter{height:8px;border-radius:99px;background:#EEF1F7;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--lc);border-radius:99px}
+details.grown{margin-top:18px;background:#fff;border-radius:16px;padding:12px 16px;box-shadow:0 2px 0 var(--line)}
+details.grown summary{font-family:var(--fd);font-weight:600;cursor:pointer}
+
+/* play */
+.meta{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.tag{display:inline-flex;align-items:center;gap:6px;background:var(--lc);color:#fff;border-radius:999px;padding:4px 12px;font-weight:900}
+.dots{display:flex;gap:5px}
+.dots i{width:14px;height:14px;border-radius:50%;background:#EEF1F7;border:2px solid var(--line)}
+.dots i.on{background:var(--lc);border-color:var(--lc)}
+.story{font-size:clamp(1.15rem,4.6vw,1.35rem);line-height:1.5;margin:10px 0 6px}
+.story b{color:var(--lc)}
+.readbtn{border:2px solid var(--line);background:#fff;border-radius:999px;padding:4px 12px;font-family:var(--fd);font-weight:600}
+
+.hint{background:var(--gold-bg);border-radius:14px;padding:12px 14px;margin:12px 0}
+.hint .why{font-family:var(--fd);font-weight:600;margin-bottom:6px}
+
+/* bar model */
+.model{margin:8px 0 2px}
+.mlabel{text-align:center;font-family:var(--fd);font-weight:600;font-size:1rem;margin:2px 0}
+.brace{height:10px;border:2px solid var(--ink);border-bottom:0;border-radius:8px 8px 0 0;margin:0 2px 4px}
+.brace.under{border-top:0;border-bottom:2px solid var(--ink);border-radius:0 0 8px 8px;margin:4px 2px 0}
+.mbar{display:flex;height:46px;border:2.5px solid var(--ink);border-radius:10px;overflow:hidden;background:#fff}
+.seg{display:grid;place-items:center;font-family:var(--fd);font-weight:600;font-size:1.05rem;border-right:2.5px solid var(--ink);min-width:0;overflow:hidden;white-space:nowrap}
+.seg:last-child{border-right:0}
+.seg.k{background:#EAF1FD;background:color-mix(in srgb,var(--lc) 18%,white)}
+.seg.q{background:#fff;color:var(--bad)}
+.seg.dots3{background:#F4F6FA;color:var(--muted)}
+.seg.left{background:#FCE6E6}
+.mrow{display:flex;align-items:center;gap:8px;margin:6px 0}
+.mrow .nm{width:64px;flex:none;font-family:var(--fd);font-weight:600;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mrow .mbar{flex:1}
+.gap{border:2.5px dashed var(--bad);border-left:0;border-radius:0 10px 10px 0;height:46px;display:grid;place-items:center;color:var(--bad);font-family:var(--fd);font-weight:600}
+
+/* answer */
+.answer{display:flex;align-items:center;justify-content:center;gap:10px;margin:14px 0 8px}
+.abox{min-width:150px;height:62px;border:3px solid var(--lc);border-radius:16px;background:#fff;display:grid;place-items:center;font-family:var(--fd);font-weight:700;font-size:2rem;padding:0 12px}
+.abox.empty{color:#B8C0D2}
+.abox.good{border-color:var(--good);background:var(--good-bg)}
+.abox.bad{border-color:var(--bad);background:var(--bad-bg);animation:shake .4s}
+.unit{font-family:var(--fd);font-weight:600;color:var(--muted);font-size:1.1rem}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:340px;margin:0 auto}
+.key{height:58px;border:0;border-radius:14px;background:#fff;box-shadow:0 3px 0 var(--line);border:2px solid var(--line);font-family:var(--fd);font-weight:600;font-size:1.6rem}
+.key:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+.key.go{background:var(--lc);border-color:var(--lc);color:#fff}
+.key.del{font-size:1.3rem}
+
+.flash{text-align:center;font-family:var(--fd);font-weight:600;font-size:1.25rem;min-height:1.6em;margin-top:6px}
+.flash.good{color:var(--good)} .flash.bad{color:var(--bad)}
+.solution{margin-top:10px}
+.step{background:#F7F9FD;border-left:5px solid var(--lc);border-radius:10px;padding:8px 12px;margin:6px 0;font-size:1.08rem;animation:in .35s both}
+.step.ans{background:var(--good-bg);border-left-color:var(--good);font-family:var(--fd);font-weight:600}
+.step.why{background:transparent;border:0;padding:4px 2px;font-family:var(--fd);font-weight:600}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.overlay{position:fixed;inset:0;background:rgba(38,48,74,.55);display:grid;place-items:center;z-index:40;padding:16px}
+.pop{background:#fff;border-radius:24px;padding:22px;text-align:center;max-width:360px;width:100%;animation:popin .4s}
+.pop .em{font-size:4rem;line-height:1.1}
+@keyframes popin{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+.foot{text-align:center;color:var(--muted);font-size:.9rem;margin-top:16px}
+.foot a{color:var(--ink)}
+@media (max-width:420px){ .card{padding:14px} .key{height:54px} }
+@media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>Math Word Problems (500)</h1>
-      <div class="muted">Easy addition/subtraction → harder → multiplication → division. Wrong answer shows a visual hint, then you try again.</div>
-      <div class="bar"><div id="barFill"></div></div>
-      <div class="row" style="margin-top:10px">
-        <div class="pill" id="pillLevel">Level 1</div>
-        <div class="pill" id="pillOp">Addition</div>
-        <div class="pill" id="pillProg">Problem 1/500</div>
-        <div class="pill" id="pillScore">Score 0</div>
-        <div class="pill" id="pillStreak">Streak 0</div>
-      </div>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">📖</div>
+      <div><h1>Story Problem Quest</h1><div class="muted" style="font-size:.9rem">Read it, picture it, solve it</div></div>
     </div>
-
-    <div class="error" id="errorBox">Loading…</div>
-
-    <div class="card">
-      <p class="q" id="questionText">If you can read this, the page loaded. The game will appear in a moment…</p>
-      <div class="muted" id="questionMeta" style="margin-top:8px"></div>
-
-      <div class="choices" id="choices"></div>
-
-      <div class="actions">
-        <button class="btn" id="btnRestart" type="button">Restart</button>
-        <button class="btn primary" id="btnNext" type="button" disabled>Next</button>
-      </div>
+    <div class="hud">
+      <span class="pill" title="Solved first try">⭐ <span id="starTotal">0</span></span>
+      <button class="pill" id="homeBtn" hidden>🗺️ Levels</button>
     </div>
+  </header>
+  <main id="main"></main>
+  <p class="foot"><a href="./">More games</a></p>
+</div>
 
-    <div class="card">
-      <div class="hint" id="hintBox">Hint area: if you choose a wrong answer, you will see a visual explanation here.</div>
-    </div>
-  </div>
+<div class="overlay" id="overlay" hidden><div class="pop" id="popBox"></div></div>
 
 <script>
 (function(){
-  // Show any JS error clearly (so it never "spins silently")
-  var errorBox = document.getElementById("errorBox");
-  window.onerror = function(msg, src, line, col){
-    errorBox.style.display = "block";
-    errorBox.textContent = "JS Error: " + msg + " (line " + line + ")";
-    return false;
-  };
+'use strict';
 
-  function $(id){ return document.getElementById(id); }
+/* ---------- storage ---------- */
+function load(k, d){ try{ var v = localStorage.getItem('wp_' + k); return v === null ? d : JSON.parse(v); }catch(e){ return d; } }
+function save(k, v){ try{ localStorage.setItem('wp_' + k, JSON.stringify(v)); }catch(e){} }
 
-  // Simple deterministic RNG (LCG)
-  function makeRng(seed){
-    var s = seed >>> 0;
-    return function(){
-      s = (s * 1664525 + 1013904223) >>> 0;
-      return s / 4294967296;
+var NEED = 8;            // first-try answers needed to pass a level
+var SEEN_MAX = 4000;     // how many past questions we remember
+var P = { pts: load('pts', {}), stars: load('stars', 0), unlocked: load('unlocked', 1) };
+var seenList = load('seen', []), seen = {};
+seenList.forEach(function(k){ seen[k] = 1; });
+function markSeen(k){
+  if (seen[k]) return;
+  seen[k] = 1; seenList.push(k);
+  if (seenList.length > SEEN_MAX) delete seen[seenList.shift()];
+  save('seen', seenList);
+}
+
+/* ---------- helpers ---------- */
+var $ = function(id){ return document.getElementById(id); };
+function el(tag, cls, html){ var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+// crypto randomness so every day (and every visit) gets fresh numbers
+function rnd(){ try{ var a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] / 4294967296; }catch(e){ return Math.random(); } }
+function rand(a, b){ return a + Math.floor(rnd() * (b - a + 1)); }
+function pick(a){ return a[Math.floor(rnd() * a.length)]; }
+function shuffle(a){ for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+var NAMES = ['Aadvik', 'Kiyansh', 'Mia', 'Leo', 'Zara', 'Omar', 'Priya', 'Sam', 'Ivy', 'Arjun', 'Noah', 'Ana', 'Ravi', 'Lily', 'Ben', 'Sara'];
+var ITEMS = [
+  {one: 'apple', many: 'apples'}, {one: 'marble', many: 'marbles'}, {one: 'sticker', many: 'stickers'},
+  {one: 'cookie', many: 'cookies'}, {one: 'crayon', many: 'crayons'}, {one: 'card', many: 'cards'},
+  {one: 'shell', many: 'shells'}, {one: 'pencil', many: 'pencils'}, {one: 'balloon', many: 'balloons'},
+  {one: 'toy car', many: 'toy cars'}, {one: 'book', many: 'books'}, {one: 'stamp', many: 'stamps'}
+];
+function pl(n, it){ return n === 1 ? it.one : it.many; }
+function two(){ var a = shuffle(NAMES.slice()); return [a[0], a[1]]; }
+// the item counts as part of the question when the story uses it
+function tkey(k, text, it){ return text.indexOf(it.many) >= 0 || text.indexOf(' ' + it.one + ' ') >= 0 ? k + ':' + it.one : k; }
+
+/* ---------- worked steps ---------- */
+function places(n){ var s = String(n), out = []; for (var i = 0; i < s.length; i++) { var v = +s[i] * Math.pow(10, s.length - 1 - i); if (v) out.push(v); } return out; }
+function addSteps(a, b){
+  if (a + b <= 20 || a < 10 || b < 10) return [a + ' + ' + b + ' = <b>' + (a + b) + '</b>'];
+  var L = Math.max(String(a).length, String(b).length), names = ['Ones', 'Tens', 'Hundreds'], parts = [], st = [];
+  for (var p = L - 1; p >= 0; p--) {
+    var u = Math.pow(10, p), x = Math.floor(a / u) % 10 * u, y = Math.floor(b / u) % 10 * u;
+    st.push(names[p] + ': ' + x + ' + ' + y + ' = ' + (x + y)); parts.push(x + y);
+  }
+  st.push(parts.join(' + ') + ' = <b>' + (a + b) + '</b>');
+  return st;
+}
+function subSteps(a, b){
+  if (a <= 20) return [a + ' − ' + b + ' = <b>' + (a - b) + '</b>'];
+  var st = places(b).length > 1 ? ['Take away ' + b + ' in parts: ' + places(b).join(', ')] : [], cur = a;
+  places(b).forEach(function(v){ st.push(cur + ' − ' + v + ' = ' + (cur - v)); cur -= v; });
+  st[st.length - 1] = st[st.length - 1].replace(/= (\d+)$/, '= <b>$1</b>');
+  st.push('Check: ' + (a - b) + ' + ' + b + ' = ' + a + ' ✓');
+  return st;
+}
+function mulSteps(g, e){
+  var big = Math.max(g, e), small = Math.min(g, e);
+  if (big <= 10) {
+    var sk = []; for (var i = 1; i <= Math.min(small, 10); i++) sk.push(big * i);
+    return ['Count by ' + big + 's, ' + small + ' times: ' + sk.join(', '), g + ' × ' + e + ' = <b>' + g * e + '</b>'];
+  }
+  var t = Math.floor(big / 10) * 10, o = big % 10;
+  if (!o) return [t / 10 + ' × ' + small + ' = ' + t / 10 * small + ', so ' + t + ' × ' + small + ' = <b>' + g * e + '</b>'];
+  return ['Split ' + big + ' into ' + t + ' and ' + o,
+    t + ' × ' + small + ' = ' + t * small, o + ' × ' + small + ' = ' + o * small,
+    t * small + ' + ' + o * small + ' = <b>' + g * e + '</b>'];
+}
+function divSteps(t, d){
+  var q = t / d;
+  if (q <= 10) return ['Which number times ' + d + ' makes ' + t + '?', d + ' × ' + q + ' = ' + t, t + ' ÷ ' + d + ' = <b>' + q + '</b>'];
+  var k = Math.floor(t / (10 * d)) * 10, chunk = k * d, rest = t - chunk;
+  return ['Take a big chunk first: ' + d + ' × ' + k + ' = ' + chunk,
+    t + ' − ' + chunk + ' = ' + rest + ' left to share',
+    rest + ' ÷ ' + d + ' = ' + rest / d,
+    k + ' + ' + rest / d + ' = <b>' + q + '</b>', 'Check: ' + d + ' × ' + q + ' = ' + t + ' ✓'];
+}
+function remSteps(t, d){
+  var q = Math.floor(t / d), r = t % d;
+  return ['Biggest ' + d + 's fact that fits in ' + t + ': ' + d + ' × ' + q + ' = ' + d * q,
+    t + ' − ' + d * q + ' = ' + r + ' left over', t + ' ÷ ' + d + ' = ' + q + ' remainder ' + r];
+}
+
+/* ---------- story makers ----------
+   Each returns {key, text, ans, unit, why, model, steps}. key is what we
+   remember so the same question never comes back. */
+var WHY = {
+  add: 'Two amounts are put together, so we <b>add</b>.',
+  take: 'Some are taken away, so we <b>subtract</b>.',
+  cmp: '"How many more" means find the difference, so we <b>subtract</b>.',
+  miss: 'We know the total and one part. Find the missing part: <b>subtract</b>.',
+  mul: 'There are equal groups, so we <b>multiply</b>.',
+  share: 'It is shared equally, so we <b>divide</b>.',
+  group: 'We want to know how many groups fit, so we <b>divide</b>.'
+};
+function addStory(a, b){
+  var n = two(), N = n[0], M = n[1], I = pick(ITEMS);
+  var T = [
+    ['a1', N + ' has ' + a + ' ' + pl(a, I) + '. ' + M + ' gives ' + N + ' ' + b + ' more. How many ' + I.many + ' does ' + N + ' have now?', I.many],
+    ['a2', 'There are ' + a + ' people on a bus. At the next stop, ' + b + ' more people get on. How many people are on the bus now?', 'people'],
+    ['a3', N + ' read ' + a + ' pages on Monday and ' + b + ' pages on Tuesday. How many pages did ' + N + ' read in all?', 'pages'],
+    ['a4', 'A shop sold ' + a + ' ' + pl(a, I) + ' in the morning and ' + b + ' in the afternoon. How many ' + I.many + ' did it sell altogether?', I.many],
+    ['a5', N + ' scored ' + a + ' points in the first game and ' + b + ' points in the second game. What is ' + N + '\'s total score?', 'points'],
+    ['a6', 'A farm has ' + a + ' cows and ' + b + ' sheep. How many animals are there in total?', 'animals']
+  ], t = pick(T);
+  return {key: tkey(t[0] + ':' + a + '+' + b, t[1], I), text: t[1], unit: t[2], ans: a + b, why: WHY.add,
+    model: {type: 'pp', whole: '?', parts: [a, b]}, steps: addSteps(a, b)};
+}
+function subStory(a, b){
+  var n = two(), N = n[0], M = n[1], I = pick(ITEMS);
+  var T = [
+    ['s1', 'take', N + ' had ' + a + ' ' + I.many + '. ' + N + ' gave ' + b + ' to ' + M + '. How many ' + I.many + ' does ' + N + ' have left?', I.many],
+    ['s2', 'take', 'There were ' + a + ' birds in a tree. ' + b + ' flew away. How many birds are still in the tree?', 'birds'],
+    ['s3', 'cmp', N + ' has ' + a + ' ' + I.many + '. ' + M + ' has ' + b + ' ' + pl(b, I) + '. How many more ' + I.many + ' does ' + N + ' have than ' + M + '?', I.many],
+    ['s4', 'miss', N + ' needs ' + a + ' ' + I.many + ' for a party and already has ' + b + '. How many more ' + I.many + ' does ' + N + ' need?', I.many],
+    ['s5', 'miss', 'A book has ' + a + ' pages. ' + N + ' has read ' + b + ' pages. How many pages are left to read?', 'pages'],
+    ['s6', 'cmp', 'The red team scored ' + a + ' points. The blue team scored ' + b + ' points. How many more points did the red team score?', 'points']
+  ], t = pick(T);
+  var model = t[1] === 'cmp' ? {type: 'cmp', big: a, small: b, names: t[0] === 's6' ? ['Red', 'Blue'] : [N, M]} : {type: 'pp', whole: a, parts: [b, '?']};
+  return {key: tkey(t[0] + ':' + a + '-' + b, t[2], I), text: t[2], unit: t[3], ans: a - b, why: WHY[t[1]], model: model, steps: subSteps(a, b)};
+}
+function mulStory(g, e){
+  var N = two()[0], I = pick(ITEMS);
+  var T = [
+    ['m1', N + ' has ' + g + ' bags. Each bag has ' + e + ' ' + I.many + '. How many ' + I.many + ' are there in all?', I.many],
+    ['m2', 'A garden has ' + g + ' rows of flowers. There are ' + e + ' flowers in each row. How many flowers are there?', 'flowers'],
+    ['m3', 'One pack has ' + e + ' ' + I.many + '. ' + N + ' buys ' + g + ' packs. How many ' + I.many + ' does ' + N + ' get?', I.many],
+    ['m4', N + ' saves $' + e + ' every week. How much money will ' + N + ' have after ' + g + ' weeks?', 'dollars'],
+    ['m5', 'Each table has ' + e + ' chairs. How many chairs are there at ' + g + ' tables?', 'chairs'],
+    ['m6', 'A bus ticket costs $' + e + '. How much do ' + g + ' tickets cost?', 'dollars'],
+    ['m7', g + ' kids each bring ' + e + ' ' + I.many + ' to school. How many ' + I.many + ' do they bring altogether?', I.many],
+    ['m8', 'There are ' + g + ' plates with ' + e + ' grapes on each plate. How many grapes are there?', 'grapes'],
+    ['m9', N + ' practises piano for ' + e + ' minutes every day. How many minutes is that in ' + g + ' days?', 'minutes']
+  ], t = pick(T);
+  return {key: tkey(t[0] + ':' + g + 'x' + e, t[1], I), text: t[1], unit: t[2], ans: g * e, why: WHY.mul,
+    model: {type: 'eq', n: g, each: e, total: '?'}, steps: mulSteps(g, e)};
+}
+function divStory(t, d){
+  var N = two()[0], I = pick(ITEMS), q = t / d;
+  var T = [
+    ['d1', 'share', N + ' shares ' + t + ' ' + I.many + ' equally among ' + d + ' friends. How many ' + I.many + ' does each friend get?', I.many],
+    ['d2', 'share', t + ' stickers are split equally onto ' + d + ' pages of a book. How many stickers go on each page?', 'stickers'],
+    ['d3', 'share', 'A ribbon is ' + t + ' cm long. ' + N + ' cuts it into ' + d + ' equal pieces. How long is each piece?', 'cm'],
+    ['d4', 'group', t + ' kids get into teams of ' + d + '. How many teams are there?', 'teams'],
+    ['d5', 'group', t + ' ' + I.many + ' are packed into boxes. Each box holds ' + d + '. How many boxes are filled?', 'boxes'],
+    ['d6', 'group', N + ' reads ' + d + ' pages a day. How many days will it take to read ' + t + ' pages?', 'days'],
+    ['d7', 'share', t + ' grapes are put equally on ' + d + ' plates. How many grapes are on each plate?', 'grapes'],
+    ['d8', 'group', N + ' puts ' + t + ' photos in an album, ' + d + ' photos on each page. How many pages does ' + N + ' use?', 'pages'],
+    ['d9', 'share', d + ' friends earn $' + t + ' together and split it equally. How much does each friend get?', 'dollars']
+  ], s = pick(T);
+  var model = s[1] === 'share' ? {type: 'eq', n: d, each: '?', total: t} : {type: 'eq', n: '?', each: d, total: t};
+  return {key: tkey(s[0] + ':' + t + '/' + d, s[2], I), text: s[2], unit: s[3], ans: q, why: WHY[s[1]], model: model, steps: divSteps(t, d)};
+}
+function remStory(t, d){
+  var N = two()[0], I = pick(ITEMS), q = Math.floor(t / d), r = t % d;
+  var T = [
+    ['r1', N + ' shares ' + t + ' ' + I.many + ' equally among ' + d + ' friends. Each friend gets as many as possible. How many ' + I.many + ' are left over?', I.many, r,
+      'Share equally, then look at what is <b>left over</b>: the remainder.', 'The remainder is the answer: <b>' + r + '</b> left over.'],
+    ['r2', t + ' eggs are put into cartons that hold ' + d + ' eggs each. How many cartons are full?', 'cartons', q,
+      'How many full groups of ' + d + ' fit? <b>Divide</b> and ignore the leftovers.', 'Only full cartons count: <b>' + q + '</b> full, with ' + r + ' eggs left over.'],
+    ['r3', t + ' kids are going on a trip. Each van holds ' + d + ' kids. How many vans are needed so everyone can go?', 'vans', q + 1,
+      '<b>Divide</b>, but nobody can be left behind!', q + ' vans are full and ' + r + ' kid' + (r === 1 ? '' : 's') + ' still need a ride, so we need one more: <b>' + (q + 1) + '</b> vans.'],
+    ['r4', t + ' cards are dealt equally to ' + d + ' players. How many cards are left over?', 'cards', r,
+      'Deal equally, then look at what is <b>left over</b>: the remainder.', 'The remainder is the answer: <b>' + r + '</b> left over.']
+  ], s = pick(T);
+  return {key: tkey(s[0] + ':' + t + '/' + d, s[1], I), text: s[1], unit: s[2], ans: s[3], why: s[4],
+    model: {type: 'eq', n: '?', each: d, total: t, left: r}, steps: remSteps(t, d).concat([s[5]])};
+}
+function twoStory(){
+  var n = two(), N = n[0], M = n[1], I = pick(ITEMS), k = rand(1, 5), g, e, b, a, c, d, p, big;
+  if (k === 1) {
+    g = rand(3, 9); e = rand(4, 10); b = rand(2, g * e - 5);
+    return {key: 't1:' + g + 'x' + e + '-' + b, text: N + ' buys ' + g + ' packs of ' + I.many + '. Each pack has ' + e + '. Then ' + N + ' gives ' + b + ' to ' + M + '. How many ' + I.many + ' does ' + N + ' have left?', unit: I.many, ans: g * e - b,
+      why: 'Two steps: first <b>multiply</b> to find how many in all, then <b>subtract</b>.', steps: ['Step 1: ' + g + ' × ' + e + ' = ' + g * e + ' ' + I.many + ' in all', 'Step 2: ' + g * e + ' − ' + b + ' = <b>' + (g * e - b) + '</b>']};
+  }
+  if (k === 2) {
+    d = rand(2, 6); var tot = d * rand(4, 12); a = rand(Math.ceil(tot / 3), tot - 2); b = tot - a;
+    return {key: 't2:' + a + '+' + b + '/' + d, text: N + ' has ' + a + ' ' + I.many + ' and gets ' + b + ' more. Then ' + N + ' shares all of them equally among ' + d + ' friends. How many does each friend get?', unit: I.many, ans: tot / d,
+      why: 'Two steps: first <b>add</b> to find the total, then <b>divide</b> to share it.', steps: ['Step 1: ' + a + ' + ' + b + ' = ' + tot + ' ' + I.many, 'Step 2: ' + tot + ' ÷ ' + d + ' = <b>' + tot / d + '</b>']};
+  }
+  if (k === 3) {
+    p = rand(3, 12); g = rand(2, 6); big = [20, 50, 100].filter(function(x){ return x > p * g; })[0];
+    return {key: 't3:' + p + 'x' + g + '/' + big, text: 'A movie ticket costs $' + p + '. ' + N + ' buys ' + g + ' tickets and pays with a $' + big + ' bill. How much change does ' + N + ' get?', unit: 'dollars', ans: big - p * g,
+      why: 'Two steps: first <b>multiply</b> to find the cost, then <b>subtract</b> from $' + big + '.', steps: ['Step 1: ' + g + ' × $' + p + ' = $' + p * g, 'Step 2: $' + big + ' − $' + p * g + ' = <b>$' + (big - p * g) + '</b>']};
+  }
+  if (k === 4) {
+    a = rand(20, 90); b = rand(5, a - 5); c = rand(5, 40);
+    return {key: 't4:' + a + '-' + b + '+' + c, text: N + ' had $' + a + '. ' + N + ' spent $' + b + ' on a book, then earned $' + c + ' helping at home. How much money does ' + N + ' have now?', unit: 'dollars', ans: a - b + c,
+      why: 'Two steps: <b>subtract</b> what was spent, then <b>add</b> what was earned.', steps: ['Step 1: $' + a + ' − $' + b + ' = $' + (a - b), 'Step 2: $' + (a - b) + ' + $' + c + ' = <b>$' + (a - b + c) + '</b>']};
+  }
+  g = rand(3, 8); e = rand(5, 12); b = rand(2, e * g - 4);
+  return {key: 't5:' + g + 'x' + e + '-' + b, text: 'There are ' + g + ' boxes with ' + e + ' ' + I.many + ' in each box. ' + b + ' of the ' + I.many + ' get lost. How many ' + I.many + ' are still there?', unit: I.many, ans: g * e - b,
+    why: 'Two steps: first <b>multiply</b> to find how many in all, then <b>subtract</b> the lost ones.', steps: ['Step 1: ' + g + ' × ' + e + ' = ' + g * e, 'Step 2: ' + g * e + ' − ' + b + ' = <b>' + (g * e - b) + '</b>']};
+}
+
+/* ---------- the 12 levels, easy to hard ---------- */
+function addNoCarry(max){ var a, b; do { a = rand(11, max - 11); b = rand(10, max - a); } while ((a % 10) + (b % 10) >= 10); return [a, b]; }
+function subNoBorrow(){ var a, b; do { a = rand(25, 99); b = rand(11, a - 10); } while (a % 10 < b % 10); return [a, b]; }
+function addCarry(){ var a, b; do { a = rand(15, 79); b = rand(12, 99 - a); } while ((a % 10) + (b % 10) < 10); return [a, b]; }
+function subBorrow(){ var a, b; do { a = rand(31, 99); b = rand(12, a - 11); } while (a % 10 >= b % 10); return [a, b]; }
+var LEVELS = [
+  {t: 'Adding to 20', em: '➕', c: 'var(--add)', gen: function(){ var a = rand(3, 15), b = rand(2, 20 - a); return addStory(a, b); }},
+  {t: 'Taking away to 20', em: '➖', c: 'var(--sub)', gen: function(){ var a = rand(8, 20), b = rand(2, a - 2); return subStory(a, b); }},
+  {t: 'Two-digit + and −', em: '🔟', c: 'var(--add)', gen: function(){ if (rnd() < 0.5) { var x = addNoCarry(99); return addStory(x[0], x[1]); } var y = subNoBorrow(); return subStory(y[0], y[1]); }},
+  {t: 'Adding with regrouping', em: '🧺', c: 'var(--add)', gen: function(){ var x = addCarry(); return addStory(x[0], x[1]); }},
+  {t: 'Subtracting with regrouping', em: '🪣', c: 'var(--sub)', gen: function(){ var x = subBorrow(); return subStory(x[0], x[1]); }},
+  {t: 'Three-digit + and −', em: '💯', c: 'var(--sub)', gen: function(){
+      if (rnd() < 0.5) { var a = rand(105, 750), b = rand(102, 999 - a); return addStory(a, b); }
+      var c = rand(250, 999), d = rand(105, c - 60); return subStory(c, d); }},
+  {t: 'Times 2, 5 and 10', em: '✖️', c: 'var(--mul)', gen: function(){ var e = pick([2, 5, 10]), g = rand(2, 10); return rnd() < 0.5 ? mulStory(g, e) : mulStory(e, g); }},
+  {t: 'All times tables', em: '🎯', c: 'var(--mul)', gen: function(){ var g = rand(3, 10), e = rand(6, 10); return rnd() < 0.5 ? mulStory(g, e) : mulStory(e, g); }},
+  {t: 'Sharing and grouping (÷)', em: '➗', c: 'var(--div)', gen: function(){ var d = rand(2, 10), q = rand(2, 10); return divStory(d * q, d); }},
+  {t: 'Which operation?', em: '🤔', c: 'var(--mix)', gen: function(){
+      var k = rand(1, 4);
+      if (k === 1) { var x = addCarry(); return addStory(x[0], x[1]); }
+      if (k === 2) { var y = subBorrow(); return subStory(y[0], y[1]); }
+      if (k === 3) return mulStory(rand(3, 10), rand(3, 10));
+      var d = rand(3, 10); return divStory(d * rand(3, 10), d); }},
+  {t: 'Bigger × and ÷', em: '🚀', c: 'var(--div)', gen: function(){
+      if (rnd() < 0.5) return mulStory(rand(12, 49), rand(2, 9));
+      var d = rand(2, 6), q = rand(11, Math.floor(150 / d)); return divStory(d * q, d); }},
+  {t: 'Remainders', em: '🧩', c: 'var(--div)', gen: function(){ var d = rand(3, 9), q = rand(2, 12), r = rand(1, d - 1); return remStory(d * q + r, d); }},
+  {t: 'Two-step problems', em: '🏆', c: 'var(--two)', gen: twoStory}
+];
+// a fresh question: never one he has already seen, and never the same story twice in a row
+var lastTpl = '';
+function newQuestion(L){
+  var q, tries = 0;
+  do { q = LEVELS[L].gen(); tries++; } while ((seen[q.key] || q.key.split(':')[0] === lastTpl) && tries < 80);
+  lastTpl = q.key.split(':')[0];
+  return q;
+}
+
+/* ---------- read aloud ---------- */
+var synth = window.speechSynthesis, voice = null;
+function pickVoice(){ if (!synth) return; var vs = synth.getVoices().filter(function(v){ return /^en/i.test(v.lang); }); voice = vs.filter(function(v){ return /Samantha|Google US English|Aria|Jenny/i.test(v.name); })[0] || vs[0] || null; }
+if (synth) { pickVoice(); synth.onvoiceschanged = pickVoice; }
+function plain(h){ var d = document.createElement('div'); d.innerHTML = h; return d.textContent.replace(/−/g, ' minus ').replace(/×/g, ' times ').replace(/÷/g, ' divided by ').replace(/\$(\d+)/g, '$1 dollars'); }
+function speak(text){ if (!synth) return; try{ synth.cancel(); var u = new SpeechSynthesisUtterance(plain(text)); u.rate = 0.85; u.lang = 'en-US'; if (voice) u.voice = voice; synth.speak(u); }catch(e){} }
+function hush(){ if (synth) try{ synth.cancel(); }catch(e){} }
+
+/* ---------- confetti ---------- */
+var cv = $('confetti'), cx = cv.getContext('2d'), bits = [], raf = 0;
+function confetti(){
+  cv.width = innerWidth; cv.height = innerHeight;
+  var cols = ['#F2B630', '#3D7BE0', '#E0703D', '#2E9D63', '#8A5CD6', '#D6509A'];
+  for (var i = 0; i < 110; i++) bits.push({x: Math.random() * cv.width, y: -20 - Math.random() * cv.height * 0.5, vx: (Math.random() - 0.5) * 3, vy: 2 + Math.random() * 3, s: 6 + Math.random() * 6, r: Math.random() * 6, c: cols[i % cols.length]});
+  if (!raf) tick();
+}
+function tick(){
+  cx.clearRect(0, 0, cv.width, cv.height);
+  bits = bits.filter(function(p){ return p.y < cv.height + 20; });
+  bits.forEach(function(p){ p.x += p.vx; p.y += p.vy; p.r += 0.1; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); cx.restore(); });
+  raf = bits.length ? requestAnimationFrame(tick) : 0;
+  if (!raf) cx.clearRect(0, 0, cv.width, cv.height);
+}
+
+/* ---------- bar models ---------- */
+function seg(label, flex, cls){ var s = el('div', 'seg ' + (cls || ''), label); s.style.flex = flex; return s; }
+function drawModel(m){
+  var box = el('div', 'model');
+  if (m.type === 'pp') {
+    var whole = typeof m.whole === 'number' ? m.whole : m.parts[0] + m.parts[1];
+    box.appendChild(el('div', 'mlabel', m.whole === '?' ? '<span style="color:var(--bad)">? in all</span>' : m.whole + ' in all'));
+    box.appendChild(el('div', 'brace'));
+    var bar = el('div', 'mbar');
+    m.parts.forEach(function(p){
+      var v = p === '?' ? whole - m.parts[0] : p;
+      bar.appendChild(seg(p, Math.max(v / whole, 0.22), p === '?' ? 'q' : 'k'));
+    });
+    box.appendChild(bar);
+  } else if (m.type === 'cmp') {
+    var r1 = el('div', 'mrow'), r2 = el('div', 'mrow');
+    r1.appendChild(el('div', 'nm', m.names[0])); var b1 = el('div', 'mbar'); b1.appendChild(seg(m.big, 1, 'k')); r1.appendChild(b1);
+    r2.appendChild(el('div', 'nm', m.names[1]));
+    var wrap = el('div', ''); wrap.style.cssText = 'flex:1;display:flex';
+    var f = Math.max(Math.min(m.small / m.big, 0.78), 0.3);
+    var b2 = el('div', 'mbar'); b2.style.flex = f; b2.style.borderRadius = '10px 0 0 10px'; b2.appendChild(seg(m.small, 1, 'k'));
+    var g = el('div', 'gap', '?'); g.style.flex = 1 - f;
+    wrap.appendChild(b2); wrap.appendChild(g); r2.appendChild(wrap);
+    box.appendChild(r1); box.appendChild(r2);
+  } else if (m.type === 'eq') {
+    box.appendChild(el('div', 'mlabel', m.total === '?' ? '<span style="color:var(--bad)">? in all</span>' : m.total + ' in all'));
+    box.appendChild(el('div', 'brace'));
+    var bar2 = el('div', 'mbar');
+    var count = typeof m.n === 'number' ? m.n : 5, show = Math.min(count, 8);
+    for (var i = 0; i < show; i++) {
+      if (typeof m.n !== 'number' && i === show - 2) { bar2.appendChild(seg('…', 0.7, 'dots3')); continue; }
+      if (typeof m.n === 'number' && count > 8 && i === show - 2) { bar2.appendChild(seg('…', 0.7, 'dots3')); continue; }
+      bar2.appendChild(seg(m.each, 1, m.each === '?' ? 'q' : 'k'));
+    }
+    if (m.left) bar2.appendChild(seg('left', 0.6, 'left'));
+    box.appendChild(bar2);
+    box.appendChild(el('div', 'brace under'));
+    box.appendChild(el('div', 'mlabel', typeof m.n === 'number' ? m.n + ' equal groups' : '<span style="color:var(--bad)">? groups</span> of ' + m.each + (m.left ? ', some left over' : '')));
+  }
+  return box;
+}
+
+/* ---------- top bar ---------- */
+$('starTotal').textContent = P.stars;
+$('homeBtn').onclick = function(){ levelMap(); };
+function screen(isMap){ hush(); document.onkeydown = null; $('homeBtn').hidden = isMap; var m = $('main'); m.innerHTML = ''; scrollTo(0, 0); return m; }
+function pts(L){ return Math.min(NEED, P.pts[L] || 0); }
+function passed(L){ return pts(L) >= NEED; }
+
+/* =====================================================
+   LEVEL MAP
+   ===================================================== */
+function levelMap(){
+  var m = screen(true);
+  // continue at the first unlocked level not yet passed
+  var cur = P.unlocked - 1;
+  for (var k = 0; k < P.unlocked; k++) if (!passed(k)) { cur = k; break; }
+  var hi = el('div', 'card');
+  hi.innerHTML = '<h2>Hi Aadvik! 📖</h2><p>Every level is a new kind of story problem. Get <b>' + NEED + ' right on the first try</b> to unlock the next one. The questions are new every day!</p>';
+  var r = el('div', 'row'); r.style.marginTop = '10px';
+  var go = el('button', 'big', '▶ Continue: Level ' + (cur + 1)); go.onclick = function(){ play(cur); };
+  r.appendChild(go); hi.appendChild(r);
+  m.appendChild(hi);
+
+  var g = el('div', 'levels');
+  LEVELS.forEach(function(L, i){
+    var lock = i >= P.unlocked, b = el('button', 'lvl' + (lock ? ' locked' : '') + (passed(i) ? ' done' : ''));
+    b.style.setProperty('--lc', L.c);
+    b.innerHTML = '<span class="em">' + (lock ? '🔒' : passed(i) ? '✅' : L.em) + '</span><div class="no">Level ' + (i + 1) + '</div><div class="ti">' + L.t + '</div><div class="meter"><i style="width:' + (pts(i) / NEED * 100) + '%"></i></div>';
+    b.onclick = function(){ if (lock) { b.animate && b.animate([{transform: 'translateX(-5px)'}, {transform: 'translateX(5px)'}, {transform: 'none'}], 250); return; } play(i); };
+    g.appendChild(b);
+  });
+  m.appendChild(g);
+
+  var gr = el('details', 'grown');
+  gr.innerHTML = '<summary>⚙️ Grown-ups</summary><p class="muted">Questions are made fresh each time, and the last ' + SEEN_MAX + ' questions are remembered so none of them come back. ' + seenList.length + ' seen so far.</p>';
+  var rr = el('div', 'row');
+  var un = el('button', 'big soft', '🔓 Unlock all levels'); un.onclick = function(){ P.unlocked = LEVELS.length; save('unlocked', P.unlocked); levelMap(); };
+  var rs = el('button', 'big soft', '🧹 Reset progress'); rs.onclick = function(){
+    if (!confirm('Reset levels and stars? (Questions already seen stay remembered.)')) return;
+    P.pts = {}; P.stars = 0; P.unlocked = 1; save('pts', {}); save('stars', 0); save('unlocked', 1); $('starTotal').textContent = 0; levelMap(); };
+  rr.appendChild(un); rr.appendChild(rs); gr.appendChild(rr);
+  m.appendChild(gr);
+}
+
+/* =====================================================
+   PLAY A LEVEL
+   ===================================================== */
+function play(L){
+  var m = screen(false), LV = LEVELS[L];
+  var c = el('div', 'card'); c.style.setProperty('--lc', LV.c); m.appendChild(c);
+
+  function ask(){
+    hush();
+    var q = newQuestion(L), tries = 0, typed = '', done = false;
+    c.innerHTML = '';
+    var dots = '<span class="dots">' + Array.from({length: NEED}, function(_, i){ return '<i' + (i < pts(L) ? ' class="on"' : '') + '></i>'; }).join('') + '</span>';
+    c.appendChild(el('div', 'meta', '<span class="tag">' + LV.em + ' Level ' + (L + 1) + '</span>' + dots));
+    c.appendChild(el('div', 'muted', LV.t));
+    var story = el('div', 'story', q.text.replace(/(\$?\d+)/g, '<b>$1</b>'));
+    c.appendChild(story);
+    var rd = el('button', 'readbtn', '🔊 Read it to me'); rd.onclick = function(){ speak(q.text); };
+    c.appendChild(rd);
+    var hint = el('div', 'hint'); hint.hidden = true; c.appendChild(hint);
+
+    var ansRow = el('div', 'answer'), abox = el('div', 'abox empty', '?');
+    ansRow.appendChild(abox); ansRow.appendChild(el('span', 'unit', q.unit)); c.appendChild(ansRow);
+    var flash = el('div', 'flash'); c.appendChild(flash);
+    var pad = el('div', 'pad');
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', '✔'].forEach(function(k){
+      var b = el('button', 'key' + (k === '✔' ? ' go' : k === '⌫' ? ' del' : ''), k);
+      b.onclick = function(){ press(k); };
+      pad.appendChild(b);
+    });
+    c.appendChild(pad);
+    var sol = el('div', 'solution'); c.appendChild(sol);
+    var nextRow = el('div', 'row c'); nextRow.style.marginTop = '12px'; c.appendChild(nextRow);
+
+    function paint(){ abox.textContent = typed || '?'; abox.classList.toggle('empty', !typed); }
+    function press(k){
+      if (done) return;
+      if (k === '⌫') typed = typed.slice(0, -1);
+      else if (k === '✔') return check();
+      else if (typed.length < 5) typed = (typed === '0' ? '' : typed) + k;
+      abox.classList.remove('bad'); paint();
+    }
+    function check(){
+      if (!typed) return;
+      var v = parseInt(typed, 10);
+      if (v === q.ans) return right();
+      tries++;
+      abox.classList.remove('bad'); void abox.offsetWidth; abox.classList.add('bad');
+      if (tries === 1) {
+        flash.className = 'flash bad'; flash.textContent = 'Not yet! Here is a clue 👇';
+        hint.hidden = false; hint.innerHTML = '<div class="why">💡 ' + q.why + '</div>';
+        if (q.model) hint.appendChild(drawModel(q.model));
+        typed = ''; setTimeout(paint, 500);
+        hint.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+      } else {
+        done = true;
+        flash.className = 'flash bad'; flash.textContent = 'Let\'s solve it together 👇';
+        showSolution(false);
+      }
+    }
+    function right(){
+      done = true;
+      abox.classList.add('good');
+      var first = tries === 0, wasPassed = passed(L);
+      if (first) { P.pts[L] = pts(L) + 1; save('pts', P.pts); P.stars++; save('stars', P.stars); $('starTotal').textContent = P.stars; }
+      flash.className = 'flash good';
+      flash.textContent = first ? pick(['Correct! ⭐', 'Great thinking! ⭐', 'You got it! ⭐', 'Spot on! ⭐']) : 'Correct! You used the clue well 👍';
+      showSolution(true);
+      var dd = c.querySelectorAll('.dots i'); for (var i = 0; i < dd.length; i++) dd[i].classList.toggle('on', i < pts(L));
+      if (first && !wasPassed && passed(L)) {
+        if (P.unlocked < L + 2 && L + 1 < LEVELS.length) { P.unlocked = L + 2; save('unlocked', P.unlocked); }
+        setTimeout(function(){ levelUp(L); }, 900);
+      }
+    }
+    function showSolution(ok){
+      markSeen(q.key);
+      pad.hidden = true;
+      sol.innerHTML = '';
+      var lines = [{c: 'why', h: q.why}].concat(q.steps.map(function(s){ return {c: '', h: s}; }));
+      lines.push({c: 'ans', h: (ok ? '✅ ' : '👉 The answer is ') + q.ans + ' ' + q.unit + (ok ? '' : '.')});
+      lines.forEach(function(l, i){ var s = el('div', 'step ' + l.c, l.h); s.style.animationDelay = (ok ? 0 : i * 0.35) + 's'; sol.appendChild(s); });
+      if (!ok && q.model && hint.hidden) { hint.hidden = false; hint.innerHTML = ''; hint.appendChild(drawModel(q.model)); }
+      nextRow.innerHTML = '';
+      if (!ok) { var say = el('button', 'big soft', '🔊 Read the steps'); say.onclick = function(){ speak(lines.map(function(l){ return l.h; }).join('. ')); }; nextRow.appendChild(say); }
+      var nx = el('button', 'big lv', 'Next ➜'); nx.onclick = ask; nextRow.appendChild(nx);
+      setTimeout(function(){ nx.scrollIntoView({block: 'nearest', behavior: 'smooth'}); }, 300);
+    }
+    // keyboard on laptops
+    document.onkeydown = function(e){
+      if (done && e.key === 'Enter') { ask(); return; }
+      if (/^[0-9]$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') press('⌫'); else if (e.key === 'Enter') press('✔');
     };
   }
-  function pick(rng, arr){ return arr[Math.floor(rng() * arr.length)]; }
-  function shuffle(rng, arr){
-    var a = arr.slice();
-    for (var i = a.length - 1; i > 0; i--){
-      var j = Math.floor(rng() * (i + 1));
-      var t = a[i]; a[i] = a[j]; a[j] = t;
-    }
-    return a;
-  }
-  function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
+  ask();
+}
 
-  var THEMES = [
-    {e:"🍎", one:"apple", many:"apples"},
-    {e:"🍪", one:"cookie", many:"cookies"},
-    {e:"🧁", one:"cupcake", many:"cupcakes"},
-    {e:"🍬", one:"candy", many:"candies"},
-    {e:"⭐", one:"sticker", many:"stickers"},
-    {e:"🪙", one:"coin", many:"coins"}
-  ];
-  var NAMES = ["Aadvik","Kiansh","Atharv","Mia","Leo","Zoe","Noah","Ivy","Kai","Eli","Uma","Ava"];
+function levelUp(L){
+  confetti();
+  var o = $('overlay'), b = $('popBox'), last = L + 1 >= LEVELS.length;
+  b.innerHTML = '<div class="em">' + (last ? '🏆' : '🎉') + '</div><h2>Level ' + (L + 1) + ' complete!</h2><p>' + (last ? 'You beat every level. Story problem champion!' : 'Level ' + (L + 2) + ' is unlocked: <b>' + LEVELS[L + 1].t + '</b>') + '</p>';
+  var r = el('div', 'row c');
+  if (!last) { var n = el('button', 'big', '▶ Level ' + (L + 2)); n.onclick = function(){ o.hidden = true; play(L + 1); }; r.appendChild(n); }
+  var k = el('button', 'big soft', 'Keep practising'); k.onclick = function(){ o.hidden = true; };
+  r.appendChild(k); b.appendChild(r);
+  o.hidden = false;
+}
 
-  // 500 problems, staged difficulty (NO pre-generation, NO loops that can hang)
-  var STAGES = [
-    {count:200, level:1, label:"Easy +/− (≤10)"},
-    {count:170, level:2, label:"+/− (≤20)"},
-    {count:60,  level:3, label:"+/− (≤100)"},
-    {count:45,  level:4, label:"× (facts)"},
-    {count:15,  level:5, label:"× (bigger)"},
-    {count:10,  level:6, label:"÷ (sharing)"}
-  ];
-  var TOTAL = 500;
-
-  function stageForIndex(i){
-    var acc = 0;
-    for (var k=0;k<STAGES.length;k++){
-      if (i < acc + STAGES[k].count) return STAGES[k];
-      acc += STAGES[k].count;
-    }
-    return STAGES[STAGES.length-1];
-  }
-
-  function opLabel(op){
-    if (op==="add") return "Addition";
-    if (op==="sub") return "Subtraction";
-    if (op==="mul") return "Multiplication";
-    return "Division";
-  }
-
-  function generateProblem(index){
-    var st = stageForIndex(index);
-    var rng = makeRng(20260104 + index * 97);
-
-    var theme = pick(rng, THEMES);
-    var name  = pick(rng, NAMES);
-
-    // Build one problem object:
-    // {op, level, stageLabel, theme, name, a, b, ans, story}
-    if (st.level === 1){
-      var op1 = (rng() < 0.52) ? "add" : "sub";
-      if (op1 === "add"){
-        var a1 = 1 + Math.floor(rng()*9);
-        var b1 = 1 + Math.floor(rng()*(10 - a1));
-        return {op:op1, level:st.level, stageLabel:st.label, theme:theme, name:name, a:a1, b:b1, ans:a1+b1,
-          story: name + " has " + a1 + " " + (a1===1?theme.one:theme.many) + ". " + name + " gets " + b1 + " more. How many " + theme.many + " now?"
-        };
-      } else {
-        var a2 = 2 + Math.floor(rng()*9);
-        var b2 = 1 + Math.floor(rng()*(a2-1));
-        return {op:op1, level:st.level, stageLabel:st.label, theme:theme, name:name, a:a2, b:b2, ans:a2-b2,
-          story: name + " has " + a2 + " " + (a2===1?theme.one:theme.many) + ". " + name + " gives away " + b2 + ". How many " + theme.many + " are left?"
-        };
-      }
-    }
-
-    if (st.level === 2){
-      var op2 = (rng() < 0.52) ? "add" : "sub";
-      if (op2 === "add"){
-        var a3 = 1 + Math.floor(rng()*19);
-        var b3 = 1 + Math.floor(rng()*(20 - a3));
-        return {op:op2, level:st.level, stageLabel:st.label, theme:theme, name:name, a:a3, b:b3, ans:a3+b3,
-          story: name + " has " + a3 + " " + (a3===1?theme.one:theme.many) + ". " + name + " gets " + b3 + " more. How many " + theme.many + " now?"
-        };
-      } else {
-        var a4 = 2 + Math.floor(rng()*19);
-        var b4 = 1 + Math.floor(rng()*(a4-1));
-        return {op:op2, level:st.level, stageLabel:st.label, theme:theme, name:name, a:a4, b:b4, ans:a4-b4,
-          story: name + " has " + a4 + " " + (a4===1?theme.one:theme.many) + ". " + name + " gives away " + b4 + ". How many " + theme.many + " are left?"
-        };
-      }
-    }
-
-    if (st.level === 3){
-      var op3 = (rng() < 0.5) ? "add" : "sub";
-      var base = 10 * (1 + Math.floor(rng()*9)); // 10..90
-      var a5 = base + Math.floor(rng()*10);
-      if (op3 === "add"){
-        var maxB = 100 - a5;
-        var b5 = 1 + Math.floor(rng()*Math.max(1, maxB));
-        return {op:op3, level:st.level, stageLabel:st.label, theme:theme, name:name, a:a5, b:b5, ans:a5+b5,
-          story: name + " has " + a5 + " " + theme.many + ". " + name + " gets " + b5 + " more. How many " + theme.many + " now?"
-        };
-      } else {
-        var b6 = 1 + Math.floor(rng()*Math.min(a5, 35));
-        return {op:op3, level:st.level, stageLabel:st.label, theme:theme, name:name, a:a5, b:b6, ans:a5-b6,
-          story: name + " has " + a5 + " " + theme.many + ". " + name + " gives away " + b6 + ". How many " + theme.many + " are left?"
-        };
-      }
-    }
-
-    if (st.level === 4){
-      var g1 = 2 + Math.floor(rng()*4); //2..5
-      var p1 = 2 + Math.floor(rng()*9); //2..10
-      return {op:"mul", level:st.level, stageLabel:st.label, theme:theme, name:name, a:g1, b:p1, ans:g1*p1,
-        story: name + " has " + g1 + " bags. Each bag has " + p1 + " " + theme.many + ". How many " + theme.many + " in all?"
-      };
-    }
-
-    if (st.level === 5){
-      var g2 = 6 + Math.floor(rng()*5); //6..10
-      var p2 = 3 + Math.floor(rng()*10); //3..12
-      return {op:"mul", level:st.level, stageLabel:st.label, theme:theme, name:name, a:g2, b:p2, ans:g2*p2,
-        story: name + " has " + g2 + " boxes. Each box has " + p2 + " " + theme.many + ". How many " + theme.many + " in all?"
-      };
-    }
-
-    // division exact
-    var groups = 2 + Math.floor(rng()*5); //2..6
-    var each = 2 + Math.floor(rng()*9); //2..10
-    var total = groups * each;
-    return {op:"div", level:st.level, stageLabel:st.label, theme:theme, name:name, a:total, b:groups, ans:each,
-      story: name + " has " + total + " " + theme.many + ". " + name + " shares them equally with " + groups + " kids. How many does each kid get?"
-    };
-  }
-
-  function makeChoices(problem, index){
-    var correct = problem.ans;
-    var rng = makeRng(99991 + index*53 + correct*7);
-
-    var set = {};
-    set[correct] = true;
-
-    var deltas = (problem.op==="mul") ? [-6,-4,-3,-2,-1,1,2,3,4,6]
-               : (problem.op==="div") ? [-3,-2,-1,1,2,3]
-               : [-4,-3,-2,-1,1,2,3,4];
-
-    while (Object.keys(set).length < 4){
-      var d = pick(rng, deltas);
-      var v = correct + d;
-      if (v < 0) v = -v;
-      set[v] = true;
-    }
-
-    var arr = [];
-    for (var k in set) arr.push(Number(k));
-    return shuffle(rng, arr);
-  }
-
-  function repeatEmoji(e, n, max){
-    var show = Math.min(n, max);
-    var s = "";
-    for (var i=0;i<show;i++) s += e;
-    if (n > max) s += " …(+" + (n-max) + ")";
-    return s;
-  }
-
-  function visualHint(p){
-    var e = p.theme.e;
-    var max = 30;
-
-    if (p.op === "add"){
-      return "ADD = put together\n"
-        + repeatEmoji(e, p.a, max) + "  (" + p.a + ")\n"
-        + "+\n"
-        + repeatEmoji(e, p.b, max) + "  (" + p.b + ")\n"
-        + "=\n"
-        + repeatEmoji(e, p.ans, max) + "  (" + p.ans + ")";
-    }
-
-    if (p.op === "sub"){
-      var line = "";
-      var show = Math.min(p.a, max);
-      for (var i=0;i<show;i++){
-        line += (i < p.b) ? "✖" : e;
-      }
-      if (p.a > max) line += " …(+" + (p.a-max) + ")";
-      return "SUBTRACT = take away\n"
-        + line + "\n"
-        + "Cross out " + p.b + " → left " + p.ans;
-    }
-
-    if (p.op === "mul"){
-      var out = "MULTIPLY = equal groups\n";
-      var g = Math.min(p.a, 6);
-      for (var r=1;r<=g;r++){
-        out += "Group " + r + ": " + repeatEmoji(e, p.b, 12) + "\n";
-      }
-      if (p.a > 6) out += "... (more groups)\n";
-      out += "Total = " + p.ans;
-      return out;
-    }
-
-    // div
-    var out2 = "DIVIDE = share equally\n";
-    var gg = Math.min(p.b, 6);
-    for (var r2=1;r2<=gg;r2++){
-      out2 += "Kid " + r2 + ": " + repeatEmoji(e, p.ans, 12) + "\n";
-    }
-    if (p.b > 6) out2 += "... (more kids)\n";
-    out2 += "Each kid gets " + p.ans;
-    return out2;
-  }
-
-  // ---------- UI ----------
-  var pillLevel = $("pillLevel");
-  var pillOp = $("pillOp");
-  var pillProg = $("pillProg");
-  var pillScore = $("pillScore");
-  var pillStreak = $("pillStreak");
-  var barFill = $("barFill");
-
-  var questionText = $("questionText");
-  var questionMeta = $("questionMeta");
-  var choicesEl = $("choices");
-  var hintBox = $("hintBox");
-  var btnNext = $("btnNext");
-  var btnRestart = $("btnRestart");
-
-  var state = { i:0, score:0, streak:0, solved:false, p:null };
-
-  function render(){
-    state.solved = false;
-    btnNext.disabled = true;
-
-    var p = generateProblem(state.i);
-    state.p = p;
-
-    pillLevel.textContent = "Level " + p.level;
-    pillOp.textContent = opLabel(p.op);
-    pillProg.textContent = "Problem " + (state.i+1) + "/500";
-    pillScore.textContent = "Score " + state.score;
-    pillStreak.textContent = "Streak " + state.streak;
-
-    barFill.style.width = ((state.i / 500) * 100).toFixed(1) + "%";
-
-    questionText.textContent = p.story;
-    questionMeta.textContent = p.stageLabel;
-
-    hintBox.textContent = "Hint area: if you choose a wrong answer, you will see a visual explanation here.";
-
-    var choices = makeChoices(p, state.i);
-    choicesEl.innerHTML = "";
-
-    for (var c=0;c<choices.length;c++){
-      (function(val){
-        var b = document.createElement("button");
-        b.className = "choice";
-        b.type = "button";
-        b.textContent = String(val);
-        b.onclick = function(){
-          if (state.solved) return;
-
-          if (val === p.ans){
-            state.solved = true;
-            state.score += 10;
-            state.streak += 1;
-
-            // lock all
-            var btns = choicesEl.querySelectorAll("button");
-            for (var k=0;k<btns.length;k++) btns[k].disabled = true;
-
-            b.disabled = true;
-            b.style.borderColor = "rgba(70,230,162,.55)";
-            b.style.background = "rgba(70,230,162,.18)";
-
-            hintBox.textContent = "✅ Correct! " + opLabel(p.op) + " answer = " + p.ans + "\n\n" + visualHint(p);
-            btnNext.disabled = false;
-
-            pillScore.textContent = "Score " + state.score;
-            pillStreak.textContent = "Streak " + state.streak;
-            barFill.style.width = (((state.i+1) / 500) * 100).toFixed(1) + "%";
-          } else {
-            state.streak = 0;
-            pillStreak.textContent = "Streak 0";
-
-            b.disabled = true;
-            b.style.borderColor = "rgba(255,107,107,.55)";
-            b.style.background = "rgba(255,107,107,.18)";
-
-            hintBox.textContent = "❌ Not quite. Look at this visual hint, then choose again:\n\n" + visualHint(p);
-          }
-        };
-        choicesEl.appendChild(b);
-      })(choices[c]);
-    }
-  }
-
-  btnNext.onclick = function(){
-    if (!state.solved) return;
-    state.i = clamp(state.i + 1, 0, 499);
-    render();
-  };
-
-  btnRestart.onclick = function(){
-    state.i = 0; state.score = 0; state.streak = 0;
-    render();
-  };
-
-  // If we got here, JS is running
-  errorBox.style.display = "none";
-  render();
-
+levelMap();
 })();
 </script>
 </body>
