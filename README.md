@@ -7,7 +7,7 @@
 No sign-up. No ads. Nothing to install. Open a link and play.
 
 [![Play now](https://img.shields.io/badge/▶_Play_now-pankaj2934.github.io-F5B301?style=for-the-badge)](https://pankaj2934.github.io/)
-![Pages](https://img.shields.io/badge/games-19-2F80ED?style=for-the-badge)
+![Pages](https://img.shields.io/badge/games-20-2F80ED?style=for-the-badge)
 ![Works on](https://img.shields.io/badge/works_on-phone_·_tablet_·_laptop-1F9D63?style=for-the-badge)
 
 </div>
@@ -18,6 +18,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 
 | | Game | What you learn |
 |:-:|---|---|
+| 🕳️ | **[Hungry Hole](https://pankaj2934.github.io/hole.html)** | Made for Kiyansh, inspired by hole.io. Drag a hole around the park and swallow only the right things: a letter, things that start with a sound, numbers in order, counting by 5s, a colour or a shape. Wrong things bounce off with a spoken reason, and the hole grows with every right one. |
 | 📖 | **[Story Problem Quest](https://pankaj2934.github.io/division.html)** | Redesigned for Aadvik. 13 levels of word problems that get harder step by step, up to division with remainders and two-step problems. Fresh questions every day, with clues and worked steps for wrong answers. |
 | 🖐️ | **[High Five Hop](https://pankaj2934.github.io/count5.html)** | Made for Kiyansh. Count by 5s to 50 or 100: tap high-five hands, help a frog hop lily pads, fix the number train and watch the 5s light up on a counting chart. Everything is read aloud. |
 | 🔍 | **[Divisibility Detective](https://pankaj2934.github.io/divide.html)** | Check whether a number divides by 2, 3, 4, 5, 6, 9 or 10 (plus bonus 8 and 11) using tricks instead of long division. Wrong answers are explained step by step, read aloud slowly. |
@@ -72,6 +73,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 |:-:|---|---|
 | ✏️ | [Trace with Buddy](https://pankaj2934.github.io/trace.html) | Drag a little buddy along each stroke to trace shapes, small letters, big letters and numbers. Arrows show which way to go, and 👀 shows how. |
 | 👾 | [Munchy's Letter Sounds](https://pankaj2934.github.io/phonics.html) | Learn the sound each letter makes with pictures, tracing, a hungry monster and floating bubbles. A grown-up can record the sounds in their own voice. |
+| 🕳️ | [Hungry Hole](https://pankaj2934.github.io/hole.html) | A hole.io-style game where the hole only eats the right letter, first sound, colour or shape, or numbers in the right order. |
 | 🎈 | [Balloon Letter Pop](https://pankaj2934.github.io/letterbaloon.html) | Find the letter shown at the top and pop its balloon. |
 | 💥 | [Missing Letter](https://pankaj2934.github.io/cannon.html) | Fill in the missing letter of a word, with read-aloud. Works offline. |
 
@@ -93,7 +95,7 @@ No sign-up. No ads. Nothing to install. Open a link and play.
 - 🔇 **Sensory friendly.** In HCF Tricks, sound and animations start **off**. Turn them on with the buttons at the top.
 - 🗣️ **Explained out loud.** In Divisibility Detective, a wrong answer replays the trick step by step in a slow voice. Open **⚙️ Grown-ups** to set the number size, the voice speed and which rules Basket Sort uses.
 - 🧩 **Kumon friendly.** GCF Quest starts with 12 and 18, the same numbers as Kumon D200b. Type in **"My numbers"** to practise any pair up to 100.
-- ⭐ **Shared stickers.** Stars from Trace with Buddy, Munchy's Letter Sounds and High Five Hop add up to the same sticker book.
+- ⭐ **Shared stickers.** Stars from Trace with Buddy, Munchy's Letter Sounds, High Five Hop and Hungry Hole add up to the same sticker book.
 - 🎙️ **Your voice, your accent.** In Munchy's Letter Sounds, open **⚙️ Grown-ups** to pick which letters to practise and to record each letter sound yourself.
 
 ---
